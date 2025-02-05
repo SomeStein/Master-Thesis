@@ -1,0 +1,52 @@
+
+\chapter{Invariant-polytope algorithm}
+\label{ch:inv.poly}	
+
+In this chapter we bring our interest to the underlying invariant-polytope algorithm. 
+One main result about JSR computation, that every irreducable family possesses an invariant norm is increadibly strong for this we observe that there always exists an norm that is in some sense extremal.
+
+
+
+% Every irreducible family M possesses an invariant norm.
+% Definition 1 A norm ‖ · ‖ is called extremal for M if ‖Aj x‖ ≤ ̂ρ ‖x‖ for all
+% The main idea proposed in the above mentioned papers is to build an extremal norm, whose unit sphere is a polytope.
+% Definition 2 A product Π ∈ Mn is a spectrum maximizing product (s.m.p.) if  [ρ(Π)]1/n = ̂ρ(M).
+
+% To prove that Π is an s.m.p. it suffices to have an extremal norm ‖ · ‖ in Rd, for which ‖Aj‖ ≤ ρl , j = 1, . . . , m. By (2) in this case we indeed have ρl = ̂ρ. We try to build a polytope extremal norm, whose unit sphere is some polytope P . Such a polytope will also be called extremal. It is characterized by the property AjP ⊂ ρlP , j = 1, . . . , m. The polytope is constructed successively: its first vertices are the leading eigenvector v1 of Π (i.e., the eigenvector corresponding to the largest by modulo eigenvalue, which is assumed to be real for the moment), the leading eigenvectors vi of the (n − 1) cyclic permutations of Π, and the same vectors taken with minus, i.e., −vi. We call an eigenvalue λ of an operator A leading if |λ| = ρ(A).  Then we consider their images (ρl)−1Ajvi , j = 1, . . . , m and remove those are in the convex hull of the previous ones, etc., until we obtain a set of points V such that  (ρl)−1Aj V ⊂ cos (V) , j = 1, . . . , m.  By cos(V) we denote the symmetrized convex hull: cos (V) = co (V ∪ (−V)), where co (·) is the (usual) convex hull. Then the polytope P = cos(V) possesses the desired property: (ρl)−1Aj P ⊂ P , so P is an extremal polytope. This implies ̂ρ = ρl. The algorithm involves standard tools of linear programming.
+
+% Computing of the joint spectral radius: the case of real leading eigenvectors (R)
+
+% We consider an irreducible family M = {A1, . . . , Am}. For some (as large as possible) l we look over all products Π of length ≤ l and take one with the biggest value [ρ(Π)]1/n, where n is the length of the product. We denote it as Π = Adn · · · Ad1 .  Let M ̃ = {A ̃1, . . . , A ̃m} be the normalized family, where A ̃i = [ρ(Π)] −1/n Ai. For the product Π ̃ = A ̃dn · · · A ̃d1 we have ρ(Π ̃ ) = 1 which implies ̂ρ(M ̃) ≥ 1. Define, for an arbitrary nonzero vector v ∈ Rd the set  Ω(v) = ⋃  k≥0  {  Γ v | Γ ∈ M ̃k}  , (5)  (where M ̃0 = Id, the identity matrix), i.e. the set obtained by joining v to all vectors obtained by applying the products of the semigroup of M ̃ to v. The following  theorem (see [P1] and [GZ1]) relates the set Ω(v) and an extremal norm for M ̃.  Theorem 2 Let M ̃ = {A ̃1, . . . , A ̃m} be irreducible and such that ̂ρ(M ̃) ≥ 1  and let Ω(v) (for a given v 6= 0) be a bounded subset of Rd spanning Rd. Then ̂ρ(M) = 1. Furthermore the set  cos (Ω(v)) = co (Ω(v) ∪ −Ω(v)) (6)  is the unit ball of an extremal norm ‖ · ‖ for M ̃ (and for M).
+
+% The main idea of the algorithm we present is to finitely compute the set (6) whenever it is a polytope. Let us clarify this key point. We say that a bounded set P ⊂ Rd is a balanced real polytope (b.r.p.) if there exists a finite set of vectors V = {vi}1≤i≤p (with p ≥ d) such that span(V) = Rd and P = cos(V) = co(V, −V). (7)  Therefore  P=  {  z= ∑  x∈V  tx x with − qx ≤ tx ≤ qx, qx ≥ 0 ∀x ∈ V and ∑  x∈V  qx ≤ 1  } .  The set P is the unit ball of a norm ‖ · ‖P on Rd, which we call a real polytope norm.
+
+% The idea is that of computing the set Ω(v) by applying recursively the family M ̃ to a finite set of vectors (which in the beginning is simply the vector v), checking at every iteration h whether M ̃ maps the symmetrized convex hull (cos(Ωh−1(v))) of the computed set of vectors  Ωh−1(v) = ⋃  0≤k≤h−1  {  Γ v | Γ ∈ M ̃k}  ,  into itself.
+
+\begin{algorithm}
+\caption{invariant-polytope algorithm}
+\begin{algorithmic}
+
+\State V := $\{v_1, \cdots, v_M\}$
+\State $V_{\text{new}} \gets V$
+\While {$V_{\text{new}} \ne \emptyset$}
+\State $V_{\text{rem}} \gets V_{\text{new}}$
+\State $V_{\text{new}} \gets \emptyset$
+\For {$v \in V_{\text{rem}}$}
+
+\For {$A \in \mathcal{A}$}
+\If {$\lVert Av \rVert_{\text{co}_{\text{s}}(V)} \geq 1$}
+\State $V \gets V \cup Av$
+\State $V_{\text{new}} \gets V_{\text{new}} \cup Av$
+\EndIf
+\EndFor
+\EndFor
+\EndWhile \\
+\Return $\text{co}_{\text{s}}(V)$ \\
+\end{algorithmic} 
+\end{algorithm}
+
+% 2.2 The cyclic tree structure of the algorithm
+
+% Consider a combinatorial cyclic tree T defined as follows. The root is formed by a cycle B of n nodes v1, . . . , vn. They are, by definition, the nodes of zero level. For every i ≤ n an edge (all edges are directed) goes from vi to vi+1, where we set vi+1 = v1. At each node of the root m − 1 edges start to nodes of the first level. So, there are n(m − 1) different nodes on the first level. The sequel is by induction: there are n(m − 1)mk−1 nodes of the kth level, k ≥ 1, from each of them m edges (“children”) go to m different nodes of the (k + 1)st level.  Consider now an arbitrary word b = dn . . . d1 of length n ≥ 1, where each dj belongs to the alphabet {1, . . . , m}. The product of several words is their concatenation. We assume that b is irreducible, i.e., is not a power of a shorter word. To every edge of the tree T we associate a letter d as follows: the edge vivi+1 corresponds to di , i = 1, . . . , n; at each node m edges start associated to m different letters. To a given word qk . . . q1 we associate the node, which is the end of the path from v1 along the edges q1, q2, . . . , qk. For example, the empty word corresponds to v1, the word b also corresponds to v1, the word d2d1 corresponds to v3, the word d2 corresponds to either v2, if d2 = d1, or to a child of v1 from the first level, otherwise. This tree is said to be generated by the word b, or by the cycle B.  For a family of operators M ̃ = {A ̃1, . . . , A ̃m} and for some product Π ̃ = A ̃dn · · · A ̃d1 with an eigenvalue 1 we associate the cyclic tree T generated by the word dn . . . d1. The node v1 corresponds to an eigenvector with the eigenvalue 1;  to a given node v ∈ T we associate a point A ̃qk . . . A ̃q1v1, where the word qk . . . q1 corresponds to the node v1.  When we start the algorithm, we take the set B = {v1, . . . , vn} as the root of the tree. At the first step we take any node vi and consider successively its (m − 1) children from the first level. For each neighbor u = A ̃vi, where A ̃ ∈ M ̃ \ {A ̃di} we solve LP problem (8) and determine, whether u belongs to the interior of the set cos (V1), where cos(M ) = co{M, −M } is the symmetrized convex hull. If it does, then u is a “dead leaf” generating a “dead branch”: we will never come back to u, nor to nodes of the branch starting at u (so, this branch is cut off). If it does not, then u is an “alive leaf”, and we add this element u to the set V1 and to the set U1. After the first step all alive leaves of the first level form the set U1. At the second step we deal with the leaves from U1 only and obtain the next set of alive leaves of the second level U2, etc. Thus, after the kth step we have a family Uk of alive  leaves from the kth level, and a set Vk, = ∪jk=0 Uj. A node u belongs to Vk iff its level does not exceed k and it belongs to an alive branch starting from the root. The polytope Pk is the symmetrized convex hull cos (Vk). The polytope Pk−1 is extremal iff Uk = ∅, i.e., the kth step produces no alive leaves (only dead ones). This means that there are no alive paths of length k from the root. Therefore Pk = Pk−1. Otherwise, if Uk is nonempty, we make the next step and go to the (k + 1)st level: take children of each element of Uk, determine whether they are alive or dead and proceed.
+
+% Explanations and proofs
