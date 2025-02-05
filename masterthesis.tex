@@ -1,11 +1,11 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Formatvorlage für Abschlussarbeiten an der Universität Wien
-% Version 0.9 2023
-% Diese Vorlage nutzt die KOMA-Script-Klassen.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\documentclass[tikz,12pt,pagesize,twoside,DIV=12,headsepline=0.4pt]{scrbook}
+\documentclass[oneside,tikz,12pt,pagesize,twoside,DIV=12,headsepline=0.4pt]{scrbook}
 \usepackage{scrhack}
+
+% Set output directory for auxiliary files
+\makeatletter
+\def\@outputdir{build/}
+\makeatother
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Packages organized by category
@@ -26,6 +26,7 @@
 
 % Graphics and Figures
 \usepackage{graphicx}                            % For including graphics
+\graphicspath{{renders/}}  % Output PDF in the 'renders' folder
 \usepackage{tikz}                                % TikZ for diagrams
 \usetikzlibrary{calc,trees}
 \usepackage{caption}
@@ -37,6 +38,7 @@
 \usepackage{setspace}                            % Line spacing
 \usepackage[colorlinks=true, linkcolor=black, citecolor=black, urlcolor=gray]{hyperref}
 \usepackage{scrlayer-scrpage}                    % Custom headers and footers
+\let\cleardoublepage\clearpage
 \pagestyle{scrheadings}
 \automark[chapter]{chapter}
 \ohead[]{\headmark}
