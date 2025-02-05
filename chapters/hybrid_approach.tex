@@ -1,0 +1,145 @@
+
+\chapter{Hybrid approach} 
+\label{ch:hybrid}
+
+In this chapter we want to explore some possible combinations of the before mentioned algorithm schemes and then present the main result of this work, the Tree-flavored-invariant-polytope-algorithm and its termination results. 
+\newline
+In its heart the invariant-polytope algorithm tries to find a norm thats specifically optimized on the given problem, whilst the finite-tree algorithm connects growth to decompositions of products. A clear combination scheme arises naturally, where we use the optimized polytope norm to estimate the products of the finite-tree. From there we can choose a specific order or level of concurrency.
+\newline
+The most modular approach would be to first run the invariant-polytope algorithm for a couple of runs and then use the calculated norm thats specially optimized for the finite-tree algorithm. But that seems to be wasteful since valuable matrix calculations from the finite-tree algorithm could have been used for an even more optimized norm and some polytopes might have already cleared insight for the decompositions that the finite-tree algorithm tries to find. So after a bit of rethinking we managed to come up with a more concurrent algorithm that builds up norms and decompositions in every step. 
+
+
+\begin{algorithm}[h]
+    \caption{Tree-flavored-invariant-polytope-algorithm}
+    \label{alg:hybrid}
+    \begin{algorithmic}
+        \State $V := \{v_1, \cdots, v_M\}$
+        \State $V_{\text{new}} \gets V$
+        \While {$V_{\text{new}} \ne \emptyset$}
+            \State $V_{\text{rem}} \gets V_{\text{new}}$
+            \State $V_{\text{new}} \gets \emptyset$
+            \For {$v \in V_{\text{rem}}$}
+                \State $\text{Construct some } (\mathcal{A},\mathbf{G})\text{-tree } \mathbf{T}$
+                \For {$L = L'A \in \mathcal{L}(T) \text{ with } A \in \mathcal{A}$}
+                    \If {$\lVert Lv \rVert_{\text{co}_{\text{s}}(V)} \geq 1$}
+                        \State $V \gets V \cup Av$
+                        \State $V_{\text{new}} \gets V_{\text{new}} \cup Av$
+                    \EndIf
+                \EndFor
+            \EndFor
+        \EndWhile \\
+        \Return \\
+    \end{algorithmic}
+\end{algorithm}
+
+% Manually add a second caption below
+% \captionsetup{type=figure, justification=centering}
+% \caption*{Hybrid algorithm with concurrent norm and tree calculation. This is just a pseudocode as the real implementation is far more advanced and complicated and also important parts are missing like s.m.p search. [Add reference to code]}
+
+
+\section{Structure of the hybrid algorithm}
+
+We try to decompose arbitrary products $P$ from factors from $\mathcal{A}$, such that their polytope-norms are less then $p(k)$ where $k$ is the number of factrors from $P$ and $p$ is a monotone polynomial.
+This removes the invariance property of the polytope to be build up, since the norms dont have to be less than 1 but it still proofes the JSR identity because we take the weighted norms in the length of the products in the three-member-inequality ~\ref{eq:three-member}.
+\newline 
+Starting the loop of the invariant-polytope algorithm with a cycle on top that is connected via the generators factors and also the first branches represented by images from the missing $m-1$ factors from $\mathcal{A}$. Instead of only adding images under vertices from $V$ and matrices from $\mathcal{A}$ directly, from now on we try to find an $(\mathcal{A},\mathbf{G})\text{-tree}$ which is one-bounded i.e its leafage-polytope-norm is less than 1, for every $v \in V$.
+For that we generate $(\mathcal{A},\mathbf{G})\text{-tree}$ patterns in the beginning and just go through every remaining vertex and calculate the leafage-norms. From the structure of those trees we can assume that every matrix in $\mathcal{A}$ represents a node for the first branches.
+For the branches that lead to a leafage-norm less than or equal 1 we are done, for the other branches we have the choice to go deeper or just add some points to $V$ that changes the leafage-norm of those branches to less than 1. Here we decided to add the points since going deeper just would mean to consider possibly the same products but the tree generation would be more complex with options for depth-first- or breadth-first-search and even using some s.m.p and generator trickery. [might change it in the future]
+\newline
+First points that come to mind are the leafage-points itself since this is what we have tested but generators could be involved meaning there are possibly infinitely many leafage-points. So the next best thing would be the roots of the branches which are guaranteed to be a single matrix from $\mathcal{A}$. This makes tree generation easy and adds points with likely more distance to the faces of the polytope and makes the norm stronger more quickly.
+\newline
+So in principle for every $v \in V_{\text{rem}}$ take a tree from the generating pool, check the leafage-norm for every root branch, if it is larger than 1 add the point from the root branch to $V_{\text{new}}$ and $V$. After one step change $V_{\text{rem}}$ to $V_{\text{new}}$ and $V_{\text{new}}$ to the empty set and repeat this as long as new vertices have been added. We use $V$ for the polytope-norms and since new points are only being added the norms decrease over time so all 1-bounded trees stay bounded.
+\newline
+After termination the set of trees generated promise a valid decomposition for every product from $\mathcal{A}$ into chunks of norm lesser 1 and one suffix thats of norm less than $p(k)$ for some monotone polynomial like the one in the introduction. Which proofes the question if the chosen radius is maximal.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+  %every node/.style={circle, draw, inner sep=2pt},
+  edge from parent/.style={draw, -latex, dashed},
+  level distance=10mm,
+  sibling distance=23mm
+  ]
+
+% Define root nodes circle
+\node (v1) at (-1.5, 2) {$v_1$};
+\node (v2) at (1.5, 2) {$v_2$};
+\node (v3) at (0, 0) {$v_3$};
+
+% Add curved arrows between root nodes
+\draw[->, thick, rounded corners, bend left=30] (v1) to node[midway, above] {$A$} (v2);
+\draw[->, thick, rounded corners, bend left=30] (v2) to node[midway, above] {$B$} (v3);
+\draw[->, thick, rounded corners, bend left=30] (v3) to node[midway, above] {$A$} (v1);
+
+% m-1 products
+\node (v4) at (-3.5,0) {$v_4$}
+  child{node{$\{Av_4\}$}}
+  child{node{$\{Bv_4\}$}};
+\node (v5) at (4,-0.5) {$v_5$}
+  child {node {$\{ Av_7\}$}}
+  child {
+    child { 
+      child {node {$\{AG^nBv_5\}$}} 
+      child {
+        child {node {$\{ABG^nBv_5\}$}} 
+        child {node {$\{BBG^nBv_5\}$}}
+      }
+    }
+  };
+\node (v6) at (0,-1.5) {$v_6$};
+\node (v7) at (-1.7, -3.5) {$v_7$}
+  child {node {$\{ Av_7\}$}}
+  child {
+    child { 
+      child {node {$\{AG^nBv_7\}$}} 
+      child {node {$\{BG^nBv_7\}$}}
+    }
+  };
+\node (v8) at (1.7, -3.5) {}
+  child {node {$\{ ABv_6\}$}}
+  child {node {$\{ BBv_6\}$}};
+  
+
+% Add curved arrows between root nodes
+\draw[->, thick, rounded corners] (v2) to node[midway, above] {$A$} (v5);
+\draw[->, thick, rounded corners] (v1) to node[midway, above] {$B$} (v4);
+\draw[->, thick, rounded corners] (v3) to node[midway, above] {$B$} (v6);
+\draw[->, thick, rounded corners] (v6) to node[midway, above] {$A$} (v7);
+\draw[->, dashed, -latex] (v6) to node[midway, above] {$B$} (v8);
+
+\end{tikzpicture}
+\caption{Cyclic tree structure generated by the algorithm. Vertices added to $V$ (solid arrows) and finite-trees for bounding products (dashed arrows)}
+\label{fig:cyclic_tree_structure}
+\end{figure}
+
+The algorithm creates a so-called cyclic-tree structure, where the starting set $V$ is the root-cycle connected via the s.m.p theory $\Pi = ABA \implies v_2 = Av_1$ etc.
+After termination we have $(\mathcal{A},\mathbf{G})\text{-Trees }$ to our disposal which lets us create a decomposition for arbitrary products from $\mathcal{A}$ into smaller products profen to be less than 1 in the $\lVert \cdot \rVert _ {co(V)}$ norm.
+For this we use the linear combination for each vector from vertices from $V$.
+Since we take the symmetriced convex hull and the vectors lie within the polytope spanned by $V$, all the factors sum to at most 1 in absolute. 
+
+\section{Termination results}
+
+\begin{theorem}{}\label{thm:hybrid-found}
+If Algorithm~\ref{alg:hybrid} terminates then $JSR(\mathcal{A}) \leq 1$
+\end{theorem}
+
+\begin{proof}
+Suppose the algorithm terminates and creates a set $V$ of vertices then for each $v \in V$ there exists an $(\mathcal{A},\mathbf{G})\text{-Tree } \mathbf{T}_{v}$ such that $\lVert Lv \rVert_{\mathbf{co}_s (V)} \leq 1 \quad \forall L \in \mathcal{L}(\mathbf{T}_{v}).$ \\
+Taking a random product $P \in \mathcal{A}^k$ and a random $v \in \mathbf{co}_s(V)$
+we get:
+$$\lVert Pv \rVert = \lVert P \sum \lambda_i v_i \rVert \leq \sum \lambda_i \lVert P v_i \rVert \quad \text{with} \quad \sum |\lambda_i| \leq 1$$
+Now for every $i = 1 \cdots \lvert V \rvert$ there either exists a Tree-partition where $P = P'_i L_i $ with $L_i \in \mathcal{L}(T_{v_i})$ and $\lVert L_i v_i \rVert \leq 1$ or $P$ is element of a node of $T_{v_i}$ thats not a leave. If the partition exists the vector $L_iv_i$ lands within the symmetrized convex hull of $V$ and thus has a linear combination like before. \\
+$$ \lVert P v_i \rVert = \lVert P'_i (L_i v_i) \rVert \leq \sum \mu_j \lVert P'_i v_j \rVert \quad \text{with} \quad \sum |\mu_j| \leq 1 $$
+If there exists no such partition then the product is in some sense already small enough. Now a similar argument, like in [finite tree paper] can be made, that theres only finitely many nodes in every tree and the spectral radius of every factor of such a matrix-product is less then 1 so norms of such products can be bounded by a monotone increasing polynomial $p(k)$ in the amount of factors $k$. \\
+Since every product can be reduced to a product that has less factors until it lies within a according tree we eventually get:
+$$ \lVert Pv \rVert \leq \sum \limits_{i} \lambda_i \lVert P v_i \rVert \leq \sum\limits_{i_1}\sum\limits_{i_2}\lambda_{i_1,i_2} \lVert P'_{i_1} v_{i_2} \rVert \leq \cdots $$
+$$  \leq \sum \limits_{i_1,\cdots,i_k \in \sigma} \lambda_{i_1,\cdots,i_k} \lVert P'_{i_1,\cdots,i_k}v_{i_k} \rVert \leq \sum \limits_{i_1,\cdots,i_k \in \sigma} \lambda_{i_1,\cdots,i_k} p(k) \leq p(k)$$
+
+wich implies $\lVert P \rVert \leq p(k)$ thus
+
+$$\hat{\rho}(\mathcal{A}) = \lim_k \max_{P \in \mathcal{A}^k} \lVert P \rVert ^{\frac{1}{k}} \leq \lim_k \max_{P \in \mathcal{A}^k} p(k) ^{\frac{1}{k}}  = 1$$
+\end{proof}
+
+Now the question is can the hybrid algorithm bring together efficiency and wide solution space from the algorithms it originated from or does it lack generalization. 
+Lets say for a given problem $JSR(\mathcal{A})$ both invariant-polytope algorithm and hybrid algorithm estimated the same s.m.p and calculates the same cyclic root from there on the invariant polytope algorithm behaves like the hybrid approach with $\{A \in \mathcal{A}\}$ as $(\mathcal{A},\mathbf{G})\text{-trees}$ so in fact the hybrid algorithm could produce the same result under the same efficiency. In general the chosen trees will be different and also will make use of the generators so the calculated points might differ but the norms are only getting stronger and more of the proofing is being done by finding those trees so naturally it will find the solution. 
+On the other side there are plenty of problems the efficient invariant-polytope algorithm cannot solve for instance a set with multiple s.m.ps or special eigenvalue cases for this the generators should give a good new tool to overcome problems. For this we make few numerical tests with suggested problems and compare the results in the \emph{Chapter~\ref{ch:numerics}}.

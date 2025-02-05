@@ -1,0 +1,37 @@
+
+\chapter{Diskussion}
+\label{ch:diskussion}
+
+Die Diskussion schließt die Arbeit ab. Im Folgenden gebe ich noch ein Beispiel für eine Tabelle, die unter Zuhilfenahme des Paketes \texttt{booktabs} hübschere Ergebnisse liefert, als die \LaTeX-üblichen Tabellen.
+
+% Die folgende Tabelle basiert auf dem Paket {booktabs}. Sie sieht den
+% Tabellen in echten Publikationen sehr ähnlich. Jedoch sind hier senkrechte
+% Linien nicht ordentlich realisierbar (wie sie in Publikationen auch nie
+% vorkommen). Um Tabellen mit senkrechten Linien zu erzeugen, empfiehlt sich
+% weiterhin die im Kurs besprochene Lösung mit der Angabe \hline für horizontale
+% Linien, statt den hier gezeigten \toprule, \midrule und \bottomrule Befehlen.
+
+\begin{table}[ht]
+\centering
+\caption[Kurzname Tabelle]{Eine Tabelle zur Verdeutlichung von Tabellen in \LaTeX. Es handelt sich um eine hübschere Tabelle, als im Kurs besprochen, die dem Aussehen von Tabellen in echten Publikationen sehr nahe kommt.}
+\begin{tabular}{clp{6cm}}
+\addlinespace					% fügt einen kleinen Abstand hinzu
+\toprule						% Top-Linie bei einer Tabelle
+Buchstabe   &	Wort	&	Satz			\\
+\midrule						% dünnere Linie für Tabellen
+A			&	Affe	&	Der Affe sitzt auf dem Baum und traut sich nicht herunter	\\
+B			&	Biene	&	Die Biene fliegt Kreise um ihren Stock, und ihr wird dennoch nicht schwindelig \\
+K			&	Karibu	&	Das Karibu ist nicht wie du! \\
+\bottomrule						% Schlußlinie bei einer Tabelle
+\end{tabular}
+\label{tab:Buchstaben}		    % für einen Textverweis mittels \ref{tab:Buchstaben}
+\end{table}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Schlussfolgerung}
+\label{ch:schlussfolgerung}
+
+Die Conclusion sollte alles oben erarbeitete Zusammenfassen und zu einem Ergebnis bringen.
+
+Zum Testen kommt hier noch ein Literaturzitat. Wie in \cite{Dockner2010} bereits anschaulich erklärt, bietet \LaTeX\ gerade für Master- oder PhD-Arbeiten enormes Potential.

@@ -1,0 +1,112 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Formatvorlage für Abschlussarbeiten an der Universität Wien
+% Version 0.9 2023
+% Diese Vorlage nutzt die KOMA-Script-Klassen.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[tikz,12pt,pagesize,twoside,DIV=12,headsepline=0.4pt]{scrbook}
+\usepackage{scrhack}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Packages organized by category
+
+% Fonts and Encoding
+\usepackage[default,semibold,light]{sourcesanspro} % Source Sans Pro font
+\usepackage[T1]{fontenc}
+
+% Citation and References
+\usepackage[round]{natbib}                       % For (Author, Year) style
+\bibliographystyle{plainnat}                     % Plain bibliography with natbib
+
+% Mathematics and Algorithms
+\usepackage{amsmath,amsthm,amssymb}              % Math tools
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\floatname{algorithm}{Algorithm}
+
+% Graphics and Figures
+\usepackage{graphicx}                            % For including graphics
+\usepackage{tikz}                                % TikZ for diagrams
+\usetikzlibrary{calc,trees}
+\usepackage{caption}
+
+% Tables
+\usepackage{booktabs}                            % For professional tables
+
+% Layout and Formatting
+\usepackage{setspace}                            % Line spacing
+\usepackage[colorlinks=true, linkcolor=black, citecolor=black, urlcolor=gray]{hyperref}
+\usepackage{scrlayer-scrpage}                    % Custom headers and footers
+\pagestyle{scrheadings}
+\automark[chapter]{chapter}
+\ohead[]{\headmark}
+\cfoot[]{}
+\ofoot[\pagemark]{\pagemark}
+
+% Float Adjustments
+\usepackage{float}
+\setlength{\intextsep}{6pt}
+\setlength{\textfloatsep}{6pt}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Theorem-Like Environments
+\newenvironment{theorem}[2][Theorem]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{lemma}[2][Lemma]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{definition}[2][Definition]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{corollary}[2][Corollary]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Custom Commands
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+
+% Remove ending keywords in algorithms
+\algtext*{EndIf}
+\algtext*{EndFor}
+\algtext*{EndWhile}
+\algtext*{EndFunction}
+\algtext*{EndProcedure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Personal Data 
+
+\renewcommand{\title}{Termination results for hybrid approach of Joint Spectral Radius computation} % Thesis title
+\renewcommand{\author}{Aaron Pumm, BA}                        % Author name
+\newcommand{\matrikelnummer}{11921970}                        % Matriculation number
+\newcommand{\studienkennzahl}{UA 066 821}                    % Study code
+\newcommand{\studienrichtung}{Masterstudium Mathematik}       % Program
+\newcommand{\betreuerin}{Assoz. Prof. Dr. Martin Ehler}       % Supervisor
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Begin Document
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Title Page
+\include{chapters/titlepage}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Table of Contents
+\tableofcontents
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Chapters
+\include{chapters/introduction}
+\include{chapters/invariant_polytope}
+\include{chapters/finite_tree}
+\include{chapters/hybrid_approach}
+\include{chapters/numerical_testing}
+\include{chapters/conclusion}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Bibliography
+\bibliography{literature} 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% End Document
+\end{document}

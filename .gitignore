@@ -1,0 +1,35 @@
+# Ignore auxiliary LaTeX files
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.idx
+*.ilg
+*.ind
+*.lof
+*.lot
+*.nav
+*.out
+*.snm
+*.synctex.gz
+*.toc
+*.fdb_latexmk
+*.fls
+*.log
+*.vrb
+*.xdv
+
+# Ignore temporary and backup files
+*.bak
+*.sav
+*~
+*.swp
+*.swo
+.DS_Store
+
+# Ignore VS Code settings (optional)
+.vscode/
+
+# Ignore build directories
+_build/
+latex.out/
