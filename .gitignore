@@ -1,35 +1,81 @@
-# Ignore auxiliary LaTeX files
+# LaTeX temporary files
 *.aux
+*.lof
+*.log
+*.lot
+*.fls
+*.out
+*.toc
+*.fmt
+*.fot
+*.cb
+*.cb2
+.*.lb
+*.fdb_latexmk
+*.synctex
+*.synctex(busy)
+*.synctex.gz
+*.synctex.gz(busy)
+*.pdfsync
+
+# BibTeX
 *.bbl
 *.bcf
 *.blg
-*.idx
-*.ilg
-*.ind
-*.lof
-*.lot
-*.nav
-*.out
-*.snm
-*.synctex.gz
-*.toc
+*-blx.aux
+*-blx.bib
+*.run.xml
+
+# Build tool auxiliary files
 *.fdb_latexmk
-*.fls
-*.log
-*.vrb
-*.xdv
+*.synctex
+*.synctex(busy)
+*.synctex.gz
+*.synctex.gz(busy)
+*.pdfsync
 
-# Ignore temporary and backup files
-*.bak
-*.sav
-*~
-*.swp
-*.swo
-.DS_Store
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
 
-# Ignore VS Code settings (optional)
-.vscode/
+# Virtual Environment
+.venv/
+venv/
+env/
+ENV/
+.env
 
-# Ignore build directories
-_build/
-latex.out/
+# IDE specific files
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea/
+.vs/
+
+# Keep all images
+!*.png
+!*.jpg
+!*.jpeg
+!*.gif
+!*.svg
+!*.pdf

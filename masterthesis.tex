@@ -2,11 +2,6 @@
 \documentclass[oneside,tikz,12pt,pagesize,twoside,DIV=12,headsepline=0.4pt]{scrbook}
 \usepackage{scrhack}
 
-% Set output directory for auxiliary files
-\makeatletter
-\def\@outputdir{build/}
-\makeatother
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Packages organized by category
 
@@ -49,6 +44,11 @@
 \usepackage{float}
 \setlength{\intextsep}{6pt}
 \setlength{\textfloatsep}{6pt}
+
+% Set output directory for auxiliary files
+\makeatletter
+\def\@outputdir{build/}
+\makeatother
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Theorem-Like Environments
