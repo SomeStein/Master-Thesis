@@ -79,3 +79,4 @@ ENV/
 !*.gif
 !*.svg
 !*.pdf
+!/build/*.pdf
