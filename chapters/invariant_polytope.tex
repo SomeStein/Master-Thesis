@@ -3,13 +3,22 @@
 \label{ch:inv.poly}	
 
 In this chapter we bring our interest to the underlying invariant-polytope algorithm. 
-One main result about JSR computation, that every irreducable family possesses an invariant norm is increadibly strong. We observe that there always exists an norm that is in some sense extremal. That way we can build a polytope extremal norm, whose unit sphere is a polytope. This polytope is characterized by the property that the image of the polytope under the action of the family of matrices is contained in the polytope itself. This is the main idea of the invariant-polytope algorithm.
+One result about JSR computation, that every irreducable family possesses an invariant norm is helpful. We observe that there always exists an norm that is in some sense extremal. 
 
-\section{introduction}
-\label{sec:poly-intro}
+\section{Extremal norms}
+\label{sec:extremal-norms}
 
+A norm is called invariant if it is preserved under the action of the family of matrices. That is, for all $A_j \in \mathcal{A}$ and $x \in \mathbb{R}^d$ we have $\lVert A_j x \rVert = \lVert x \rVert$.
 
+\begin{theorem}
+    Every irreducible family $\mathcal{A}$ possesses an invariant norm.
+\end{theorem}
 
+\begin{definition}
+    A norm $\lVert \cdot \rVert$ is called extremal for a family of matrices $\mathcal{A}$ if $\lVert A_j x \rVert \leq \rho(\mathcal{A}) \lVert x \rVert$ for all $x \in \mathbb{R}^d$ and $A_j \in \mathcal{A}$.
+\end{definition}
+
+Every invariant norm is extremal
 
 % Every irreducible family M possesses an invariant norm.
 % Definition 1 A norm ‖ · ‖ is called extremal for M if ‖Aj x‖ ≤ ̂ρ ‖x‖ for all

@@ -1,3 +1,10 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Master Thesis 
+% Title: Termination results for hybrid approach of Joint Spectral Radius computation
+% Author: Aaron Pumm
+% Date: 2025
+% License: MIT License
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \documentclass[oneside,tikz,12pt,pagesize,twoside,DIV=12,headsepline=0.4pt]{scrbook}
 \usepackage{scrhack}
@@ -11,7 +18,7 @@
 
 % Citation and References
 \usepackage[round]{natbib}                       % For (Author, Year) style
-\bibliographystyle{plainnat}                     % Plain bibliography with natbib
+\bibliographystyle{apalike}                     % Plain bibliography with natbib
 
 % Mathematics and Algorithms
 \usepackage{amsmath,amsthm,amssymb}              % Math tools
@@ -52,14 +59,10 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Theorem-Like Environments
-\newenvironment{theorem}[2][Theorem]{\begin{trivlist}
-\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
-\newenvironment{lemma}[2][Lemma]{\begin{trivlist}
-\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
-\newenvironment{definition}[2][Definition]{\begin{trivlist}
-\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
-\newenvironment{corollary}[2][Corollary]{\begin{trivlist}
-\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newtheorem{theorem}{Theorem}[section]  % Numbering by section
+\newtheorem{lemma}[theorem]{Lemma}      % Lemma numbered the same as theorems
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{corollary}[theorem]{Corollary}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Custom Commands
@@ -98,6 +101,8 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Chapters
+%\include{chapters/danksagung}
+\include{chapters/abstract}
 \include{chapters/introduction}
 \include{chapters/invariant_polytope}
 \include{chapters/finite_tree}
@@ -107,6 +112,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Bibliography
+\nocite{*}
 \bibliography{literature} 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
