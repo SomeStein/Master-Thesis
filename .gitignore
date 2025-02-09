@@ -79,4 +79,4 @@ ENV/
 !*.gif
 !*.svg
 !*.pdf
-!/build/*.pdf
+!build/masterthesis.pdf
