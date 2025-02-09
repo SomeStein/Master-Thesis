@@ -67,7 +67,16 @@ The \emph{three-member inequality} provides essential bounds for the JSR. For an
     \max_{P \in \mathcal{A}^k} \rho(P)^{\frac{1}{k}} \leq JSR(\mathcal{A}) \leq \max_{P \in \mathcal{A}^k} \| P\|^{\frac{1}{k}},
     \label{eq:three-member}
 \end{equation}
-holds for every $k \in \mathbb{N}$ [Jungers]. This result forms a starting point for many computational approaches as the bounds are sharp in the sense that both sides converge to the JSR as $k\rightarrow \infty$ (left side in $\limsup$).
+holds for every $k \in \mathbb{N}$ \citep{jungersJointSpectralRadius2009}. This result forms a starting point for many computational approaches as the bounds are sharp in the sense that both sides converge to the JSR as $k\rightarrow \infty$ (left side in $\limsup$).
+
+\subsection*{Minimum over norms}
+The JSR can be equivalently defined as the minimum over all submultiplicative norms:
+\begin{equation}
+    JSR(\mathcal{A}) = \min_{\|\cdot\|} \max_{A \in \mathcal{A}} \|A\|.
+\end{equation}
+\begin{proof}{equivalence\\}
+
+\end{proof}
 
 \subsection*{Complexity and the Finiteness Property}
 The computation of the JSR is known to be computationally challenging, with determining its exact value classified as NP-hard. However, certain matrix sets exhibit the \emph{finiteness property}, which states that there exists a finite sequence of matrices $A_{i_1}, \dots, A_{i_k}$ such that:
