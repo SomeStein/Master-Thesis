@@ -3,34 +3,12 @@
 \label{ch:hybrid}
 
 In this chapter we want to explore some possible combinations of the before mentioned algorithm schemes and then present the main result of this work, the Tree-flavored-invariant-polytope-algorithm and its termination results. 
-\newline
+
+\begin{section}{Goal and options}
 In its heart the invariant-polytope algorithm tries to find a norm thats specifically optimized on the given problem, whilst the finite-tree algorithm connects growth to decompositions of products. A clear combination scheme arises naturally, where we use the optimized polytope norm to estimate the products of the finite-tree. From there we can choose a specific order or level of concurrency.
 \newline
 The most modular approach would be to first run the invariant-polytope algorithm for a couple of runs and then use the calculated norm thats specially optimized for the finite-tree algorithm. But that seems to be wasteful since valuable matrix calculations from the finite-tree algorithm could have been used for an even more optimized norm and some polytopes might have already cleared insight for the decompositions that the finite-tree algorithm tries to find. So after a bit of rethinking we managed to come up with a more concurrent algorithm that builds up norms and decompositions in every step. 
-
-
-\begin{algorithm}[h]
-    \caption{Tree-flavored-invariant-polytope-algorithm}
-    \label{alg:hybrid}
-    \begin{algorithmic}
-        \State $V := \{v_1, \cdots, v_M\}$
-        \State $V_{\text{new}} \gets V$
-        \While {$V_{\text{new}} \ne \emptyset$}
-            \State $V_{\text{rem}} \gets V_{\text{new}}$
-            \State $V_{\text{new}} \gets \emptyset$
-            \For {$v \in V_{\text{rem}}$}
-                \State $\text{Construct some } (\mathcal{A},\mathbf{G})\text{-tree } \mathbf{T}$
-                \For {$L = L'A \in \mathcal{L}(T) \text{ with } A \in \mathcal{A}$}
-                    \If {$\lVert Lv \rVert_{\text{co}_{\text{s}}(V)} \geq 1$}
-                        \State $V \gets V \cup Av$
-                        \State $V_{\text{new}} \gets V_{\text{new}} \cup Av$
-                    \EndIf
-                \EndFor
-            \EndFor
-        \EndWhile \\
-        \Return \\
-    \end{algorithmic}
-\end{algorithm}
+\end{section}
 
 % Manually add a second caption below
 % \captionsetup{type=figure, justification=centering}
@@ -50,7 +28,30 @@ First points that come to mind are the leafage-points itself since this is what 
 \newline
 So in principle for every $v \in V_{\text{rem}}$ take a tree from the generating pool, check the leafage-norm for every root branch, if it is larger than 1 add the point from the root branch to $V_{\text{new}}$ and $V$. After one step change $V_{\text{rem}}$ to $V_{\text{new}}$ and $V_{\text{new}}$ to the empty set and repeat this as long as new vertices have been added. We use $V$ for the polytope-norms and since new points are only being added the norms decrease over time so all 1-bounded trees stay bounded.
 \newline
-After termination the set of trees generated promise a valid decomposition for every product from $\mathcal{A}$ into chunks of norm lesser 1 and one suffix thats of norm less than $p(k)$ for some monotone polynomial like the one in the introduction. Which proofes the question if the chosen radius is maximal.
+After termination the set of trees generated promise a valid decomposition for every product from $\mathcal{A}$ into chunks of norm lesser 1 and one suffix thats of norm less than $p(k)$ for some monotone polynomial, which proofes the question if the chosen radius is maximal.
+
+\begin{algorithm}[h]
+  \caption{Tree-flavored-invariant-polytope-algorithm}
+  \label{alg:hybrid}
+  \begin{algorithmic}
+      \State $V := \{v_1, \cdots, v_M\}$
+      \State $V_{\text{new}} \gets V$
+      \While {$V_{\text{new}} \ne \emptyset$}
+          \State $V_{\text{rem}} \gets V_{\text{new}}$
+          \State $V_{\text{new}} \gets \emptyset$
+          \For {$v \in V_{\text{rem}}$}
+              \State $\text{Construct some } (\mathcal{A},\mathbf{G})\text{-tree } \mathbf{T}$
+              \For {$L = L'A \in \mathcal{L}(T) \text{ with } A \in \mathcal{A}$}
+                  \If {$\lVert Lv \rVert_{\text{co}_{\text{s}}(V)} \geq 1$}
+                      \State $V \gets V \cup Av$
+                      \State $V_{\text{new}} \gets V_{\text{new}} \cup Av$
+                  \EndIf
+              \EndFor
+          \EndFor
+      \EndWhile \\
+      \Return \\
+  \end{algorithmic}
+\end{algorithm}
 
 \begin{figure}[H]
 \centering
