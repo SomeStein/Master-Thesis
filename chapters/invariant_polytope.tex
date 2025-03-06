@@ -8,24 +8,29 @@ One result about JSR computation, that every irreducable family possesses an inv
 \section{Extremal norms}
 \label{sec:extremal-norms}
 
-A norm is called invariant if it is preserved under the action of the family of matrices. That is, for all $A_j \in \mathcal{A}$ and $x \in \mathbb{R}^d$ we have $\lVert A_j x \rVert = \lVert x \rVert$.
+\begin{definition}
+    A norm $\lVert \cdot \rVert$ is called invariant if there is a number $\lambda \geq 0$ such that 
+    $$\max\limits_{j=1,...,J}\lVert A_j x \rVert = \lambda, \quad \forall x \in \mathbb{R}^d$$
+\end{definition}
 
 \begin{theorem}
     Every irreducible family $\mathcal{A}$ possesses an invariant norm.
 \end{theorem}
 
 \begin{definition}
-    A norm $\lVert \cdot \rVert$ is called extremal for a family of matrices $\mathcal{A}$ if $\lVert A_j x \rVert \leq \rho(\mathcal{A}) \lVert x \rVert$ for all $x \in \mathbb{R}^d$ and $A_j \in \mathcal{A}$.
+    A norm $\lVert \cdot \rVert$ is called extremal for a family of matrices $\mathcal{A}$ if 
+    $$\lVert A_j x \rVert \leq \JSR(\mathcal{A}) \lVert x \rVert \forall x \in \mathbb{R}^d \text{ and } A_j \in \mathcal{A}$$
 \end{definition}
 
 Every invariant norm is extremal
 
 \section{Invariant polytope norms}
-For every polytope there exists a \emph{Minkowski norm}
+For every polytope there exists a corrisponding \emph{Minkowski norm} where the polytope is its unit ball.
 
 \section{Structure of the invariant-polytope algorithm}
-After the preprocessing is over we start with the leading eigenvector of the calculated candidate. 
-Now every product with matrices from $\mathcal{A}$ and vertices from $V$ is added if the current polytope-norm is bigger or equal to 1.
+After the preprocessing~\ref{sec:preprocessing} is over we start with the leading eigenvector of the calculated candidate as $V$. 
+Now we add new vertices to $V$ iteratively by multiplying with the matrices in $\mathcal{A}$ and checking if the polytope-norm corrisponding to $V$ of the new vertex is greater than 1.
+The algorithm terminates when no new vertices are added.
 
 \vspace{1cm}
 
@@ -60,12 +65,10 @@ Now every product with matrices from $\mathcal{A}$ and vertices from $V$ is adde
 \vspace{2cm}
 
 \section{Stopping criterions}
-The runtime of the algorithm \ref{alg:exact} is not finite. 
-Suitable conditions for stopping or recalculating a candidate have to be put in place for the algorithm to have a finite runtime. 
-Of course a bare minimum of an max iteration trigger is implemented. 
-The paper \citep{guglielmiExactComputationJoint2011} promises at least good bounds on the real JSR value while also proposing a stopping criterion thats based on eigenplanes. This criterion also generates a new candidate if the last wasnt sufficient after finite time.
-The last criterion is ... [dont remember right now].
-In the following section the needed theory from \citep{guglielmiExactComputationJoint2011} is restated. 
+The runtime of the algorithm \ref{alg:exact} is not finite in general. 
+Suitable conditions for stopping or recalculating a candidate have to be put in place. 
+Of course a bare minimum of an max iteration is implemented. 
+The paper \citep{guglielmiExactComputationJoint2013} promises at least good bounds on the real JSR value while also proposing a stopping criterion thats based on eigenplanes. This criterion also generates a new candidate if the last wasnt sufficient after finite time.
 
 \section{Termination conditions}
 The invariant-polytope algorithm is very efficient but has its caviat. It only is guaranteed to terminate in finite time if the leading eigenvector of the chosen candidate is unique and simple. 
@@ -75,7 +78,7 @@ In the following i will present the according proofs.
 Three years after publishing the fundamental algorithm, the creators released a new paper on rebalancing multiple s.m.ps as well as starting with some extra vertices so the polytope is conditioned better (not as flat).
 
 \section{Eigenvector cases}
-If the eigenvector is complex a different norm must be used a so called complex symmetric polytope norm. 
-Also in the case of nonnegative matrices a so called cone-norm is used instead of the polytope-norm since its way more efficient. 
+If the eigenvector is complex, then a different norm must be used, a so called complex balanced polytope norm. 
+Also in the case of nonnegative matrices a different norm is used. 
 
 
