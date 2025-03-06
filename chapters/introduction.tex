@@ -2,34 +2,38 @@
 \chapter{Introduction}
 \label{ch:introduction} % für einen Textverweis auf das Kapitel: \ref{ch:introduction}
 
-The \textit{Joint Spectral Radius} (JSR) was first introduced by G.-C. Rota and G. Strang in 1960 \citep{rotaNoteJointSpectral1960}. They described the JSR as the maximal exponential growth rate of a product of matrices taken from a finite set. Since its inception, the JSR has become a cornerstone in various mathematical and engineering disciplines due to its ability to encapsulate the asymptotic behavior of matrix sequences. 
+The \textit{Joint Spectral Radius} (JSR) was first introduced by G.-C. Rota and G. Strang in 1960 \citep{rotaNoteJointSpectral1960}. They described the JSR as the maximal exponential growth rate of a product of matrices taken from a finite set. Since its inception, the JSR has become a cornerstone in various mathematical and engineering disciplines due to its ability to encapsulate the asymptotic behavior of matrix long products. 
 
-The concept gained significant traction in the 1990s when researchers began exploring its theoretical properties and practical implications. Notable advancements include its application in control theory, where it is used to analyze the stability of switched linear systems \citep{blondelSurveyComputationalComplexity2000}, and in wavelet theory, where it assists in the construction of refinable functions (citep{daubechies1992ten}). The computational challenges associated with determining the JSR have inspired the development of several algorithms, such as the invariant-polytope method \citep{guglielmiExactComputationJoint2013} and the finite-tree method \citep{jungersJointSpectralRadius2009}.
+The concept gained significant traction in the 1990s when researchers began exploring its theoretical properties and practical implications. Notable advancements include its application in wavelet theory, where it assists in the construction of refinable functions (citep{daubechies1992ten}) as well as in control theory, where it is used to analyze the stability of switched linear systems \citep{blondelSurveyComputationalComplexity2000}. The computational challenges associated with determining the JSR have inspired the development of several algorithms, such as the invariant-polytope method \citep{guglielmiExactComputationJoint2013} and the finite-tree method \citep{mollerTreebasedApproachJoint2014}.
 
 Despite the progress, the JSR computation remains a challenging problem, particularly due to the exponential complexity of exploring all possible matrix products. This thesis seeks to contribute to this ongoing effort by leveraging the invariant-polytope algorithm and the finite-tree algorithm to create a hybrid methodology that mitigates their respective limitations.
 
 To fully grasp the subsequent mathematical framework, the reader should be familiar with linear algebra, specifically matrix norms, eigenvalues, and spectral radius. A basic understanding of combinatorial optimization and algorithm design will also be beneficial.
 
 \section{Motivation of the JSR}
-For some motivation i would like to point our interest to the analysis of wavelets:
+[include linear switched dynamical system example]
 
 \section*{Structure of the Thesis}
 The remainder of this thesis is structured as follows: Chapter~\ref{ch:introduction} provides a sufficient background on the JSR and its basic properties. Chapters~\ref{ch:inv.poly} and~\ref{ch:finite-tree} present the ideas and concepts of the algorithms that will be exploited to form the proposed hybrid approach, outlining their theoretical foundation and algorithmic implementation. Chapter~\ref{ch:hybrid} discusses possible combinations of former approaches, proposes the so-called Tree-flavored-invariant-polytope algorithm, and brings proofs of termination which is the main result of this thesis. \emph{Chapter~\ref{ch:numerics}} presents numerical results on ... problems to analyze the efficiency and applicability of the hybrid algorithm. Chapter~\ref{ch:conclusion} concludes with insights and future directions.
 
 \section{Theoretical background}
 
-The \emph{joint spectral radius} (JSR) of a set of matrices is a generalization of the spectral radius for a single matrix. For a finite set of matrices $\mathcal{A} = \{A_1, A_2, \dots, A_m\}$, the JSR is formally defined as:
+The \emph{joint spectral radius} (JSR) of a set of matrices is a generalization of the spectral radius for a single matrix. For a finite set of matrices $\mathcal{A} = \{A_1, A_2, \dots, A_m\}$, the JSR is defined as:
 \begin{equation}
-    JSR(\mathcal{A}) = \lim_{k \to \infty} \max_{A_i \in \mathcal{A}} \|A_{i_k} \dots A_{i_1}\|^{1/k},
+    \JSR(\mathcal{A}) = \lim_{k \to \infty} \max_{A_i \in \mathcal{A}} \|A_{i_k} \dots A_{i_1}\|^{1/k},
 \end{equation}
 where $\|\cdot\|$ denotes any submultiplicative matrix norm.
+
+\begin{theorem}
+    The JSR is well-defined and independent of the choice of the submultiplicative norm.
+\end{theorem}
 
 \begin{proof}{well-definedness\\}
 Let $\| \cdot \|_1$   and $ \| \cdot \|_2 $ be two submultiplicative norms on $ \mathbb{R}^{n \times n} $. By equivalence of norms in finite-dimensional vector spaces, there exist constants $ c, C > 0 $ such that:
 $$
 c \|P\|_1 \leq \|P\|_2 \leq C \|P\|_1 \quad \forall P \in \mathbb{R}^{n \times n}
 $$
-Now if we consider this and take asymptotic equality into account we get: 
+Now if we consider this we get: 
 $$
 \lim_{k \to \infty} \max_{A_i \in \mathcal{A}} \|A_{i_k} \dots A_{i_1}\|_{1}^{1/k} 
 $$
@@ -47,22 +51,19 @@ $$
 $$
 \end{proof}
 
-A simple application would be the categorization of the stability of linear switched dynamical systems in discrete time. 
-lets define $v_{n+1} := A_{i_n}v_{n}$ where $i_n \in \{1, \cdots , m\}$. Now the system is stable (i.e. $v_n \rightarrow 0$) exactly if $JSR(\mathcal{A}) < 1$.
-
-This hints at the more general problem of finding whether $JSR(\mathcal{A}) < 1$ which is proofen to be mathematically undecidable [Jungers] as seen in a future section. This and some other complexity results are the reason of vast research efforts in JSR analysis and numerics. 
-
 To understand the state-of-the-art algorithms considered as well as the main results that will follow, it is necessary to introduce some basic properties of the JSR.
 
 \subsection*{Homogeneity}
 For any scalar $\alpha$ and set of matrices $\mathcal{A}$, the scaling property
 \begin{equation}
-    JSR(\alpha \mathcal{A}) = |\alpha| JSR(\mathcal{A})
+    \JSR(\alpha \mathcal{A}) = |\alpha| \JSR(\mathcal{A})
 \end{equation}
 holds, which follows directly from norm homogenity. 
 
 \subsection*{Irreducibility}
-A set of matrices is called \emph{(commonly) reducible} if there exists a nontrivial subspace of $\mathbb{R}^n$ that is invariant under all matrices in the set. This means there exists a change of basis that block-triangularizes all matrices in $\mathcal{A}$ at the same time. If $\mathcal{A}$ is not reducable it is called irreducable. 
+\begin{definition}
+    A set of matrices is called \emph{(commonly) reducible} if there exists a nontrivial subspace of $\mathbb{R}^n$ that is invariant under all matrices in the set. This means there exists a change of basis that block-triangularizes all matrices in $\mathcal{A}$ at the same time. If $\mathcal{A}$ is not reducible it is called irreducible. 
+\end{definition}
 
 \subsection*{Three-member inequality}
 The \emph{three-member inequality} provides essential bounds for the JSR. For any submultiplicative matrix norm $\|\cdot\|$, the inequality
@@ -75,47 +76,49 @@ holds for every $k \in \mathbb{N}$ \citep{jungersJointSpectralRadius2009}. This 
 \subsection*{Minimum over norms}
 The JSR can be equivalently defined as the minimum over all submultiplicative norms:
 \begin{equation}
-    JSR(\mathcal{A}) = \min_{\|\cdot\|} \max_{A \in \mathcal{A}} \|A\|.
+    \JSR(\mathcal{A}) = \min_{\|\cdot\|} \max_{A \in \mathcal{A}} \|A\|.
 \end{equation}
-\begin{proof}{equivalence\\}
+\begin{proof}{blondel\\}
 
 \end{proof}
 
-\subsection*{Complexity and the Finiteness Property}
-The computation of the JSR is known to be computationally challenging, with determining its exact value classified as NP-hard. However, certain matrix sets exhibit the \emph{finiteness property}, which states that there exists a finite sequence of matrices $A_{i_1}, \dots, A_{i_k}$ such that:
+\subsection*{Finiteness Property}
+Certain matrix sets exhibit the \emph{finiteness property}, which states, that there exists a finite sequence of matrices $A_{i_1}, \dots, A_{i_k}$, such that:
 \begin{equation}
-    JSR(\mathcal{A}) = \|A_{i_k} \cdots A_{i_1}\|^{1/k}.
+    \JSR(\mathcal{A}) = \|A_{i_k} \cdots A_{i_1}\|^{1/k}.
 \end{equation}
-While this property does not hold universally, it is essential for algorithmic approaches.
+While this property does not hold universally, it is essential for algorithmic approaches and termination in most cases.
+
+\subsection*{Complexity}
 
 \subsection*{Candidates and Generators}
 Approximating the JSR requires identifying candidate products or \emph{generators} of the matrix set that contribute most significantly to the asymptotic growth rate. These generators are often derived through optimization techniques and their identification is a key step in computational algorithms.
 
 \subsection*{Similarity and reducibility}
-In the following section it is assumed that the set of interest is irreducable for some later results. If the set happens to be reducable there is an easy work-around but for that we need an intermediate result: 
-For any invertable matrix $T$ and reducable set $\mathcal{A}$
+For any invertable matrix $T$ and reducible set $\mathcal{A}$
 \begin{equation}
-   JSR(\mathcal{A}) = JSR(T^{-1}\mathcal{A}T) 
+   \JSR(\mathcal{A}) = \JSR(T^{-1}\mathcal{A}T) 
 \end{equation}
 
-holds. Now per definition there exists a change of basis such that all $A \in \mathcal{A}$ are block-triangularized: 
+holds. Per definition, there exists a change of basis such that all $A \in \mathcal{A}$ are block-triangularized: 
 $$\exists T: T^{-1}A_{i}T = 
 \begin{bmatrix}
 B_i & C_i  \\
 0 & D_i
 \end{bmatrix}
 $$
-Now 
+Now we can split the set into two sets of blocks $B_i$ and $D_i$ and the JSR can be computed as:
 \begin{equation}
-    JSR(\mathcal{A}) = \max\{JSR(\{B_i\}), JSR(\{D_i\})\}
+    \JSR(\mathcal{A}) = \max\{\JSR(\{B_i: i = 1, \cdots J \}), \JSR(\{D_i: i = 1, \cdots J \})\}
 \end{equation}
-The proof can be seen in [Jungers].
-This can be applied iteratively until the sets of blocks are all irreducable.
+The proof can be seen in \citep{jungersJointSpectralRadius2009}.
+This can be applied iteratively until the sets of blocks are all irreducible.
 The problem was split into similar problems of smaller dimension.
-For the following considerations we can now assume $\mathcal{A}$ to be irreducable.
+For the following considerations we can now assume $\mathcal{A}$ to be irreducible.
 
 \section{Preprocessing}
-This thesis aims to address the challenge of computing the JSR by combining two existing algorithms that have demonstrated practical effectiveness in calculationg the JSR for nontrivial sets of matrices. Both algorithms are based on the following simple concept: \\
+\label{sec:preprocessing}
+This thesis aims to address the challenge of computing the JSR by combining two existing algorithms that have demonstrated practical effectiveness in calculationg the JSR for nontrivial sets of matrices. Both algorithms are based on the following simple concept:
 
 We want to find the JSR of the finite set of matrices $\mathcal{A} = \{A_1, \cdots, A_n\}$
 \begin{enumerate}
@@ -126,4 +129,4 @@ We want to find the JSR of the finite set of matrices $\mathcal{A} = \{A_1, \cdo
 \end{enumerate}
 
 The considered algorithms only differ in step 4, while the invariant-polytope algorithm tries to find a norm that bounds the products of length 1 already enough. The finite tree algorithm, on the other hand, bounds the products using some partitioning-space that separates every product into products that are 1-bounded and some rest-term that doesnt grow fast enough to overcome the k-th root of the JSR definition (polynomial growth).
-By integrating these algorithms into a hybrid approach, this work aims to advance the computational tools available for JSR analysis combining efficiency and a wide solution-space of the former. Where solution space is refering to the space of matrix-sets $\mathcal{A}$ for which the algorithm finds the exact $JSR(\mathcal{A})$, not to be confused with the space of solutions like with differantial equations.
+By integrating these algorithms into a hybrid approach, this work aims to advance the computational tools available for JSR analysis combining efficiency and a vast space of matrix sets for which the algorithm terminates.

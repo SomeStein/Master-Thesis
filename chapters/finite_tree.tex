@@ -1,18 +1,18 @@
 
 \chapter{Finite-tree algorithm}
 \label{ch:finite-tree}
-In this chapter i introduce the reader to the concepts of the finite-tree algorithm. 
+In this chapter I want to introduce the finite-tree algorithm and its theoretical background. 
 
 \section{Notation and definitions}
 
 Throughout this thesis, we consider a finite set of matrices \( \mathcal{A} = \{A_1, \dots, A_J\} \) with \( A_j \in \mathbb{R}^{s \times s} \). The computation of the JSR using tree-based methods, requires a structured representation of matrix products.
 
 \subsection*{Encoding of Matrix Products}
-The set \( J^n := \{1, \dots, J\}^n \) denotes the collection of all index sequences of length \( n \). For an index sequence \( j = [j_1, \dots, j_n] \in J^n \), the corresponding matrix product is given by
+The set \( \mathcal{I}^n := \{1, \dots, J\}^n \) denotes the collection of all index sequences of length \( n \). For an index sequence \( i = [i_1, \dots, i_n] \in \mathcal{I}^n \), the corresponding matrix product is given by
 \[
-    A_j = A_{j_n} \cdots A_{j_1}.
+    A_i = A_{i_n} \cdots A_{i_1}.
 \]
-For \( n = 0 \), we define the identity matrix \( A_j = I \).
+For \( n = 0 \), we define the identity matrix \( A_i = I \).
 
 \subsection*{Definition of an finite-tree}
 \label{def:tree}
@@ -21,7 +21,6 @@ An \( (A,G) \)-tree is a structured representation of matrix products used to de
     A Tree with the following structure: 
 \begin{itemize}
     \item The root node contains the identity matrix: \( t_0 = \{I\} \).
-    \item The root node is parent of exactly \( J \) children: \( \{A_j P : P \in t\}, j = 1, \dots, J \)
     \item Each node \( t \in T \) is either:
     \begin{itemize}
         \item A leaf (i.e., it has no children),
@@ -33,32 +32,28 @@ Is called $(\mathcal{A},\mathbf{G})\text{-tree}$
 \end{definition}
 
 \subsection*{Covered Nodes}
-A node in the tree is called \textit{covered} if it is a subset of one of its ancestors in the tree. Otherwise, it is called \textit{uncovered}. The set of uncovered leaves is denoted as
+A node in the tree is called \textit{covered} if it is a subset of one of its ancestors in the tree. Otherwise, it is called \textit{uncovered}. 
+
+\begin{definition}
+    The set of uncovered leaves is denoted as
 \[
     \mathcal{L}(T) := \{ L \in t : t \text{ is an uncovered leaf of } T \}.
 \]
 and called leafage of the tree $T$.
+\end{definition}
 
 \subsection*{1-Boundedness}
-An \( (A,G) \)-tree $T$ is called \textit{1-bounded} with respect to a sub-multiplicative matrix norm \( \| \cdot \| \) if
+An \( (A,G) \)-tree $T$ is called \textit{1-bounded} with respect to a matrix norm \( \| \cdot \| \) if
 \[
     \sup_{L \in \mathcal{L}(T)} \| L \| \leq 1.
 \]
 If a stricter bound holds, i.e., \( \sup_{L \in \mathcal{L}(T)} \| L \| < 1 \), then the tree is called \emph{strictly 1-bounded}.
 
-\subsection*{Possible trees remark}
-Since we are only interested in the smallest possible tree (smallest runtime) there are some trees that can be sorted out.
-For example if we take a generator directly at the beginning of the tree, per definition for the tree to be 1-bounded also choosing $n = 0$, meaning the generator acts as identity, should yield norms less then 1. But that means the generator could have been left out and all norms are still less than 1, making it unnecessary. Also putting a generator as a leaf is unefficient: either the leaf is 1-bounded and the same argument with $n=0$ from before holds or it is covered by another node. I propose that a generator leaf can only be covered by another generator leaf. That would mean we at least have one 1-bounded generator leaf which is declared inefficient from before. 
-
-\begin{proof}
-    Let the encoding of the leaf $t_1$ node be $j = [P,g]$. $P$ stands for prefix and $g$ is the index for the used generator. For it to be covered, there must exist a node $t_2$ with the encoding $[P', g, S]$ where the prefix is different and it also is allowed to have a suffix. Since all products from $t_1$ are in $t_2$ the suffix can only be of the form $S = g^k$. Now choosing $n = 0$ for the generator of the node $t_1$, we get $P = g^k \cdot g^m \cdot P'$ for some $m \in \mathbb{N}$ but that would mean the node at $P'$ has positive and negative children, which is not allowed, forming a contradiction. 
-\end{proof}
-
 \section{Structure of the finite-tree algorithm}
-We start with the root node, the identity $t_0 = {I}$. Now we build up a tree thats of the form of \ref{alg:tree}.
-Possible methods would be breadth-first- or depth-first-search for building up the tree. 
+We start with the root node, the identity $t_0 = {I}$. Now we build up an $(\mathcal{A},\mathbf{G})\text{-tree}$.
+For that we calculate the norms of the children of current leaf-nodes and if they are bigger than 1 we add them to the tree. 
 The chosen norm in this case is arbitrary but changes the runtime dramatically. 
-If the 1-bounded tree was found, we have proven that there exists a decomposition for every product of matrices from $\mathcal{A}$.
+If the algorithm terminates a 1-bounded tree was found and by that we have proven that there exists a decomposition for every product of matrices from $\mathcal{A}$. 
 
 \vspace{1cm}
 
@@ -70,7 +65,7 @@ If the 1-bounded tree was found, we have proven that there exists a decompositio
 \vspace{1cm}
 
 \begin{theorem}
-    If the finite-tree algorithm \ref{alg:tree} terminates the $JSR(\mathcal{A})$ was found. 
+    If the finite-tree algorithm~\ref{alg:tree} terminates the $\JSR(\mathcal{A})$ was found. 
 \end{theorem}
 
 \begin{proof}
@@ -100,11 +95,10 @@ If the 1-bounded tree was found, we have proven that there exists a decompositio
 \end{theorem}
 
 \begin{proof}
-    From theorem \ref{thm:same_solution} we know that the finite-tree algorithm always terminates if the invariant-polytope algorithm does. 
-    Lets view an example for when the invariant-polytope algorithm cannot terminate due to a missing spectral-gap. But the finite-tree algorithm can find $JSR(\mathcal{A})$ nonetheless. 
+    From theorem~\ref{thm:same_solution} we know that the finite-tree algorithm always terminates if the invariant-polytope algorithm does.
+    But there exist cases where the finite-tree algorithm terminates but the ivariant-polytope algorithm does not. 
 \end{proof}
 
-\subsection*{Tree generation}
-The runtime does not only depend on the chosen norm but also on the use of the generators. 
-The idea is that the generators come closest to the maximal growth rate so using them will maximize the norm and the subsequent branches can almost only decrease the norms eventually so that the 1-boundedness can be checked earlier. 
+\section{Ussage of generators}
+In~\citep{mollerTreebasedApproachJoint2014}, the authors show that the use of generators is essential for ensuring termination in cases where the invariant-polytope algorithm fails to terminate.
 

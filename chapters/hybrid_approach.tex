@@ -2,18 +2,18 @@
 \chapter{Hybrid approach} 
 \label{ch:hybrid}
 
-In this chapter we want to explore some possible combinations of the before mentioned algorithm schemes and then present the main result of this work, the Tree-flavored-invariant-polytope-algorithm and its termination results. 
+In this chapter we want to explore some possible combinations of the before mentioned algorithm schemes and then present the main result of this work, the tree-flavored-invariant-polytope-algorithm and its termination results. 
 
 \begin{section}{Goal and options}
-In its heart the invariant-polytope algorithm tries to find a norm thats specifically optimized on the given problem, whilst the finite-tree algorithm connects growth to decompositions of products. A clear combination scheme arises naturally, where we use the optimized polytope norm to estimate the products of the finite-tree. From there we can choose a specific order or level of concurrency.
+In its heart the invariant-polytope algorithm tries to find a polytope, which corrisponding minkowski-norm is specifically optimized on the given problem, whilst the finite-tree algorithm connects growth-rate to decompositions of products. A clear combination scheme arises naturally, where we use the optimized polytope norm to estimate the products of the finite-tree. From there we can choose a specific order or level of concurrency.
 \newline
-The most modular approach would be to first run the invariant-polytope algorithm for a couple of runs and then use the calculated norm thats specially optimized for the finite-tree algorithm. But that seems to be wasteful since valuable matrix calculations from the finite-tree algorithm could have been used for an even more optimized norm and some polytopes might have already cleared insight for the decompositions that the finite-tree algorithm tries to find. So after a bit of rethinking we managed to come up with a more concurrent algorithm that builds up norms and decompositions in every step. 
+The most modular approach would be to first run the invariant-polytope algorithm for a couple of runs and then use the calculated norm thats specially optimized for the finite-tree algorithm. But that seems to be wasteful since valuable matrix calculations from the finite-tree algorithm could have been used for an even more optimized norm and some polytopes might have already cleared insight for the decompositions that the finite-tree algorithm tries to find. In \citep{mejstrikHybridApproachJoint} the authors came up with a more concurrent algorithm that builds up norms and decompositions in every step. 
 \end{section}
 
 \section{Structure of the hybrid algorithm}
 
-We try to decompose arbitrary products $P$ from factors from $\mathcal{A}$, such that their polytope-norms are less then $p(k)$ where $k$ is the number of factrors from $P$ and $p$ is a monotone polynomial.
-This removes the invariance property of the polytope to be build up, since the norms dont have to be less than 1 but it still proofes the JSR identity because we take the weighted norms in the length of the products in the three-member-inequality ~\ref{eq:three-member}.
+We try to decompose arbitrary products $P \in \mathcal{A}^k$, such that their polytope-norms are less then $p(k)$ where $p$ is a monotone polynomial.
+This removes the invariance property of the polytope to be build up, since the norms dont have to be less than 1 but it still proofes the JSR identity because we take the averaged norms in the length of the products in the three-member-inequality ~\ref{eq:three-member}.
 \newline 
 Starting the loop of the invariant-polytope algorithm with a cycle on top that is connected via the generators factors and also the first branches represented by images from the missing $J-1$ factors from $\mathcal{A}$. Instead of only adding images under vertices from $V$ and matrices from $\mathcal{A}$ directly, from now on we try to find an $(\mathcal{A},\mathbf{G})\text{-tree}$ which is one-bounded i.e its leafage-polytope-norm is less than 1, for every $v \in V$.
 For that we generate $(\mathcal{A},\mathbf{G})\text{-tree}$ patterns in the beginning and just go through every remaining vertex and calculate the leafage-norms. From the structure of those trees we can assume that every matrix in $\mathcal{A}$ represents a node for the first branches.
@@ -21,7 +21,7 @@ For the branches that lead to a leafage-norm less than or equal 1 we are done, f
 \newline
 First points that come to mind are the leafage-points itself since this is what we have tested but generators could be involved meaning there are possibly infinitely many leafage-points. So the next best thing would be the roots of the branches which are guaranteed to be a single matrix from $\mathcal{A}$. This makes tree generation easy and adds points with likely more distance to the faces of the polytope and makes the norm stronger more quickly.
 \newline
-So in principle for every $v \in V_{\text{rem}}$ take a tree from the generating pool, check the leafage-norm for every root branch, if it is larger than 1 add the point from the root branch to $V_{\text{new}}$ and $V$. After one step change $V_{\text{rem}}$ to $V_{\text{new}}$ and $V_{\text{new}}$ to the empty set and repeat this as long as new vertices have been added. We use $V$ for the polytope-norms and since new points are only being added the norms decrease over time so all 1-bounded trees stay bounded.
+So in principle for every $v \in V_{\text{rem}}$ take a tree from the generating pool, check the leafage-norm for every root branch, if it is larger than 1 add the point from the root branch to $V_{\text{new}}$ and $V$. Repeat this as long as new vertices have been added. We use $V$ for the polytope-norms and since new points are only being added the norms decrease over time so all 1-bounded trees stay bounded.
 \newline
 After termination the set of trees generated promise a valid decomposition for every product from $\mathcal{A}$ into chunks of norm lesser 1 and one suffix thats of norm less than $p(k)$ for some monotone polynomial, which proofes the question if the chosen radius is maximal.
 
@@ -39,8 +39,8 @@ After termination the set of trees generated promise a valid decomposition for e
           \For {$v \in V_{\text{rem}}$}
               \State $\text{Construct some } (\mathcal{A},\mathbf{G})\text{-tree } \mathbf{T}$
               \For {$L = L'A \in \mathcal{L}(T) \text{ with } A \in \mathcal{A}$}
-                  \If {$\lVert Lv \rVert_{\text{co}_{\text{s}}(V)} \geq 1$}
-                      \State $V \gets V \cup Av$
+                  \If {$\lVert Lv \rVert _{\text{co}_{\text{s}}(V)} \geq 1$}
+                      \State $V Av$
                       \State $V_{\text{new}} \gets V_{\text{new}} \cup Av$
                   \EndIf
               \EndFor
@@ -97,7 +97,7 @@ The following figure~\ref{fig:cyclic_tree_structure} shows an example of the gen
   \draw[-latex, thick] (v2) to node[midway, above] {$A$} (v5);
   
   % Middle with adjusted growth angle for v6 subtree
-  \node (v6) at (0,-1.5) {$v_6$}
+  \node (v6) at (-0.5,-1.5) {$v_6$}
     child[grow= -140, level distance=20mm] { 
       node (v7) {$v_7$}  
       child[grow= -140, level distance=15mm] {node {$\{ Av_7\}$}}
@@ -164,7 +164,7 @@ Now the finite-tree theory comes in and every vertex gets tested by a $(\mathcal
 
 \begin{lemma}
   \label{lem:arb.prod.bound}
-  Take an arbitrary product $P$ from factors from $\mathcal{A}$ and some $v$ from $V$, then there exists an monotone polynomial $p$ such that $\lVert Pv \rVert _V \le p(\lvert P \rvert)$.
+  There exists an monotone polynomial $p$ such that for every product $P \in \mathcal{A}^k$ and $v \in V$, $\lVert Pv \rVert _V \le p(k)$ holds.
 \end{lemma}
 
 \begin{proof}
@@ -202,38 +202,77 @@ Of course, if the candidate had a spectral radius of $1 \implies JSR(\mathcal{A}
 
 \begin{corollary}
   If the chosen trees are always $T_v = \mathcal{A}$, then we would have exactly the invariant-polytope algorithm \ref{alg:exact}. 
-  Which makes the new approach a real generalization. 
-\end{corollary}
-
-\begin{corollary}
-  If the chosen trees do not make use of generators, then the polynomial bounding would collapse to just a constant $ K = \max\limits_{v \in V}\max\limits_{P \in T_{v}}: \lVert P \rVert _{co_{s}(V)}$ that is the maximum over all polytope-norms of nodes in the generated cyclic-tree. This constant would not depend on the sizes of the products anymore.
+  Which makes the new approach a real generalization. \\
+  Also the polynomial bounding would collapse to just a constant $ K = \max\limits_{v \in V}\max\limits_{P \in T_{v}}: \lVert P \rVert _{co_{s}(V)}$ that is the maximum over all polytope-norm values of nodes in the generated cyclic-tree. This constant would not depend on the sizes of the products anymore.
 \end{corollary}
 
 \section{Efficiency}
-
-\begin{theorem}
-  The Tree-flavored-invariant-polytope algorithm has a bigger solution space than the invariant-polytope algorithm.
-\end{theorem}
-
-\begin{proof}
-  [empty]
-\end{proof}
-
-\begin{theorem}
-  The Tree-flavored-invariant-polytope algorithm is numerically faster than the finite-tree algorithm starting with an ill-conditioned norm.
-\end{theorem}
-
-It is hard to proof this but in the next Chapter \ref{ch:numerics} i will present some numerical results that support the claim.
 
 \subsection*{Remarks}
 \subsubsection*{Used trees}
 It was proofen in \citep{mollerTreebasedApproachJoint2014} that in order to have a bigger solution space then algorithm \ref{alg:exact} the use of generators is mandatory. 
 The choice of the testing-trees is not trivial and subject to active research. 
+We propose to use so-called minimal trees that fulfill every necessary and beneficial condition of the $(\mathcal{A},\mathbf{G})\text{-trees}$ but keep the amount of nodes minimal.
+
 \subsubsection*{Stopping criterions}
 Some of the stopping criterions of the invariant-polytope algorithm can still be used as the structure is very similar. 
-Just some remarks...
-\subsubsection*{Rebalancing and added starting vertices}
-Rebalancing allows for multiple s.m.p's in the invariant-polytope algorithm so it has a bigger solution space but it is still comparable to the hybrid approach due to ...
-\subsubsection*{Polytope invariance}
-Since the norms of matrices in $\mathcal{A}$ are allowed to be bigger than 1 just less than $p(1)$ it is possible the polytope is not invariant. Although this is not the main goal, as we are trying to compute $JSR(\mathcal{A})$, but if one is interested in finding an invariant polytope anyway, one has to ...
+For this the eigenplane stopping condition is implemented. 
 
+\subsubsection*{Polytope invariance}
+Since the polytope-norms of matrices in $\mathcal{A}$ are allowed to be bigger than 1 just less than $p(1)$ it is possible and very likely the polytope is not invariant.
+
+\subsection{Implementation}
+
+\begin{definition}
+  An $(\mathcal{A},\mathbf{G})\text{-tree}$ with just one generator at the root, one path from root to the covered node and all neccessarily added branches, to make it comply with definition~\ref{def:tree}, is called a \emph{minimal tree}. This tree only depends on the set $\mathcal{A}$ and the chosen generator $G$. Its denoted by $\min(G, \mathcal{A})$.
+\end{definition}
+
+\tikzset{every picture/.style={line width=0.75pt}} %set default line width to 0.75pt        
+
+\begin{figure}[!h]
+  \centering
+  \begin{tikzpicture}[x=0.75pt,y=0.75pt,yscale=-1,xscale=1]
+    %uncomment if require: \path (0,477); %set diagram left start at 0, and has height of 477
+    
+    %Straight Lines [id:da16898060564023787] 
+    \draw [line width=1.5]    (300,60) -- (300,116) ;
+    \draw [shift={(300,120)}, rotate = 270] [fill={rgb, 255:red, 0; green, 0; blue, 0 }  ][line width=0.08]  [draw opacity=0] (11.61,-5.58) -- (0,0) -- (11.61,5.58) -- cycle    ;
+    %Straight Lines [id:da06600633985452076] 
+    \draw [line width=0.75]    (300,120) -- (262.12,157.88) ;
+    \draw [shift={(260,160)}, rotate = 315] [fill={rgb, 255:red, 0; green, 0; blue, 0 }  ][line width=0.08]  [draw opacity=0] (8.93,-4.29) -- (0,0) -- (8.93,4.29) -- cycle    ;
+    %Straight Lines [id:da7450241120277035] 
+    \draw    (300,120) -- (337.88,157.88) ;
+    \draw [shift={(340,160)}, rotate = 225] [fill={rgb, 255:red, 0; green, 0; blue, 0 }  ][line width=0.08]  [draw opacity=0] (8.93,-4.29) -- (0,0) -- (8.93,4.29) -- cycle    ;
+    %Straight Lines [id:da20701336800849934] 
+    \draw [line width=0.75]    (260,160) -- (297.88,197.88) ;
+    \draw [shift={(300,200)}, rotate = 225] [fill={rgb, 255:red, 0; green, 0; blue, 0 }  ][line width=0.08]  [draw opacity=0] (8.93,-4.29) -- (0,0) -- (8.93,4.29) -- cycle    ;
+    %Straight Lines [id:da9104391839581025] 
+    \draw [line width=0.75]    (300,200) -- (262.12,237.88) ;
+    \draw [shift={(260,240)}, rotate = 315] [fill={rgb, 255:red, 0; green, 0; blue, 0 }  ][line width=0.08]  [draw opacity=0] (8.93,-4.29) -- (0,0) -- (8.93,4.29) -- cycle    ;
+    %Straight Lines [id:da14256048753952277] 
+    \draw    (260,160) -- (222.12,197.88) ;
+    \draw [shift={(220,200)}, rotate = 315] [fill={rgb, 255:red, 0; green, 0; blue, 0 }  ][line width=0.08]  [draw opacity=0] (8.93,-4.29) -- (0,0) -- (8.93,4.29) -- cycle    ;
+    %Straight Lines [id:da285744534909546] 
+    \draw    (300,200) -- (337.88,237.88) ;
+    \draw [shift={(340,240)}, rotate = 225] [fill={rgb, 255:red, 0; green, 0; blue, 0 }  ][line width=0.08]  [draw opacity=0] (8.93,-4.29) -- (0,0) -- (8.93,4.29) -- cycle    ;
+    %Shape: Square [id:dp22230762253177927] 
+    \draw   (255,235) -- (265,235) -- (265,245) -- (255,245) -- cycle ;
+    %Shape: Circle [id:dp7008956868229022] 
+    \draw   (335,240) .. controls (335,237.24) and (337.24,235) .. (340,235) .. controls (342.76,235) and (345,237.24) .. (345,240) .. controls (345,242.76) and (342.76,245) .. (340,245) .. controls (337.24,245) and (335,242.76) .. (335,240) -- cycle ;
+    %Shape: Circle [id:dp8387416622961836] 
+    \draw   (335,160) .. controls (335,157.24) and (337.24,155) .. (340,155) .. controls (342.76,155) and (345,157.24) .. (345,160) .. controls (345,162.76) and (342.76,165) .. (340,165) .. controls (337.24,165) and (335,162.76) .. (335,160) -- cycle ;
+    %Shape: Circle [id:dp030752111549602335] 
+    \draw   (215,200) .. controls (215,197.24) and (217.24,195) .. (220,195) .. controls (222.76,195) and (225,197.24) .. (225,200) .. controls (225,202.76) and (222.76,205) .. (220,205) .. controls (217.24,205) and (215,202.76) .. (215,200) -- cycle ;
+    
+    % Text Node
+    \draw (309,82.4) node [anchor=north west][inner sep=0.75pt]    {$G\ =\ ABA$};
+    % Text Node
+    \draw (264,122.4) node [anchor=north west][inner sep=0.75pt]    {$A$};
+    % Text Node
+    \draw (281,162.4) node [anchor=north west][inner sep=0.75pt]    {$B$};
+    % Text Node
+    \draw (264,202.4) node [anchor=north west][inner sep=0.75pt]    {$A$};
+    
+    \end{tikzpicture}
+    \caption{Minimal tree structure $\min(G, \mathcal{A})$ for the candidate $G = ABA$ and $\mathcal{A} = \{A,B\}$. The arrows marked with circles are uncovered-leafs, the arrow marked with a square is a covered-leaf}
+\end{figure}
