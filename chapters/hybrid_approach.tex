@@ -13,7 +13,7 @@ The most modular approach would be to first run the invariant-polytope algorithm
 \section{Structure of the hybrid algorithm}
 
 We try to decompose arbitrary products $P \in \mathcal{A}^k$, such that their polytope-norms are less then $p(k)$ where $p$ is a monotone polynomial.
-This removes the invariance property of the polytope to be build up, since the norms dont have to be less than 1 but it still proofes the JSR identity because we take the averaged norms in the length of the products in the three-member-inequality ~\ref{eq:three-member}.
+This removes the invariance property of the polytope to be build up, since the norms dont have to be less than 1 but it still proofes the JSR identity because we take the averaged norms in the length of the products in the three-member-inequality~\ref{eq:three-member}.
 \newline 
 Starting the loop of the invariant-polytope algorithm with a cycle on top that is connected via the generators factors and also the first branches represented by images from the missing $J-1$ factors from $\mathcal{A}$. Instead of only adding images under vertices from $V$ and matrices from $\mathcal{A}$ directly, from now on we try to find an $(\mathcal{A},\mathbf{G})\text{-tree}$ which is one-bounded i.e its leafage-polytope-norm is less than 1, for every $v \in V$.
 For that we generate $(\mathcal{A},\mathbf{G})\text{-tree}$ patterns in the beginning and just go through every remaining vertex and calculate the leafage-norms. From the structure of those trees we can assume that every matrix in $\mathcal{A}$ represents a node for the first branches.
@@ -39,8 +39,8 @@ After termination the set of trees generated promise a valid decomposition for e
           \For {$v \in V_{\text{rem}}$}
               \State $\text{Construct some } (\mathcal{A},\mathbf{G})\text{-tree } \mathbf{T}$
               \If {$\exists L \in \mathcal{L}(T) \text{ with } \lVert Lv \rVert _{\text{co}_{\text{s}}(V)} \geq 1$}
-                  \State $V \gets V \cup \mathcal{A}v$
-                  \State $V_{\text{new}} \gets V_{\text{new}} \cup \mathcal{A}v$
+                  \State $V \xleftarrow{\cup}\mathcal{A} v$
+                  \State $V_{\text{new}} \xleftarrow{\cup} \mathcal{A}v$
               \EndIf  
           \EndFor
       \EndWhile \\
@@ -114,7 +114,7 @@ The following figure~\ref{fig:cyclic_tree_structure} shows an example of the gen
   \draw[-latex, thick, rounded corners] (v3) to node[right, pos=0.5] {$B$} (v6);
   
   % Override the edge from v6 to v7 with longer length and consistent arrow style
-  \draw[-latex, thick] (v6) -- ($(v6)!0.78!(v7)$);
+  %\draw[-latex, thick] (v6) -- ($(v6)!0.78!(v7)$);
   \node[above] at ($(v6)!0.5!(v7)$) {$A$};
   \node[above] at ($(v6)!0.6!(v6-2)$) {$B$};
   
@@ -129,7 +129,7 @@ Now the finite-tree theory comes in and every vertex gets tested by a $(\mathcal
 
 \begin{lemma}
   \label{lem:poly}
-  For every $(\mathcal{A},\mathbf{G})\text{-tree } T$ there exists a polynomial $p$ such that for every node $N \in T$ and every product $P \in \mathcal{A}^k$ encoded by $N$, $\lVert P \rVert _V \le p(k)$ holds.
+  For every $(\mathcal{A},\mathbf{G})\text{-tree } T$ there exists a polynomial $p$ such that for every node $N \in T$ and every product $P \in \mathcal{A}^k$ encoded by $N$, $\lVert P \rVert _{\text{co}_{\text{s}}(V)} \le p(k)$ holds.
 \end{lemma}
 
 \begin{proof}
@@ -148,76 +148,52 @@ Now the finite-tree theory comes in and every vertex gets tested by a $(\mathcal
   Now we have: 
   $$
   \begin{aligned}
-  \lVert P \rVert _V & = \lVert A_{i_n}^{e_{n}} \cdots A_{i_1}^{e_{1}} \rVert _V \\
-  & \leq \lVert A_{i_n}^{e_{n}} \rVert _V \cdots \lVert A_{i_1}^{e_{1}} \rVert _V \\
+  \lVert P \rVert _{\text{co}_{\text{s}}(V)} & = \lVert A_{i_n}^{e_{n}} \cdots A_{i_1}^{e_{1}} \rVert _{\text{co}_{\text{s}}(V)} \\
+  & \leq \lVert A_{i_n}^{e_{n}} \rVert _{\text{co}_{\text{s}}(V)} \cdots \lVert A_{i_1}^{e_{1}} \rVert _{\text{co}_{\text{s}}(V)} \\
   & \leq p_{n}(e_n) \cdots p_{1}(e_1) \\
   & \leq p_{n}(\lvert P \rvert) \cdots p_{1}(\lvert P \rvert) \\
   & = p_N(\lvert P \rvert) \leq p(\lvert P \rvert) \\
   \end{aligned}
   $$
-  Since the node $N$ was chosen arbitrary this concludes the proof. 
+  Since the node $N$ and the product $P$ were chosen arbitrary, this concludes the proof. 
 \end{proof}
 
 \begin{lemma}
   \label{lem:arb.prod.bound}
-  If algorithm~\ref{alg:hybrid} terminates there exists an monotone polynomial $p$ such that for every product $P \in \mathcal{A}^k$ and $v \in V$, $\lVert Pv \rVert _V \le p(k)$ holds.
+  If algorithm~\ref{alg:hybrid} terminates there exists an monotone polynomial $p$ such that for every product $P \in \mathcal{A}^k$ and $v \in V$, $\lVert Pv \rVert _{\text{co}_{\text{s}}(V)} \le p(k)$ holds.
 \end{lemma}
 
 \begin{proof}
-If the algorithm terminates, then the set of vertices $V$ is finite and for each $v \in V$ there exists an $(\mathcal{A},\mathbf{G})\text{-tree } T_v$ such that $\lVert Lv \rVert _V \leq 1$ for every $L \in \mathcal{L}(T_v)$. According to Lemma~\ref{lem:poly}, there exists a polynomial $p_v$ such that for every product $P \in \mathcal{A}^k$ encoded by $T_v$, $\lVert Pv \rVert _V \leq p_v(k)$.
+If the algorithm terminates, then the set of vertices $V = \{ v_1, \cdots, v_m \}$ is finite and for each $v \in V$ there exists an $(\mathcal{A},\mathbf{G})\text{-tree } T_v$ such that $\lVert Lv \rVert _{\text{co}_{\text{s}}(V)} \leq 1$ for every $L \in \mathcal{L}(T_v)$, which means there exists $\lambda_1, \cdots, \lambda_m$ such that $Lv = \sum \lambda_j v_j$ with $ \sum |\lambda_j| \leq 1 $. According to Lemma~\ref{lem:poly}, there exists a polynomial $p_v$ such that for every product $P \in \mathcal{A}^k$ encoded by $T_v$, $\lVert Pv \rVert _{\text{co}_{\text{s}}(V)} \leq p_v(k)$.
 Take an arbitrary product $P \in \mathcal{A}^k$ and $v \in V$.
 Define: 
 $$
 \begin{aligned}
-p & := \sum \limits_{v \in V} p_v \\
-P'_{i_1 \dots i_k} L_{i_1 \dots i_k} & = P'_{i_1 \dots i_{k-1}}\\
- \text{with} \quad L_{i_1 \dots i_k} & \in  \mathcal{L}(T_{v_{i_{k-1}}}) \\
+  p & := \sum \limits_{v \in V} p_v \\
+  P' L & := P \text{ with } L  \in  \mathcal{L}(T_v) \text{ if } P \notin T_v \text{ and } L  := I \text{ else}\\
+  P'_{i_1 \dots i_r} L_{i_1 \dots i_r} & := P'_{i_1 \dots i_{r-1}} \text{ with } L_{i_1 \dots i_r} \in  \mathcal{L}(T_{v_{i_{r-1}}}) \text{ if } P'_{i_1 \dots i_{r-1}} \notin T_{v_{i_{r-1}}}\\
+  \text{ and } L_{i_1 \dots i_r} & := I \text{ else.} \\
+  \text{Where } i_j \in \mathcal{I} & := \{1, \cdots, m \}\\
 \end{aligned}
 $$
-\[
-\|Pv\|_V = \| P'_i v \|_V \leq \| P'_i \| \| v \|_V
-\]
-
-\[
-\| v \|_V \leq 1
-\]
-
-\[
-= \sum_{i_1} \lambda_{i_1} \| P'_{i_1} v_{i_1} \|_V
-\]
-
-\[
-\leq \sum_{i_1} \lambda_{i_1} \| P'_{i_1} \| \| v_{i_1} \|_V
-\]
-
-\[
-\leq \sum_{i_1} \sum_{i_2} \lambda_{i_1} \lambda_{i_2} \| P'_{i_1 i_2} v_{i_1 i_2} \|_V
-\]
-
-\[
-\leq \sum_{i_1} \sum_{i_2} \lambda_{i_1} \lambda_{i_2} \| P'_{i_1 i_2} \| \| v_{i_1 i_2} \|_V
-\]
-
-\[
-\vdots
-\]
-
-\[
-\leq \sum_{i \in \mathcal{I}( |v| )} \lambda_{i_1} \lambda_{i_2} \cdots \lambda_{i_k} \| P'_{i_1 \dots i_k} v_{i_1 \dots i_k} \|_V
-\]
-
-\[
-\leq \sum_{i \in \mathcal{I} (|v| )} \lambda_{i_1} \cdots \lambda_{i_k} \| P'_{i_1 \dots i_k} \|
-\]
-
-mit  
-\[
-P'_{i_1 \dots i_k} \in U^+ + \varepsilon T
-\]
-
-\[
-\sum_{i \in \mathcal{I}(|v|)} \lambda_{i_1} \cdots \lambda_{i_k} p(k) \leq p(k)
-\]
+These kind of decompositions are guaranteed to exist because of the special structure of $(\mathcal{A},\mathbf{G})\text{-trees}$.
+Now we have:
+$$
+\begin{aligned}
+  \|Pv\|_{co_s(V)} & = \|P'Lv\|_{co_s(V)} \\ 
+  & = \|P' \sum \limits_{i_1 \in \mathcal{I}} \lambda_{i_1} v_{i_1} \|_{co_s(V)} \\ 
+  & = \sum \limits_{i_1 \in \mathcal{I}} |\lambda_{i_1}| \|P'v_{i_1} \|_{co_s(V)}\\
+  & = \sum \limits_{i_1 \in \mathcal{I}} |\lambda_{i_1}| \|P'_{i_1}L_{i_1}v_{i_1} \|_{co_s(V)} \\ 
+  & = \sum \limits_{i \in \mathcal{I}^2} |\lambda_{i_1}| |\lambda_{i_2}| \|P'_{i}v_{i_2} \|_{co_s(V)}\\
+  & \cdots \\
+  & = \sum \limits_{i \in \mathcal{I}^{k}} |\lambda_{i_1}| \cdot ... \cdot |\lambda_{i_k}| \|P'_{i}v_{i_{k}} \|_{co_s(V)}\\
+  & \leq \sum \limits_{i \in \mathcal{I}^{k}} |\lambda_{i_1}| \cdot ... \cdot |\lambda_{i_k}| \text{ } p_{v_{i_k}}(k) \\
+  & \leq p(k)\sum \limits_{i \in \mathcal{I}^{k}} |\lambda_{i_1}| \cdot ... \cdot |\lambda_{i_k}| \\
+  & =  p(k)\sum \limits_{i_1 \in \mathcal{I}} |\lambda_{i_1}| \sum \limits_{i_2 \in \mathcal{I}} |\lambda_{i_2}| \text{ } ... \sum \limits_{i_k \in \mathcal{I}} |\lambda_{i_k}| \\
+  & \leq p(k)
+\end{aligned}
+$$
+Here the first inequality works since after $k$ steps the prefix $P'_{i}$ is guaranteed to be in the tree $T_{v_{i_k}}$ and thus the norm is bounded by $p_{v_{i_k}}(k)$, which in turn is of course less then $p(k)$ by definition.
 \end{proof}
 
 \begin{theorem}{}\label{thm:hybrid-found}
@@ -226,10 +202,10 @@ If Algorithm~\ref{alg:hybrid} terminates then $\JSR(\mathcal{A}) \leq 1$
 
 \begin{proof}
   Due to the prework in the lemmas this is now easy to show. 
-  Lemma \ref{lem:arb.prod.bound} implies that for every $P \in \mathcal{A}^k$ and $v \in V$, $\lVert Pv \rVert _V \le p(k)$
+  Lemma \ref{lem:arb.prod.bound} implies that for every $P \in \mathcal{A}^k$ and $v \in V$, $\lVert Pv \rVert _{\text{co}_{\text{s}}(V)} \le p(k)$
   trivially this implies: 
   $$
-    \forall P \in \mathcal{A}^k: \lVert P \rVert _V \le p(k)
+    \forall P \in \mathcal{A}^k: \lVert P \rVert _{\text{co}_{\text{s}}(V)} \le p(k)
   $$
   Now we take the definition of the $\JSR$ and get:
   $$
@@ -241,8 +217,7 @@ Of course, if the candidate had a spectral radius of $1 \implies \JSR(\mathcal{A
 
 \begin{corollary}
   If the chosen trees are always $T_v = \mathcal{A}$, then we would have exactly the invariant-polytope algorithm \ref{alg:exact}. 
-  Which makes the new approach a real generalization. \\
-  Also the polynomial bounding would collapse to just a constant $ K = \max\limits_{v \in V}\max\limits_{P \in T_{v}}: \lVert P \rVert _{co_{s}(V)}$ that is the maximum over all polytope-norm values of nodes in the generated cyclic-tree. This constant would not depend on the sizes of the products anymore.
+  Which makes the new approach a real generalization of the original. \\
 \end{corollary}
 
 \section{Efficiency}
