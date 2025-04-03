@@ -4,11 +4,9 @@
 
 The \textit{Joint Spectral Radius} (JSR) was first introduced by G.-C. Rota and G. Strang in 1960 \citep{rotaNoteJointSpectral1960}. They described the JSR as the maximal exponential growth rate of a product of matrices taken from a finite set. Since its inception, the JSR has become a cornerstone in various mathematical and engineering disciplines due to its ability to encapsulate the asymptotic behavior of matrix long products. 
 
-The concept gained significant traction in the 1990s when researchers began exploring its theoretical properties and practical implications. Notable advancements include its application in wavelet theory, where it assists in the construction of refinable functions (citep{daubechies1992ten}) as well as in control theory, where it is used to analyze the stability of switched linear systems \citep{blondelSurveyComputationalComplexity2000}. The computational challenges associated with determining the JSR have inspired the development of several algorithms, such as the invariant-polytope method \citep{guglielmiExactComputationJoint2013} and the finite-tree method \citep{mollerTreebasedApproachJoint2014}.
+The concept gained significant traction in the 1990s when researchers began exploring its theoretical properties and practical implications. Notable advancements include its application in wavelet theory, where it assists in the construction of refinable functions \citep{daubechies1992sets} as well as in control theory, where it is used to analyze the stability of switched linear systems \citep{blondelSurveyComputationalComplexity2000}, for which we will give a small example in the following. The computational challenges associated with determining the JSR have inspired the development of several algorithms, such as the invariant-polytope method \citep{guglielmiExactComputationJoint2013} and the finite-tree method \citep{mollerTreebasedApproachJoint2014}.
 
 Despite the progress, the JSR computation remains a challenging problem, particularly due to the exponential complexity of exploring all possible matrix products. This thesis seeks to contribute to this ongoing effort by leveraging the invariant-polytope algorithm and the finite-tree algorithm to create a hybrid methodology that mitigates their respective limitations.
-
-To fully grasp the subsequent mathematical framework, the reader should be familiar with linear algebra, specifically matrix norms, eigenvalues, and spectral radius. A basic understanding of combinatorial optimization and algorithm design will also be beneficial.
 
 \section{Motivation of the JSR}
 [include linear switched dynamical system example]
@@ -49,29 +47,46 @@ $$
 $$
 = \lim_{k \to \infty} \max_{A_i \in \mathcal{A}} \|A_{i_k} \dots A_{i_1}\|_{1}^{1/k}
 $$
+Which concludes the proof.
 \end{proof}
 
 To understand the state-of-the-art algorithms considered as well as the main results that will follow, it is necessary to introduce some basic properties of the JSR.
 
 \subsection*{Homogeneity}
-For any scalar $\alpha$ and set of matrices $\mathcal{A}$, the scaling property
-\begin{equation}
-    \JSR(\alpha \mathcal{A}) = |\alpha| \JSR(\mathcal{A})
-\end{equation}
-holds, which follows directly from norm homogenity. 
+\begin{proposition}
+    For any set of matrices $\mathcal{A}$ and scalar $\alpha$, the JSR is homogeneous:
+    \begin{equation}
+        \JSR(\alpha \mathcal{A}) = |\alpha| \JSR(\mathcal{A})
+    \end{equation}
+\end{proposition}
+\begin{proof}
+    Let $\mathcal{A} = \{A_1, A_2, \dots, A_m\}$ and $\alpha \in \mathbb{R}$. Then:
+    \begin{align*}
+        \JSR(\alpha \mathcal{A}) &= \lim_{k \to \infty} \max_{A_i \in \mathcal{A}^k} \|\alpha A_{i_k} \cdot ... \cdot \alpha A_{i_1}\|^{1/k} \\
+        &= |\alpha| \lim_{k \to \infty} \max_{A_i \in \mathcal{A}^k} \|A_{i_k} \cdot ... \cdot A_{i_1}\|^{1/k} = |\alpha| JSR(\mathcal{A})
+    \end{align*}
+\end{proof}
 
 \subsection*{Irreducibility}
 \begin{definition}
-    A set of matrices is called \emph{(commonly) reducible} if there exists a nontrivial subspace of $\mathbb{R}^n$ that is invariant under all matrices in the set. This means there exists a change of basis that block-triangularizes all matrices in $\mathcal{A}$ at the same time. If $\mathcal{A}$ is not reducible it is called irreducible. 
+    A set of matrices is called \emph{(commonly) reducible} if there exists a nontrivial subspace of $\mathbb{R}^n$ that is invariant under all matrices in the set. This means there exists a change of basis that block-triangularizes all matrices in $\mathcal{A}$ at the same time. If $\mathcal{A}$ is not reducible it is called \emph{irreducible}. 
 \end{definition}
 
 \subsection*{Three-member inequality}
-The \emph{three-member inequality} provides essential bounds for the JSR. For any submultiplicative matrix norm $\|\cdot\|$, the inequality
-\begin{equation}
+The \emph{three-member inequality} provides essential bounds for the JSR. 
+
+\begin{proposition}
+    For any submultiplicative matrix norm $\|\cdot\|$, the inequality
+    \begin{equation}
     \max_{P \in \mathcal{A}^k} \rho(P)^{\frac{1}{k}} \leq JSR(\mathcal{A}) \leq \max_{P \in \mathcal{A}^k} \| P\|^{\frac{1}{k}},
     \label{eq:three-member}
-\end{equation}
-holds for every $k \in \mathbb{N}$ \citep{jungersJointSpectralRadius2009}. This result forms a starting point for many computational approaches as the bounds are sharp in the sense that both sides converge to the JSR as $k\rightarrow \infty$ (left side in $\limsup$).
+    \end{equation}
+    holds for every $k \in \mathbb{N}$.
+\end{proposition}
+\begin{proof}
+    The left side of the inequality follows from the definition of the JSR, as $\rho(P^k) = \rho(P)^k$ for any matrix $P$. The right side follows from a special case of Fekete's lemma.
+\end{proof}
+This result forms a starting point for many computational approaches as the bounds are sharp in the sense that both sides converge to the JSR as $k\rightarrow \infty$ (left side in $\limsup$).
 
 \subsection*{Minimum over norms}
 The JSR can be equivalently defined as the minimum over all submultiplicative norms:
