@@ -43,6 +43,7 @@
 \usepackage{setspace}                            % Line spacing
 \usepackage[colorlinks=true, linkcolor=black, citecolor=black, urlcolor=gray]{hyperref}
 \usepackage{scrlayer-scrpage}                    % Custom headers and footers
+\usepackage{parskip}
 \let\cleardoublepage\clearpage
 \pagestyle{scrheadings}
 \automark[chapter]{chapter}
@@ -64,9 +65,23 @@
 % Theorem-Like Environments
 \newtheorem{theorem}{Theorem}[section]  % Numbering by section
 \newtheorem{lemma}[theorem]{Lemma}      % Lemma numbered the same as theorems
-\newtheorem{definition}[theorem]{Definition}
 \newtheorem{corollary}[theorem]{Corollary}
 \newtheorem{proposition}[theorem]{Proposition}
+
+\newtheoremstyle{normaltext} % Name of the new style
+  {}                        % Space above
+  {}                        % Space below
+  {}                        % Body font (empty means default - upright)
+  {}                        % Indent amount
+  {\bfseries}               % Theorem head font (bold)
+  {.}                       % Punctuation after theorem head
+  { }                       % Space after theorem head
+  {}                        % Theorem head spec
+
+\theoremstyle{normaltext}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Custom Commands
