@@ -8,11 +8,11 @@ The concept gained significant traction in the 1990s when researchers began expl
 
 Despite the progress, the JSR computation remains a challenging problem, particularly due to the exponential complexity of exploring all possible matrix products. This thesis seeks to contribute to this ongoing effort by leveraging the invariant-polytope algorithm and the finite-tree algorithm to create a hybrid methodology that mitigates their respective limitations.
 
+\section*{Structure of the Thesis}
+The remainder of this thesis is structured as follows: Chapter~\ref{ch:introduction} provides a sufficient background on the JSR and its basic properties. Chapters~\ref{ch:inv.poly} and~\ref{ch:finite-tree} present the ideas and concepts of the algorithms that will be exploited to form the proposed hybrid approach, outlining their theoretical foundation and algorithmic implementation. Chapter~\ref{ch:hybrid} discusses possible combinations of former approaches, proposes the so-called Tree-flavored-invariant-polytope algorithm, and brings proofs of termination which is the main result of this thesis. \emph{Chapter~\ref{ch:numerics}} presents numerical results to analyze the efficiency and applicability of the hybrid algorithm. Chapter~\ref{ch:conclusion} concludes with insights and future directions.
+
 \section{Motivation of the JSR}
 [include linear switched dynamical system example]
-
-\section*{Structure of the Thesis}
-The remainder of this thesis is structured as follows: Chapter~\ref{ch:introduction} provides a sufficient background on the JSR and its basic properties. Chapters~\ref{ch:inv.poly} and~\ref{ch:finite-tree} present the ideas and concepts of the algorithms that will be exploited to form the proposed hybrid approach, outlining their theoretical foundation and algorithmic implementation. Chapter~\ref{ch:hybrid} discusses possible combinations of former approaches, proposes the so-called Tree-flavored-invariant-polytope algorithm, and brings proofs of termination which is the main result of this thesis. \emph{Chapter~\ref{ch:numerics}} presents numerical results on ... problems to analyze the efficiency and applicability of the hybrid algorithm. Chapter~\ref{ch:conclusion} concludes with insights and future directions.
 
 \section{Theoretical background}
 
@@ -31,7 +31,7 @@ Let $\| \cdot \|_1$   and $ \| \cdot \|_2 $ be two submultiplicative norms on $ 
 $$
 c \|P\|_1 \leq \|P\|_2 \leq C \|P\|_1 \quad \forall P \in \mathbb{R}^{n \times n}
 $$
-Now if we consider this we get: 
+Now we get: 
 $$
 \lim_{k \to \infty} \max_{A_i \in \mathcal{A}} \|A_{i_k} \dots A_{i_1}\|_{1}^{1/k} 
 $$
@@ -54,16 +54,18 @@ To understand the state-of-the-art algorithms considered as well as the main res
 
 \subsection*{Homogeneity}
 \begin{proposition}
-    For any set of matrices $\mathcal{A}$ and scalar $\alpha$, the JSR is homogeneous:
+    The JSR is homogeneous, meaning for any set of matrices $\mathcal{A}$ and scalar $\alpha$: 
     \begin{equation}
         \JSR(\alpha \mathcal{A}) = |\alpha| \JSR(\mathcal{A})
     \end{equation}
+    holds.
 \end{proposition}
 \begin{proof}
     Let $\mathcal{A} = \{A_1, A_2, \dots, A_m\}$ and $\alpha \in \mathbb{R}$. Then:
     \begin{align*}
-        \JSR(\alpha \mathcal{A}) &= \lim_{k \to \infty} \max_{A_i \in \mathcal{A}^k} \|\alpha A_{i_k} \cdot ... \cdot \alpha A_{i_1}\|^{1/k} \\
-        &= |\alpha| \lim_{k \to \infty} \max_{A_i \in \mathcal{A}^k} \|A_{i_k} \cdot ... \cdot A_{i_1}\|^{1/k} = |\alpha| JSR(\mathcal{A})
+        \JSR(\alpha \mathcal{A}) & = \lim_{k \to \infty} \max_{A_i \in \mathcal{A}^k} \|\alpha A_{i_k} \cdot ... \cdot \alpha A_{i_1}\|^{1/k} \\
+        & = |\alpha| \lim_{k \to \infty} \max_{A_i \in \mathcal{A}^k} \|A_{i_k} \cdot ... \cdot A_{i_1}\|^{1/k} \\
+        & = |\alpha| JSR(\mathcal{A}) \\
     \end{align*}
 \end{proof}
 
@@ -71,6 +73,34 @@ To understand the state-of-the-art algorithms considered as well as the main res
 \begin{definition}
     A set of matrices is called \emph{(commonly) reducible} if there exists a nontrivial subspace of $\mathbb{R}^n$ that is invariant under all matrices in the set. This means there exists a change of basis that block-triangularizes all matrices in $\mathcal{A}$ at the same time. If $\mathcal{A}$ is not reducible it is called \emph{irreducible}. 
 \end{definition}
+\begin{example}
+    \[
+    A_1 = \begin{bmatrix} 2 & 1 \\ 1 & 2 \end{bmatrix}, \quad
+    A_2 = \begin{bmatrix} 3 & 2 \\ 2 & 3 \end{bmatrix}
+    \]
+
+    These matrices are reducible because there exists a nontrivial change of basis that transforms them into block-triangular form. The eigenvectors common to both matrices are:
+
+    \[
+    v_1 = \begin{bmatrix} 1 \\ 1 \end{bmatrix}, \quad
+    v_2 = \begin{bmatrix} 1 \\ -1 \end{bmatrix}
+    \]
+
+    Using the change of basis matrix:
+
+    \[
+    P = \begin{bmatrix} 1 & 1 \\ 1 & -1 \end{bmatrix}
+    \]
+
+    we compute the similarity transformations:
+
+    \[
+    P^{-1} A_1 P = \begin{bmatrix} 3 & 0 \\ 0 & 1 \end{bmatrix}, \quad
+    P^{-1} A_2 P = \begin{bmatrix} 5 & 0 \\ 0 & 1 \end{bmatrix}
+    \]
+
+    Since both matrices are upper triangular in this basis, they share a common invariant subspace, proving that they are reducible.
+\end{example}
 
 \subsection*{Three-member inequality}
 The \emph{three-member inequality} provides essential bounds for the JSR. 
@@ -88,44 +118,78 @@ The \emph{three-member inequality} provides essential bounds for the JSR.
 \end{proof}
 This result forms a starting point for many computational approaches as the bounds are sharp in the sense that both sides converge to the JSR as $k\rightarrow \infty$ (left side in $\limsup$).
 
+\begin{proposition}
+    The $\JSR$ can be equally defined as:
+    $$
+    \JSR(\mathcal{A}) = \limsup_{k \to \infty} \max_{A_i \in \mathcal{A}^k} \rho(A_{i_k} \cdots A_{i_1})^{1/k}
+    $$
+    where $\rho(P)$ is the spectral radius of the matrix $P$.
+\end{proposition}
+
 \subsection*{Minimum over norms}
-The JSR can be equivalently defined as the minimum over all submultiplicative norms:
-\begin{equation}
-    \JSR(\mathcal{A}) = \min_{\|\cdot\|} \max_{A \in \mathcal{A}} \|A\|.
-\end{equation}
-\begin{proof}{blondel\\}
+\begin{proposition}
+    The JSR can be equivalently defined as the minimum over all submultiplicative norms:
+    \begin{equation}
+        \JSR(\mathcal{A}) = \min_{\|\cdot\|} \max_{A \in \mathcal{A}} \|A\|.
+    \end{equation}
+\end{proposition}
+
+\begin{proof}
+    This is done by defining the family of norms $\|x\|_{\epsilon} := \max \{ \| \frac{A}{\rho + \epsilon}x\|_2 : A \in \mathcal{A}\}$,
+    where $\epsilon > 0$ and $\rho$ is the $\JSR$ of the set $\mathcal{A}$.
+    Now, using the induced matrix norm we arrive at: 
+    $$ \sup _{A \in \mathcal{A}} \|Ax\|_{\epsilon} \leq \rho + \epsilon$$
 
 \end{proof}
 
 \subsection*{Finiteness Property}
-Certain matrix sets exhibit the \emph{finiteness property}, which states, that there exists a finite sequence of matrices $A_{i_1}, \dots, A_{i_k}$, such that:
-\begin{equation}
+\begin{definition}
+    The matrix set $\mathcal{A} = \{ A_1, \cdots, A_m\}$ is sayed to exhibit the \emph{finiteness property}, if there exists a finite sequence of matrices $A_{i_1}, \dots, A_{i_k}$, such that:
+    \begin{equation}
     \JSR(\mathcal{A}) = \|A_{i_k} \cdots A_{i_1}\|^{1/k}.
-\end{equation}
+    \end{equation}
+\end{definition}
 While this property does not hold universally, it is essential for algorithmic approaches and termination in most cases.
 
 \subsection*{Complexity}
+
+The computation of the joint spectral radius (JSR) is theoretically challenging due to several complexity results.
+
+Determining whether the JSR of a given set of matrices is below a threshold is \textbf{NP-hard} \citep{tsitsiklis1997lyapunov}, meaning no polynomial-time algorithm is expected unless $\text{P} = \text{NP}$. Moreover, for general sets of matrices, even deciding whether the JSR is strictly less than one is \textbf{undecidable} \citep{blondel2000boundedness}. Despite these theoretical limitations, many practical cases allow for efficient numerical estimation.
+
+Unlike the spectral radius of a single matrix, the JSR is often \textbf{non-algebraic} \citep{guglielmiExactComputationJoint2011}, meaning it cannot always be expressed as a root of a polynomial with rational coefficients.
+
+While these complexity results highlight fundamental challenges, they rarely pose a barrier in applied settings where efficient approximation algorithms provide useful results.
 
 \subsection*{Candidates and Generators}
 Approximating the JSR requires identifying candidate products or \emph{generators} of the matrix set that contribute most significantly to the asymptotic growth rate. These generators are often derived through optimization techniques and their identification is a key step in computational algorithms.
 
 \subsection*{Similarity and reducibility}
-For any invertable matrix $T$ and reducible set $\mathcal{A}$
-\begin{equation}
-   \JSR(\mathcal{A}) = \JSR(T^{-1}\mathcal{A}T) 
-\end{equation}
+\begin{proposition}
+    For any invertable matrix $T$ we have invariance of the $\JSR$ under similarity transformations:
+    \begin{equation}
+       \JSR(\mathcal{A}) = \JSR(T^{-1}\mathcal{A}T) 
+    \end{equation}
+\end{proposition}
 
-holds. Per definition, there exists a change of basis such that all $A \in \mathcal{A}$ are block-triangularized: 
-$$\exists T: T^{-1}A_{i}T = 
-\begin{bmatrix}
-B_i & C_i  \\
-0 & D_i
-\end{bmatrix}
-$$
-Now we can split the set into two sets of blocks $B_i$ and $D_i$ and the JSR can be computed as:
-\begin{equation}
-    \JSR(\mathcal{A}) = \max\{\JSR(\{B_i: i = 1, \cdots J \}), \JSR(\{D_i: i = 1, \cdots J \})\}
-\end{equation}
+\begin{proof}
+    This follows from the definition of the JSR and the properties of the spectral radius.
+    \begin{align*}
+    \JSR(T^{-1}\mathcal{A}T) & = \limsup_{k \to \infty} \max_{A_i \in \mathcal{A}^k} \rho(T^{-1}A_{i_k}T \cdot ... \cdot T^{-1}A_{i_1}T)^{1/k}\\
+    & = \limsup_{k \to \infty} \max_{A_i \in \mathcal{A}^k} \rho(T^{-1}A_{i_k} \cdot ... \cdot A_{i_1}T)^{1/k}\\
+    & = \limsup_{k \to \infty} \max_{A_i \in \mathcal{A}^k} \rho(A_{i_k} \cdot ... \cdot A_{i_1})^{1/k}\\
+    & = \JSR(\mathcal{A}) \\
+    \end{align*}
+\end{proof}
+
+\begin{proposition}
+    If $\mathcal{A}$ is reducible, then the following holds:
+    \begin{equation}
+        \JSR(\mathcal{A}) = \max \{\JSR(\mathcal{B}), \JSR(\mathcal{D})\}
+    \end{equation}
+    where $\mathcal{B} = \{B_1,\cdots, B_m\}$ and $\mathcal{D}= \{D_1,\cdots, D_m\}$ are the blocks of the block-triangularized matrices.
+\end{proposition}
+ 
 The proof can be seen in \citep{jungersJointSpectralRadius2009}.
 This can be applied iteratively until the sets of blocks are all irreducible.
 The problem was split into similar problems of smaller dimension.

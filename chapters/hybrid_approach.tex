@@ -176,7 +176,9 @@ $$
   \text{Where } i_j \in \mathcal{I} & := \{1, \cdots, m \}\\
 \end{aligned}
 $$
-These kind of decompositions are guaranteed to exist because of the special structure of $(\mathcal{A},\mathbf{G})\text{-trees}$.
+These decompositions exist and are unique because of the special structure of $(\mathcal{A},\mathbf{G})\text{-trees}$.
+It follows the same principle as huffman-coding, where the tree structure is used to encode the product. Since in every branch we force all the possible children to be in the tree. An in depth explanaition of finding the decomposition can be found in \citep{mollerTreebasedApproachJoint2014}.
+\newline
 Now we have:
 $$
 \begin{aligned}
@@ -190,14 +192,15 @@ $$
   & \leq \sum \limits_{i \in \mathcal{I}^{k}} |\lambda_{i_1}| \cdot ... \cdot |\lambda_{i_k}| \text{ } p_{v_{i_k}}(k) \\
   & \leq p(k)\sum \limits_{i \in \mathcal{I}^{k}} |\lambda_{i_1}| \cdot ... \cdot |\lambda_{i_k}| \\
   & =  p(k)\sum \limits_{i_1 \in \mathcal{I}} |\lambda_{i_1}| \sum \limits_{i_2 \in \mathcal{I}} |\lambda_{i_2}| \text{ } ... \sum \limits_{i_k \in \mathcal{I}} |\lambda_{i_k}| \\
+  & \leq p(k) \cdot 1 \cdot ... \cdot 1\\
   & \leq p(k)
 \end{aligned}
 $$
-Here the first inequality works since after $k$ steps the prefix $P'_{i}$ is guaranteed to be in the tree $T_{v_{i_k}}$ and thus the norm is bounded by $p_{v_{i_k}}(k)$, which in turn is of course less then $p(k)$ by definition.
+Here the first inequality works since after $k$ steps the prefix $P'_{i}$ is guaranteed to be in the tree $T_{v_{i_k}}$ and thus the norm is bounded by $p_{v_{i_k}}(k)$, which in turn is of course less then $p(k)$ by definition. The second to last inequality works since those sums of the absolute values of the coefficients of a linear combination of vectors are less than or equal to 1 from the 1-boundedness of the $(\mathcal{A},\mathbf{G})\text{-trees}$.
 \end{proof}
 
 \begin{theorem}{}\label{thm:hybrid-found}
-If Algorithm~\ref{alg:hybrid} terminates then $\JSR(\mathcal{A}) \leq 1$
+If algorithm~\ref{alg:hybrid} terminates then $\JSR(\mathcal{A}) \leq 1$
 \end{theorem}
 
 \begin{proof}
