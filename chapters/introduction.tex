@@ -32,21 +32,15 @@ $$
 c \|P\|_1 \leq \|P\|_2 \leq C \|P\|_1 \quad \forall P \in \mathbb{R}^{n \times n}
 $$
 Now we get: 
-$$
-\lim_{k \to \infty} \max_{A_i \in \mathcal{A}} \|A_{i_k} \dots A_{i_1}\|_{1}^{1/k} 
-$$
-$$
-\le \lim_{k \to \infty} {(\frac{1}{c})}^{\frac{1}{k}} \max_{A_i \in \mathcal{A}} \|A_{i_k} \dots A_{i_1}\|_{2}^{1/k} 
-$$
-$$
-= \lim_{k \to \infty} \max_{A_i \in \mathcal{A}} \|A_{i_k} \dots A_{i_1}\|_{2}^{1/k} 
-$$
-$$
-\le \lim_{k \to \infty} {C}^{\frac{1}{k}} \max_{A_i \in \mathcal{A}} \|A_{i_k} \dots A_{i_1}\|_{1}^{1/k}
-$$
-$$
-= \lim_{k \to \infty} \max_{A_i \in \mathcal{A}} \|A_{i_k} \dots A_{i_1}\|_{1}^{1/k}
-$$
+
+\begin{align*}
+& \lim_{k \to \infty} \max_{A_i \in \mathcal{A}} \|A_{i_k} \dots A_{i_1}\|_{1}^{1/k} \\
+\le & \lim_{k \to \infty} {(\frac{1}{c})}^{\frac{1}{k}} \max_{A_i \in \mathcal{A}} \|A_{i_k} \dots A_{i_1}\|_{2}^{1/k} \\
+= & \lim_{k \to \infty} \max_{A_i \in \mathcal{A}} \|A_{i_k} \dots A_{i_1}\|_{2}^{1/k} \\
+\le & \lim_{k \to \infty} {C}^{\frac{1}{k}} \max_{A_i \in \mathcal{A}} \|A_{i_k} \dots A_{i_1}\|_{1}^{1/k}\\
+= & \lim_{k \to \infty} \max_{A_i \in \mathcal{A}} \|A_{i_k} \dots A_{i_1}\|_{1}^{1/k}\\
+\end{align*}
+
 Which concludes the proof.
 \end{proof}
 
@@ -148,6 +142,7 @@ This result forms a starting point for many computational approaches as the boun
     \begin{equation}
     \JSR(\mathcal{A}) = \|A_{i_k} \cdots A_{i_1}\|^{1/k}.
     \end{equation}
+    Such a product is called \emph{spectrum-maximizing (s.m.p.)}.
 \end{definition}
 While this property does not hold universally, it is essential for algorithmic approaches and termination in most cases.
 
