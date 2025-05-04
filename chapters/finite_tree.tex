@@ -1,104 +1,212 @@
 
 \chapter{Finite-tree algorithm}
 \label{ch:finite-tree}
-In this chapter I want to introduce the finite-tree algorithm and its theoretical background. 
+In this chapter we introduce basic definitions and concepts to the second approach of $\JSR$ computation. It is called \emph{finite-tree algrithm} as its trying to decompose arbitrary products $P \in \mathcal{A}^k$ into sub-products that can be 1-bounded by an a priori chosen norm.  
 
 \section{Notation and definitions}
 
-Throughout this thesis, we consider a finite set of matrices \( \mathcal{A} = \{A_1, \dots, A_J\} \) with \( A_j \in \mathbb{R}^{s \times s} \). The computation of the JSR using tree-based methods, requires a structured representation of matrix products.
-
-\subsection*{Encoding of Matrix Products}
-The set \( \mathcal{I}^n := \{1, \dots, J\}^n \) denotes the collection of all index sequences of length \( n \). For an index sequence \( i = [i_1, \dots, i_n] \in \mathcal{I}^n \), the corresponding matrix product is given by
-\[
-    A_i = A_{i_n} \cdots A_{i_1}.
-\]
-For \( n = 0 \), we define the identity matrix \( A_i = I \).
-
-\subsection*{Definition of an finite-tree}
-\label{def:tree}
-An \( (A,G) \)-tree is a structured representation of matrix products used to decompose arbitrary matrix products from $\mathcal{A}$. Lets define it given a set of generator indices \( G = \{g_1, \dots, g_I\} \subseteq J^n \):
 \begin{definition}
-    A Tree with the following structure: 
+    A \emph{tree} is a connected, acyclic graph \( T = (V, E) \) with a distinguished vertex \( r \in V \) called the \textbf{root}. The tree structure induces a natural hierarchy: for any vertex \( v \neq r \), there exists a unique path from \( r \) to \( v \). The tree can then be described in terms of the following concepts:
+    \begin{itemize}
+        \item \textbf{Parent}: For any \( v \neq r \), the vertex preceding \( v \) on the path from the root is called its \emph{parent}.
+        \item \textbf{Children}: The vertices adjacent to a given vertex \( v \) that are further from the root are called its \emph{children}.
+        \item \textbf{Leaf}: A vertex with no children is called a \emph{leaf}.
+        \item \textbf{Internal vertex}: A vertex with at least one child is called an \emph{internal} or \emph{non-leaf} vertex.
+        \item Vertices are also called \emph{node}.
+    \end{itemize}
+\end{definition}
+
+Consider the finite set of matrices \( \mathcal{A} = \{A_1, \dots, A_n\} \).
+We will encode products from $\mathcal{A}$ by finite index sequences.
+
+\begin{definition}
+    The set \( \mathcal{I}^k := \{1, \dots, n\}^k \) denotes the collection of all positive index sequences of length \( k \). 
+    For an positive index sequence \( i = [i_1, \dots, i_k] \in \mathcal{I}^k \), the corresponding matrix product is given by
+    \[
+        A_i := A_{i_k} \cdots A_{i_1}.
+    \]
+    For \( k = 0 \), we define the identity matrix \( A_i := I \).
+\end{definition}
+
+This creates a natural tree structure $T_{\mathcal{A}}$ on the set $\bigcup_ {k \in \mathbb{N}}\mathcal{A}^k$ of all finite products from $\mathcal{A}$ where every index sequence represents a node. An example can be seen in figure~\ref{fig:matrix-product-tree}.
+
+\begin{figure}[ht]
+\centering
+\begin{forest}
+    for tree={
+        grow'=0,
+        child anchor=west,
+        parent anchor=east,
+        l sep=20pt,
+        s sep=20pt,
+        edge={->, >=latex},
+        anchor=base west,
+        font=\small,
+    }
+    [{$A_{\emptyset} = I$}
+  [{$A_{[1]} = A_1$}
+    [{$A_{[1,1]} = A_1 A_1$}
+      [{$A_{[1,1,1]} = A_1 A_1 A_1$}]
+      [{$A_{[1,1,2]} = A_2 A_1 A_1$}]
+    ]
+    [{$A_{[1,2]} = A_2 A_1$}
+      [{$A_{[1,2,1]} = A_1 A_2 A_1$}]
+      [{$A_{[1,2,2]} = A_2 A_2 A_1$}]
+    ]
+  ]
+  [{$A_{[2]} = A_2$}
+    [{$A_{[2,1]} = A_1 A_2$}
+      [{$A_{[2,1,1]} = A_1 A_1 A_2$}]
+      [{$A_{[2,1,2]} = A_2 A_1 A_2$}]
+    ]
+    [{$A_{[2,2]} = A_2 A_2$}
+      [{$A_{[2,2,1]} = A_1 A_2 A_2$}]
+      [{$A_{[2,2,2]} = A_2 A_2 A_2$}]
+    ]
+  ]
+]
+\end{forest}
+\caption{An example of an product encoding tree $T_{\mathcal{A}}$ with $\mathcal{A} = \{ A_1, A_2\}$. Here truncated to lengths of 3 while in reality infinitely deep.}
+\label{fig:matrix-product-tree}
+\end{figure}
+
+The objective is now to find a sub-tree $T \subset T_{\mathcal{A}}$ for a chosen norm, with the condition of every leaf encoding a product that has norm of less then 1 and every node thats not a leaf having all possible children $A_1,\cdots,A_J$.
+If such a tree has been found it easily allows for a decomposition of every possible product $P = A_{[i_1,\cdots,i_k]} \in \mathcal{A}^k$ into sub-products encoded by leafs and one possible rest term encoded by an internal-node. 
+Leading to a proof of $\JSR(\mathcal{A}) = 1$.
+But such sub-trees are often infinitely large and therefore unsuitable for a computational tree-search algorithm.
+In the paper \citep{mollerTreebasedApproachJoint2014} the writers propose to use a different kind of encoding making use of so-called generators and set-valued nodes.
+
+We fixate a set $\mathbf{G} = \{ g_1, \cdots, g_m \}$ with $g_i \in \bigcup_ {k \in \mathbb{N}}\mathcal{A}^k$ and $\rho(g_i)^{\frac{1}{|g_i|}} \le 1$.
+All products from this set will be called \emph{generators}.
+We also define $A_l := g_{-l}$ for $l \in \{-m, \dots, -1\}$.
+
+\begin{definition}
+    
+    The set \( \mathcal{J}^k := \{-m, \dots, -1, 1, \dots, n\}^k \) denotes the collection of all index sequences of length \( k \). 
+    For an index sequence \( j = [j_1, \dots, j_k] \in \mathcal{J}^k \), the corresponding matrix product set is defined by:
+    $$
+    A_j := \{ A_{j_k}^{e_k} \cdots A_{j_1}^{e_1} \text{ for } e_i \in \mathbb{N}_0 \text{ if } j_i < 0 \text{ or } e_i = 1 \text{ else}\} 
+    $$
+  
+\end{definition}
+
+Again this creates a tree structure in a similar way except now the nodes represent (possibly infinite) sets of products. 
+Now we want to find a subtree of a special form. 
+
+\begin{definition}
+    A so-called $(\mathcal{A},\mathbf{G})\text{-tree}$ has the following structure: 
 \begin{itemize}
     \item The root node contains the identity matrix: \( t_0 = \{I\} \).
     \item Each node \( t \in T \) is either:
     \begin{itemize}
-        \item A leaf (i.e., it has no children),
-        \item A parent of exactly \( J \) children: \( \{A_j P : P \in t\}, j = 1, \dots, J \) (positive children),
-        \item A parent of arbitrarily many generators: \( \{A_g^n P : P \in t, n \in \mathbb{N}_0\} \) for some \( g \in G \) (negative children).
+        \item A leaf,
+        \item A parent of exactly \( n \) children: \( \{A_j P : P \in t\},\quad j = 1, \dots, n \),
+        \item A parent of only generators: \( \{A_j^n P : P \in t, \quad n \in \mathbb{N}_0\}, \text{ for } j\in~J~\subseteq ~\{ -m, \cdots, -1\}\)
     \end{itemize}
 \end{itemize}
-Is called $(\mathcal{A},\mathbf{G})\text{-tree}$
 \end{definition}
-
-\subsection*{Covered Nodes}
-A node in the tree is called \textit{covered} if it is a subset of one of its ancestors in the tree. Otherwise, it is called \textit{uncovered}. 
 
 \begin{definition}
+    A node in the tree is called \emph{covered} if it is a subset of one of its ancestors in the tree. Otherwise, it is called \emph{uncovered}. 
     The set of uncovered leaves is denoted as
 \[
-    \mathcal{L}(T) := \{ L \in t : t \text{ is an uncovered leaf of } T \}.
+    \mathcal{L}(T) := \{ L \in t : t \in T \text{ is an uncovered leaf} \}.
 \]
-and called leafage of the tree $T$.
+and called \emph{leafage} of the tree $T$.
 \end{definition}
 
-\subsection*{1-Boundedness}
-An \( (A,G) \)-tree $T$ is called \textit{1-bounded} with respect to a matrix norm \( \| \cdot \| \) if
+\begin{definition}
+An $(\mathcal{A},\mathbf{G})\text{-tree}$ $T$ is called \emph{1-bounded} with respect to a matrix norm \( \| \cdot \| \) if
 \[
     \sup_{L \in \mathcal{L}(T)} \| L \| \leq 1.
 \]
 If a stricter bound holds, i.e., \( \sup_{L \in \mathcal{L}(T)} \| L \| < 1 \), then the tree is called \emph{strictly 1-bounded}.
+\end{definition}
 
 \section{Structure of the finite-tree algorithm}
-We start with the root node, the identity $t_0 = {I}$. Now we build up an $(\mathcal{A},\mathbf{G})\text{-tree}$.
-For that we calculate the norms of the children of current leaf-nodes and if they are bigger than 1 we add them to the tree. 
-The chosen norm in this case is arbitrary but changes the runtime dramatically. 
-If the algorithm terminates a 1-bounded tree was found and by that we have proven that there exists a decomposition for every product of matrices from $\mathcal{A}$. 
+We try to find a 1-bounded $(\mathcal{A},\mathbf{G})\text{-tree}$. We start with only the root node $t_0 = \{I\}$ and iteratively check in every step $ \sup \{\lVert P \rVert: P \in L\} \le 1$ for every leaf in the current tree. If for one particular leaf the bound doesnt hold we add either all positive children or an arbitrary amount of generator children. This is done in a breadth-first-search manner until the generated tree $T$ is 1-bounded. 
 
 \vspace{1cm}
 
-\begin{algorithm}
-    \caption{Finite-tree algorithm}
+\begin{algorithm}[h]
+    \caption{Finite-tree-algorithm}
     \label{alg:tree}
-\end{algorithm}
+    \begin{algorithmic}
+        \State $Q = \{[1], \cdots, [n]\}$
+        \While{$Q \ne \emptyset$}
+            \State $Q_{\text{new}} = \emptyset$
+            \For{$j = [j_1,\cdots,j_k] \in Q$} 
+                \If{$\sup \{ \lVert P \rVert : P \in A_j \} > 1$}
+                    \State $J = \{1, \cdots, n\} \text{ or } J \subseteq \{-m, \cdots, -1\}$
+                    \State $Q_{\text{new}} \xleftarrow{\cup} \{[j_1,\cdots,j_k,j_{k+1}]: j_{k+1} \in J\}$
+                \EndIf
+            \EndFor
+            \State $Q = Q_{\text{new}}$
+        \EndWhile \\
+        \Return $\text{True}$
+    \end{algorithmic}
+  \end{algorithm}
 
-\vspace{1cm}
+\vspace{3cm}
 
-\begin{theorem}
-    If the finite-tree algorithm~\ref{alg:tree} terminates the $\JSR(\mathcal{A})$ was found. 
-\end{theorem}
-
+\begin{lemma}
+    \label{lem:poly_bound}
+    For every $(\mathcal{A},\mathbf{G})\text{-tree } T$ there exists a polynomial $p$ such that for every node $N \in T$ and every product $P \in \mathcal{A}^k$ encoded by $N$, $\lVert P \rVert _{\text{co}_{\text{s}}(V)} \le p(k)$ holds.
+\end{lemma}
+  
 \begin{proof}
-    The leafage of the generated tree is 1-bounded. Now we take an arbitrary product $P \in \mathcal{A}^n$.
-    If the profduct is outside the current tree i.e. after applying lexicographic ordering on the encodings of the nodes the encoding of the product is bigger then every other encoding in the tree. 
-    That means the structure of $(A,G)$-trees allows us to find one leaf-node that is a valid prefix of the product. Now we have $P = P'L$ with $\lVert L \rVert \le 1$. Since every leaf-node is guaranteed to have at least length 1 (first branches must be $\mathcal{A}$) the length of $P'$ is strictly smaller then the length of $P$. We can repeat that process until $P'^{(k)}$ is within the tree.
-    If the product is within the tree, we can generate a polynomial $p(k)$ that is monotone and an upper bound on the norms of products within the tree, where $k$ is the length of the product. 
-    For that we have to analyse the Jordan-Normalform of the products. Since the spectral radius of every matrix in $\mathcal{A}$ and of every generator is less than 1, we now the growth of potencies of the Jordan-blocks is bounded by a polynomial in the order of the size of the Jordan-block. Just taking a maximum over all factors of all such polynomials we generate a polynomial that bounds every product within the tree according to the length of the product.  
-    So every product $P \in \mathcal{A}^n$ is of the form $P = S \cdot P_k \cdot ... \cdot P_1$ where $\lVert P_i \rVert \le 1$ and $\lVert S \rVert \le p(k)$. We imply: 
-    $$JSR(\mathcal{A}) = \lim_k \max_{P \in \mathcal{A}^k} \lVert P \rVert ^{\frac{1}{k}} \leq \lim_k p(k) ^{\frac{1}{k}}  = 1$$
-    The detailed proof can be read in \citep{mollerTreebasedApproachJoint2014}. 
+    Take an arbitrary node $N = [i_1, \cdots, i_n]$ of the tree $T$. 
+    Now every $i_j$ encodes either a matrix from $\mathcal{A}$ or a generator from $\mathcal{G}$. 
+    Since all those matrices have a spectral radius less then or equal to 1, its Jordan-Normal forms grow utmost polynomially und thus, due to equality of norms in finite-dimensional vector spaces, we have that $ \exists p_j: \forall e \in \mathbb{N}_0: \lVert A_{i_j}^{e} \rVert _{\text{co}_{\text{s}}(V)} \le p_j(e)$.
+    Take now an arbitrary product $P = A_{i_n}^{e_{n}}\cdot...\cdot A_{i_1}^{e_{1}}$ that is encoded by this node. 
+    With $e_j$ being either 1 for positive $i_j$ or an integer in $\mathbb{N}_0$ for negative $i_j$.
+    We define: 
+    $$
+    \begin{aligned}
+    p_N & := p_{n} \cdot ... \cdot p_{1} \\
+    p & := \sum \limits_{N \in T} p_N
+    \end{aligned}
+    $$
+    Now we have: 
+    $$
+    \begin{aligned}
+    \lVert P \rVert _{\text{co}_{\text{s}}(V)} & = \lVert A_{i_n}^{e_{n}} \cdots A_{i_1}^{e_{1}} \rVert _{\text{co}_{\text{s}}(V)} \\
+    & \leq \lVert A_{i_n}^{e_{n}} \rVert _{\text{co}_{\text{s}}(V)} \cdots \lVert A_{i_1}^{e_{1}} \rVert _{\text{co}_{\text{s}}(V)} \\
+    & \leq p_{n}(e_n) \cdots p_{1}(e_1) \\
+    & \leq p_{n}(\lvert P \rvert) \cdots p_{1}(\lvert P \rvert) \\
+    & = p_N(\lvert P \rvert) \leq p(\lvert P \rvert) \\
+    \end{aligned}
+    $$
+    Since the node $N$ and the product $P$ were chosen arbitrary, this concludes the proof. 
 \end{proof}
 
-\section{Efficiency results}
-
 \begin{theorem}
-    \label{thm:same_solution}
-    If the invariant-polytope algorithm terminates so does the finite-tree algorithm.
+\label{thm:tree_JSR_found}
+    If an 1-bounded $(\mathcal{A},\mathbf{G})\text{-tree}$ was found for a given matrix set $\mathcal{A}$ and generator set $\mathbf{G}$ then $\JSR(\mathcal{A}) = 1$
 \end{theorem}
-
+~
 \begin{proof}
-    The proof can be seen in \citep{mollerTreebasedApproachJoint2014}.
+    We take an arbitrary positive finite index sequence $I = [i_1, \cdots, i_k]$.
+    Our found $(\mathcal{A},\mathbf{G})\text{-tree } T$ allows for a unique decomposition of this sequence into $I_k, \cdots, I_1$ where each subsequence $I_j \quad j = 1, \cdots,k-1$ encodes either a leaf or is the empty set and $I_k$ encodes an internal node of $T$. Now due to Lemma~\ref{lem:poly_bound} there exists a polynomial $p$ such that:
+    \[ 
+        \lVert A_{I}  \rVert =  \lVert A_{I_k} \cdot A_{I_{k-1}} \cdot ... \cdot A_{I_1}  \rVert \le  \lVert A_{I_k} \rVert \cdot \lVert A_{I_{k-1}}\rVert \cdot ... \cdot \lVert A_{I_1} \rVert \le p(k) 
+    \]
+    The last equality holds since all $A_{I_j} \quad j = 1, \cdots,k-1$ are either the identity or leaf encoded products which are by assumption 1-bounded. 
+    Furthermore $A_{I_k}$ can be bounded by the polynomial $p$ of the length $|A_{I_k}|$ which is less then $k$. 
+    Since the chosen index sequence was arbitrary we can imply: 
+      $$\JSR(\mathcal{A}) = \lim_k \max_{P \in \mathcal{A}^k} \lVert P \rVert ^{\frac{1}{k}} \leq \lim_k p(k) ^{\frac{1}{k}}  = 1$$
 \end{proof}
 
-\begin{theorem}
-    The solution space of the finite-tree algorithm is strictly bigger then the one from the invariant-polytope algorithm. 
-\end{theorem}
+\begin{remark}
+    The decomposition used in the proof of theorem~\ref{thm:tree_JSR_found} exists and is unique due to the structure of an $(\mathcal{A},\mathbf{G})\text{-tree}$.
+    It follows a similar manner as the huffman encoding. 
+    For more info see \citep{mollerTreebasedApproachJoint2014}.
+\end{remark}
 
-\begin{proof}
-    From theorem~\ref{thm:same_solution} we know that the finite-tree algorithm always terminates if the invariant-polytope algorithm does.
-    But there exist cases where the finite-tree algorithm terminates but the ivariant-polytope algorithm does not. 
-\end{proof}
+\section{Efficiency}
 
-\section{Ussage of generators}
-In~\citep{mollerTreebasedApproachJoint2014}, the authors show that the use of generators is essential for ensuring termination in cases where the invariant-polytope algorithm fails to terminate.
+
+\begin{remark}
+    In~\citep{mollerTreebasedApproachJoint2014}, the authors show that the use of generators is essential for ensuring termination in cases where the invariant-polytope algorithm fails to terminate. But deciding when to use generators instead of all positive children is still part of active research and is handled via highly histographic approaches. 
+\end{remark}
 

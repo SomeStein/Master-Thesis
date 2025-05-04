@@ -1,0 +1,76 @@
+\chapter{A Tree-Based Method for Joint Spectral Radius Computation}
+
+\section{Motivation and Background}
+
+The \emph{joint spectral radius} (JSR) of a finite set of matrices $\mathcal{A} = \{A_1, \dots, A_m\} \subset \mathbb{C}^{d \times d}$ is a generalization of the spectral radius for a single matrix. It quantifies the maximal asymptotic growth rate of all infinite products formed from elements of $\mathcal{A}$:
+\[
+\hat{\rho}(\mathcal{A}) := \limsup_{k \to \infty} \max_{I \in \{1, \dots, m\}^k} \|A_{i_k} \cdots A_{i_1}\|^{1/k},
+\]
+independently of the chosen matrix norm.
+
+The JSR arises in diverse applications, such as wavelet theory, control theory, and subdivision schemes. However, its exact computation is notoriously difficult—it is generally undecidable and NP-hard to approximate.
+
+One known sufficient condition is the \emph{finiteness property} (FP), which holds if a finite product achieves the JSR:
+\[
+\exists J \in \{1, \dots, m\}^k \text{ such that } \hat{\rho}(\mathcal{A}) = \rho(A_J)^{1/k}.
+\]
+This work builds on and generalizes algorithms that aim to verify this property using a novel tree-based approach.
+
+\section{Tree-Based Algorithmic Framework}
+
+The key idea is to construct a \emph{finite tree} in which nodes represent \emph{sets} of matrix products (rather than individual products). This allows verification of the FP even when reducibility or lack of asymptotic simplicity prohibits other approaches.
+
+\subsection{Encoding Matrix Products}
+
+Let $J_1, \dots, J_n$ be index vectors representing \emph{generators}, i.e., products $A_{J_i}$ with $\rho(A_{J_i}) = 1$. We then define a tree $\mathcal{T}$ whose nodes correspond to sequences $K = [k_1, \dots, k_\ell]$ with $k_i \in \{-n, \dots, -1, 1, \dots, m\}$. Positive entries refer to individual matrices $A_i$, and negative entries to powers of generator products, i.e., $A_{-j} = \{A_{J_j}^k : k \in \mathbb{N}_0\}$.
+
+The matrix product set associated with a node $K$ is defined recursively:
+\[
+A_K = A_{k_\ell} \cdots A_{k_1},
+\]
+where multiplication of sets is defined as the set of all resulting matrix products.
+
+\subsection{Node Classification}
+
+Each node $K$ is classified based on:
+\begin{itemize}
+  \item \textbf{1-boundedness}: $\sup\{\|A\| : A \in A_K\} \leq 1$.
+  \item \textbf{Coveredness}: There exists a prefix $P$ of $K$ such that $A_K \subset A_P$, with the complementary suffix being a nonempty positive index sequence.
+\end{itemize}
+
+\subsection{Main Theorem and Verification Strategy}
+
+\begin{theorem}[Möller \& Reif]
+Let $\mathcal{A}$ be a finite set of matrices, and $J$ a generator set with $\max_{J_i \in J} \rho(A_{J_i}) = 1$. If there exists a finite subtree $\mathcal{T}^* \subset \mathcal{T}$ such that:
+\begin{enumerate}
+  \item The root $\emptyset$ has exactly $m$ positive children,
+  \item Every leaf is either 1-bounded or covered,
+  \item Every internal node has either $m$ positive or arbitrary negative children,
+\end{enumerate}
+then $\hat{\rho}(\mathcal{A}) = 1$.
+\end{theorem}
+
+This result allows numerical or symbolic verification of the FP by searching for a tree $\mathcal{T}^*$ satisfying the above.
+
+\subsection{Algorithmic Construction}
+
+The tree is built via a depth-first traversal:
+\begin{enumerate}
+  \item Start with root node $\emptyset$.
+  \item For each node, append $m$ positive children unless the node is covered or 1-bounded.
+  \item Optionally, add negative children corresponding to powers of generators if it helps cover deeper branches.
+  \item Terminate when all leaves satisfy the theorem's conditions.
+\end{enumerate}
+
+The norm used affects the tree structure. For irreducible families with a \emph{spectral gap at 1}, an appropriate norm guarantees termination.
+
+\section{Remarks and Extensions}
+
+The method is applicable even in cases where:
+\begin{itemize}
+  \item $\mathcal{A}$ is reducible,
+  \item multiple generator sets are needed,
+  \item no dominant eigenvalue exists (i.e., no spectral gap).
+\end{itemize}
+
+This makes it a versatile building block for hybrid strategies combining polytope norm methods and symbolic exploration of product structures. Our implementation extends this algorithm by allowing generators with spectral radius less than 1 to accelerate termination.
