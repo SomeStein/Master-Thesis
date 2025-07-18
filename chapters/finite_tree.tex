@@ -16,19 +16,9 @@ In this chapter we introduce basic definitions and concepts to the second approa
     \end{itemize}
 \end{definition}
 
-Consider the finite set of matrices \( \mathcal{A} = \{A_1, \dots, A_n\} \).
-We will encode products from $\mathcal{A}$ by finite index sequences.
 
-\begin{definition}
-    The set \( \mathcal{I}^k := \{1, \dots, n\}^k \) denotes the collection of all positive index sequences of length \( k \). 
-    For an positive index sequence \( i = [i_1, \dots, i_k] \in \mathcal{I}^k \), the corresponding matrix product is given by
-    \[
-        A_i := A_{i_k} \cdots A_{i_1}.
-    \]
-    For \( k = 0 \), we define the identity matrix \( A_i := I \).
-\end{definition}
 
-This creates a natural tree structure $T_{\mathcal{A}}$ on the set $\bigcup_ {k \in \mathbb{N}}\mathcal{A}^k$ of all finite products from $\mathcal{A}$ where every index sequence represents a node. An example can be seen in figure~\ref{fig:matrix-product-tree}.
+Identifying products of matrices by their index sequences creates a natural tree structure $T_{\mathcal{A}}$ on the set $\bigcup_ {k \in \mathbb{N}}\mathcal{A}^k$ of all finite products from $\mathcal{A}$ where every index sequence represents a node. An example can be seen in figure~\ref{fig:matrix-product-tree}.
 
 \begin{figure}[ht]
 \centering
