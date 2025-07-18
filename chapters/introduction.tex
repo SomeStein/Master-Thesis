@@ -274,6 +274,10 @@ This result forms a starting point for many computational approaches as the boun
     \]
 \end{example}
 
+This can be applied iteratively until the sets of blocks are all irreducible.
+The problem was split into similar problems of smaller dimension.
+For the following considerations we can now assume $\mathcal{A}$ to be irreducible.
+
 \subsection*{Infimum over norms}
 \begin{proposition}
     \textcolor{red}{reference Rota und Strang 1960}
@@ -319,11 +323,6 @@ These complexity results highlight fundamental challenges. There are still appli
 
 \subsection*{Candidates and generators}
 Approximating the JSR, using the invariant-polytope or the finite-tree algorithms, requires identifying candidate products or \emph{generators} of the matrix set that contribute most significantly to the asymptotic growth rate. These generators are often derived through optimization techniques and their identification is a key step in computational algorithms.
- 
-The proof can be seen in \citep{jungersJointSpectralRadius2009}.
-This can be applied iteratively until the sets of blocks are all irreducible.
-The problem was split into similar problems of smaller dimension.
-For the following considerations we can now assume $\mathcal{A}$ to be irreducible.
 
 \subsection*{Spectral gap}
 \begin{definition}
@@ -344,11 +343,11 @@ This thesis aims to address the challenge of computing the JSR by combining two 
 
 We want to find the JSR of the finite set of matrices $\mathcal{A} = \{A_1, \cdots, A_n\}$
 \begin{enumerate}
-    \item \textbf{Assumptions}: $\mathcal{A}$ is irreducible and posesses the finiteness property. 
-    \item \textbf{Candidates}: Efficiently find products $P = A_{i_k} \cdots A_{i_1}$ of matrices from $\mathcal{A}$ that maximize the averaged-spectral radius $\hat{\rho} := \rho(P)^\frac{1}{k}$ for a given maximal length $k_{\text{max}}$.
+    \item \textbf{Assumptions}: $\mathcal{A}$ is irreducible. 
+    \item \textbf{Candidates}: Efficiently find products $P = A_{i_k} \cdots A_{i_1}$ of matrices from $\mathcal{A}$ that maximize the averaged-spectral radius $\hat{\rho} := \rho(P)^\frac{1}{k}$.
     \item \textbf{Rescaling}: Transform $\mathcal{A} \to \tilde{\mathcal{A}}$ with $\tilde{A_i} := \frac{1}{\hat{\rho}} A_i$.
     \item \textbf{Proofing}: Now establish the fact that JSR$(\tilde{\mathcal{A}}) = 1$ using the three-member-inequality. By homogenity this is equivalent to JSR$(\mathcal{A}) = \hat{\rho}$.
 \end{enumerate}
 
-The considered algorithms only differ in step 4, while the invariant-polytope algorithm tries to find a norm that bounds the products of length 1 already enough. The finite-tree algorithm, on the other hand, bounds the products using some partitioning-space that separates every product into products that are 1-bounded and some rest-term that doesnt grow fast enough to overcome the k-th root of the JSR definition (polynomial growth).
-By integrating these algorithms into a hybrid approach, this work aims to advance the computational tools available for JSR analysis combining efficiency and a vast space of matrix sets for which the algorithm terminates.
+The considered algorithms only differ in step 4, while the invariant-polytope algorithm tries to find a vector norm whos induced matrix norm bounds the matrices from $\mathcal{A}$ already enough. The finite-tree algorithm, on the other hand, bounds the products using some partitioning-space that separates every product into products that are bounded by 1 and some rest-term that does not grow fast enough to overcome the k-th root of the JSR definition (polynomial growth).
+By integrating these algorithms into a hybrid approach, this work advances the computational tools available for JSR analysis combining efficiency and a vast space of matrix sets for which the algorithm terminates.
