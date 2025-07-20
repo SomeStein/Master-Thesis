@@ -2,102 +2,112 @@
 \chapter{Invariant-polytope algorithm}
 \label{ch:inv.poly}	
 
-In this chapter we bring our interest to the invariant-polytope algorithm. 
-At its core this algorithm tries to find a polytope $P$ which is invariant under the action of the already scaled matrices in $\tilde{\mathcal{A}}$. The according minkowski-functional of the polytope is then a so-called extremal norm for the family $\mathcal{A}$.
+In this chapter we focus on the invariant-polytope algorithm. 
+At its core this algorithm tries to find a polytope $\mathcal{P} \subset \R^d $ which is invariant under the action of the already scaled matrices in $\tilde{\mathcal{A}}$. The according Minkowski functional of the polytope is then a so-called extremal norm for the family $\mathcal{A}$.
 As we will see, this is enough to proof that the chosen candidate is indeed a s.m.p., which is our goal.
 
 \section{Extremal norms}
 \label{sec:extremal-norms}
 
 \begin{definition}
-    For a family of matrices $\mathcal{A}$ a norm $\lVert \cdot \rVert$ is called \emph{invariant} if there is a number $\lambda \geq 0$ such that:
-    $$\max\limits_{A \in \mathcal{A}}\lVert A x \rVert = \lambda \lVert x \rVert, \quad \forall x \in \mathbb{R}^d$$
+    \citep{barabanov1988lyapunov}
+    For a family of matrices $\mathcal{A}$ a norm $\lVert \cdot \rVert$ is called \emph{invariant} or \emph{Barabanov} if there exists a number $\lambda \geq 0$ such that
+    $$\max\limits_{A \in \mathcal{A}}\lVert A x \rVert = \lambda \lVert x \rVert, \quad \forall x \in \mathbb{R}^d.$$
 \end{definition}
+    It can be shown that such a $\lambda$ will always equal the $\JSR$.
 
 \begin{theorem}
-    \citep{barabanov1988lyapunov} Every irreducible family $\mathcal{A}$ possesses an invariant norm.
+    \citep{barabanov1988lyapunov} 
+    Every irreducible family $\mathcal{A}$ possesses an invariant norm.
 \end{theorem}
 
 We are actually interested in norms with a weaker condition.
 
 \begin{definition}
-    A norm $\lVert \cdot \rVert$ is called extremal for a family of matrices $\mathcal{A}$ if 
-    $$\lVert A x \rVert \leq \JSR(\mathcal{A}) \lVert x \rVert \quad \forall x \in \mathbb{R}^d \text{ and } A \in \mathcal{A}$$
+    \citep{protasov1996joint}
+    A norm $\lVert \cdot \rVert$ is called \emph{extremal} or \emph{protasov} for a family of matrices $\mathcal{A}$ if 
+    $$\max\limits_{A \in \mathcal{A}}\lVert A x \rVert \leq \JSR(\mathcal{A}) \lVert x \rVert \quad \forall x \in \mathbb{R}^d$$
 \end{definition}
 
 Every invariant norm is of course extremal which guarantees the existance of such a norm. 
   
 \begin{theorem}
-    For every extremal norm $\lVert \cdot \rVert$ of a family of matrices $\mathcal{A}$ the following holds:
+    For every extremal norm $\lVert \cdot \rVert$ of a family of matrices $\mathcal{A}$ 
     $$
-    \max \limits_{P \in \mathcal{A}^k} \lVert P \rVert = \JSR(\mathcal{A})^k \quad \forall k \in \mathbb{N}
+    \max \limits_{P \in \mathcal{A}^k} \lVert P \rVert = \JSR(\mathcal{A})^k
     $$
+    holds for every $k \in \N$ 
 \end{theorem}
 \begin{proof}
     By the submultiplicativity and extremality of the norm we have:
     $$
     \begin{aligned}
-        \max \limits_{P \in \mathcal{A}^k} \lVert P \rVert & = \max \limits_{d_k,\cdots,d_1} \lVert A_{d_k}\cdot...\cdot A_{d_1} \rVert \\
-        & \le \max \limits_{d_k,\cdots,d_1} \lVert A_{d_k} \rVert \cdot...\cdot \lVert A_{d_1} \rVert \\
+        \max \limits_{P \in \mathcal{A}^k} \lVert P \rVert & = \max \limits_{d_k,\dots,d_1} \lVert A_{d_k}\cdots A_{d_1} \rVert \\
+        & \le \max \limits_{d_k,\dots,d_1} \lVert A_{d_k} \rVert \cdots \lVert A_{d_1} \rVert \\
         & \le \JSR(\mathcal{A})^k 
     \end{aligned}
     $$
-    By the three-member-inequality~\ref{eq:three-member} we have:
+    By the three-member-inequality~\ref{eq:three-member} we know
     $$
-    \max \limits_{P \in \mathcal{A}^k} \lVert P \rVert \ge \JSR(\mathcal{A})^k 
+    \begin{aligned}
+        & \JSR(\mathcal{A}) \leq \max_{P \in \mathcal{A}^k} \| P\|^{\frac{1}{k}} \\
+        & \JSR(\mathcal{A})^k \leq \max \limits_{P \in \mathcal{A}^k} \lVert P \rVert 
+    \end{aligned}
     $$
+    for every $k \in \N$.
 
 \end{proof}
 
 \begin{remark}
-    The last equality holds especially for $k = 1 \implies \max \limits_{P \in \mathcal{A}} \lVert P \rVert = \JSR(\mathcal{A})$.
-    If we have an extremal norm we can calculate the exact value of the $\JSR(\mathcal{A})$. 
+    In particular, when $k = 1$, we have $\max\limits_{A \in \mathcal{A}} \lVert A \rVert = \mathrm{JSR}(\mathcal{A})$. The existence of an extremal norm for $\mathcal{A}$ therefore enables the exact computation of the joint spectral radius.
 \end{remark}
 
-In the following we are trying to build up an extremal norm whose unit ball is a balanced polytope introduced by \citep{protasov1996joint} and \citep{guglielmi2008algorithm}.
+In the following we are trying to build up an extremal norm whose unit ball is a balanced polytope introduced in \citep{protasov1996joint} and \citep{guglielmi2008algorithm}.
 
 \begin{definition}
-    A polytope $P$ is called \emph{balanced} if it spans the whole space and is equal to the symmetriced convex hull of a finite set of vertices.
-    $$P = \text{co}_{\text{s}}(V) := \text{co}(V, -V) = \{x \in \mathbb{R}^d : x = \sum_{i=1}^M \alpha_i v_i, \sum_{i=1}^M |\alpha_i| = 1\}$$
-    If it fulfills $\mathcal{A}P \subseteq P$ for some family $\mathcal{A}$ it is called \emph{invariant under $\mathcal{A}$}.
+    A polytope $\mathcal{P}$ is called \emph{balanced} if it spans the whole space and is equal to the symmetriced convex hull of a finite set of vertices.
+    $$\mathcal{P} = \text{co}_{\text{s}}(V) := \text{co}(V, -V) = \{x \in \R^d : x = \sum_{i=1}^M \alpha_i v_i \text{ and } \sum_{i=1}^M |\alpha_i| = 1\}$$
+    If a polytope fulfills $\mathcal{A}\mathcal{P} \subseteq \mathcal{P}$ for some family $\mathcal{A}$ it is called \emph{invariant under $\mathcal{A}$}.
 \end{definition}
 
 
 \begin{definition}
-    Let $C \subseteq \mathbb{R}^n$ be a nonempty, convex set such that $0 \in \operatorname{int}(C)$.
-    The \emph{Minkowski functional} (or \emph{gauge function}) associated to $C$ is the mapping $p_C : \mathbb{R}^n \to [0,\infty)$ defined by:
+    Let $C \subseteq \R^d$ be a nonempty, convex set such that $0 \in \operatorname{int}(C)$.
+    The \emph{Minkowski functional} (or \emph{gauge function}) associated to $C$ is the mapping $p_C : \R^d \to [0,\infty)$ defined by:
     \[
-    p_C(x) = \inf\left\{ \lambda > 0 \ \middle| \ x \in \lambda C \right\} \quad \forall x \in \mathbb{R}^n
+    p_C(x) = \inf\left\{ \lambda > 0 \ \middle| \ x \in \lambda C \right\} \quad \forall x \in \R^d
     \]
-    This is in general a semi-norm on $\mathbb{R}^n$.
+    This is in general a semi-norm on $\R^d$.
 
 \end{definition}
+
 \begin{remark}
-    If $P$ is a balanced polytope, then the according Minkowski functional is a submultiplicative norm on $\mathbb{R}^n$ and we write it as $\lVert \cdot \rVert _P$.
+    If $\mathcal{P}$ is a balanced polytope, then the associated Minkowski functional defines a norm on $\mathbb{R}^d$. Moreover, the corresponding induced matrix norm on $\mathbb{R}^{d \times d}$ is submultiplicative. In both cases, we denote the norm by $\lVert \cdot \rVert _{\mathcal{P}}$.
 \end{remark}
 
 \begin{theorem}
-    If a balanced polytope $P$ is invariant under $\tilde{\mathcal{A}}$ from~\ref{sec:preprocessing}
-    the according minkowski functional is an extremal norm for the family $\mathcal{A}$ and $ \JSR(\mathcal{A}) = \hat{\rho}$.
+    If a balanced polytope $\mathcal{P}$ is invariant under $\tilde{\mathcal{A}}$ from~\eqref{sec:preprocessing}
+    the according Minkowski functional is an extremal norm for the family $\mathcal{A}$ and $ \JSR(\mathcal{A}) = \hat{\rho}$.
 \end{theorem}
+
 \begin{proof}
-    We have 
+    \vspace{\baselineskip}
     $$
     \begin{aligned}
-    \tilde{\mathcal{A}}P \subseteq  P & \implies \mathcal{A}P \subseteq \hat{\rho}P \\
-    & \implies \lVert A \rVert _P \le \hat{\rho} \quad \forall A \in \mathcal{A} \\
-    & \implies \max \limits_{A \in \mathcal{A}} \lVert A \rVert _P \le \hat{\rho} \\
+    \tilde{\mathcal{A}}\mathcal{P} \subseteq  \mathcal{P} & \implies \mathcal{A}\mathcal{P} \subseteq \hat{\rho}\mathcal{P} \\
+    & \implies \lVert A \rVert _\mathcal{P} \le \hat{\rho} \quad \forall A \in \mathcal{A} \\
+    & \implies \max \limits_{A \in \mathcal{A}} \lVert A \rVert _\mathcal{P} \le \hat{\rho} \\
     \end{aligned}
     $$
-    We already established $\max \limits_{P \in \mathcal{A}^{k}} \rho(P)^{\frac{1}{k}} = \hat{\rho}$ for a particular $k$
-    and by the three-member-inequality~\ref{eq:three-member} we have $ \hat{\rho} \le \JSR(\mathcal{A}) \le \hat{\rho} \implies \JSR(\mathcal{A}) = \hat{\rho}$ .
+    In \ref{sec:preprocessing} already established $\max \limits_{P \in \mathcal{A}^{k}} \rho(P)^{\frac{1}{k}} = \hat{\rho}$ for a particular $k$ \textcolor{red}{depending on our search space for preprocessing}
+    and by the three-member-inequality~\eqref{eq:three-member} we have $ \hat{\rho} \le \JSR(\mathcal{A}) \le \hat{\rho} \implies \JSR(\mathcal{A}) = \hat{\rho}$ .
 \end{proof}
 So by that last theorem we just need to find a balanced polytope that is invariant under the action of $\tilde{\mathcal{A}}$ and we have proven that the chosen candidate from the preprocessing is indeed a s.m.p..
 
 \section{Structure of the invariant-polytope algorithm}
-After the preprocessing has been carried out we end up with a candidate $\Pi = \tilde{A_{d_k}} \cdot ... \cdot \tilde{A_{d_1}}$ for our finiteness property hypothesis. We want to establish $\JSR{\tilde{\mathcal{A}}} = 1$ by finding an invariant balanced polytope $P = \text{co}_{\text{s}}(V)$. Now we define $V := \{ v_1, \cdots, v_k \}$ where $v_1$ is the leading eigenvector of $\Pi$ which is assumed to be real and $v_i := \tilde{A_{d_{i-1}}}\cdot ... \cdot \tilde{A_{d_1}}v_1$ the leading eigenvectors of the cyclic-permutations of $\Pi$. 
-Now we add new vertices to $V$ iteratively by multiplying with the matrices from $\tilde{\mathcal{A}}$ so $V \xleftarrow{\cup} \mathcal{A}V$. All vertices that fall into the symmetriced convex hull of $V$ can technically be disregarded as they dont contribute to a change of the polytope $P$, which will lessen the computational effort. In practice it is very important to drop as many vertices as possible since $V$ grows exponentially. This is done by solving a standard linear programming problem to find whether $\lVert Av \rVert _{\text{co}_{\text{s}}(V)} \geq 1$. 
-If the algorithm doesnt produce new vertices that lie outside of the current polytope for every $A \in \tilde{\mathcal{A}}$ it is by definition invariant and the finiteness property was proven for the used candidate.
+After the preprocessing has been carried out we end up with a candidate $\tilde{\Pi} = \tilde{A_{d_k}} \cdots \tilde{A_{d_1}}$ for our finiteness property hypothesis. We want to establish $\JSR(\tilde{\mathcal{A}}) = 1$ by finding an invariant balanced polytope $\mathcal{P} = \text{co}_{\text{s}}(V)$. Now we define $V := \{ v_1, \cdots, v_k \}$ where $v_1$ is the leading eigenvector of $\Pi$ which is assumed to be real and $v_i := \tilde{A_{d_{i-1}}}\cdot ... \cdot \tilde{A_{d_1}}v_1$ an leading eigenvectors of the cyclic-permutations of $\Pi$. 
+Now we add new vertices to $V$ iteratively by multiplying with the matrices from $\tilde{\mathcal{A}}$ i.e. $$ V \xleftarrow{\cup} \mathcal{A}V :\iff V \leftarrow V \, \cup \, \mathcal{A}V. $$ All vertices that fall into the symmetriced convex hull of $V$ can technically be disregarded as they dont contribute to a change of the polytope $\mathcal{P}$, which will lessen the computational effort. In practice it is very important to drop as many vertices as possible since $V$ grows exponentially. This is done by solving a standard linear programming problem to find whether $\lVert Av \rVert _{\text{co}_{\text{s}}(V)} \geq 1$. 
+If the algorithm does not produce new vertices that lie outside of the current polytope for every $\tilde{A} \in \tilde{\mathcal{A}}$ it is by definition invariant and the finiteness property was proven for the used candidate.
 
 \vspace{1cm}
 
@@ -132,16 +142,16 @@ If the algorithm doesnt produce new vertices that lie outside of the current pol
 %\vspace{2cm}
 
 \section{Stopping criterion}
-The runtime of the algorithm \ref{alg:exact} is not finite in general. 
-in \citep{guglielmiExactComputationJoint2013} it is propsed in the case of the candidate $\Pi$ having an unique simple leading eigenvalue to define $v_1^{*}$ as the leading eigenvector of $\Pi^{*}$ the conjugate operator of the candidate $\Pi$ normalized by $(v_1, v_1^{*}) = 1$ as well as $v_i^{*} := \tilde{A_{d_i}^{*}} \cdot ... \cdot \tilde{A_{d_k}^{*}} v_1^{*}$ which are the leading eigenvectors of the conjugates of the cyclic-permutations of $\Pi \in \mathcal{A}^k$.
+The runtime of algorithm \ref{alg:exact} is not finite in general. 
+In \citep{guglielmiExactComputationJoint2013} it is proposed, in the case of the candidate $\tilde{\Pi}$ having an unique simple leading eigenvalue and there also exists only one s.m.p., to define $v_1^{*}$ as the leading eigenvector of $\tilde{\Pi}^{*}$ the conjugate operator of the candidate $\tilde{\Pi}$ normalized by $(v_1, v_1^{*}) = 1$ as well as $v_i^{*} := \tilde{A_{d_i}^{*}} \cdots \tilde{A_{d_k}^{*}} v_1^{*}$ which are the leading eigenvectors of the conjugates of the cyclic-permutations of $\Pi \in \mathcal{A}^k$.
 If now $\lVert Av \rVert _{\text{co}_{\text{s}}(V)}  > 1$ if there exists a $j$
 such that $| ( v_j^{*}, Av) | > 1$ then the chosen candidate is not a s.m.p. and the algorithm either stops ore restarts with a new candidate. 
 
 \section{Termination conditions}
-There exist some rare cases where the finiteness property doesnt hold or it holds but there are no invariant polytopes. In this cases the algorithm will not find the value of the $\JSR$ also for multiple s.m.p's the current algorithm will not terminate which can be fixed by a better choice of starting vertices.
+There exist some rare cases where the finiteness property either does not hold or there are no invariant polytopes. In those cases the algorithm will not find the value of the $\JSR$.
 
 \section{Rebalancing and added starting vertices}
-Three years after publishing the fundamental algorithm with the provided stopping criterion, the writers released a new paper on rebalancing multiple s.m.ps as well as starting with some extra vertices so the polytope is conditioned better (not as flat) \citep{guglielmiInvariantPolytopesLinear2015} in that case its possible to even terminate with multiple s.m.p's.
+Three years after publishing the fundamental algorithm with the provided stopping criterion, the writers released a new paper on rebalancing multiple s.m.p.s as well as starting with some extra vertices so the polytope is conditioned better \citep{guglielmi2016invariant} in that case its possible to even terminate with multiple s.m.p.s..
 
 \section{Eigenvector cases}
 If the eigenvector is complex, then a different norm must be used, a so called complex-balanced-polytope norm. 
