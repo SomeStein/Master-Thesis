@@ -13,7 +13,7 @@ The remainder of this thesis is structured as follows: Chapter~\ref{ch:introduct
 
 \section{Preliminaries}
 
-In this thesis, we denote the spectral radius of a matrix by $\rho$. Unless specified otherwise, all matrices under consideration are assumed to have real entries, and all matrix norms are assumed to be submultiplicative (The complex case is analogous and can be transformed into the real case.). 
+In this thesis, the spectral radius of a matrix $A$ is denoted by $\rho(A)$. Unless stated otherwise, all matrices considered are assumed to have real entries, and all matrix norms are presumed to be submultiplicative. The analogous results for complex matrices follow similarly and may be reduced to the real case when necessary.
 
 Let $\mathcal{A} = \{A_1, \dots, A_m\}$ denote a finite collection of matrices, each of size $d \times d$.
 
@@ -38,7 +38,7 @@ $$
 For any scalar $\alpha \in \mathbb{R}$, we define the scaled matrix set by
 
 $$
-    \alpha \mathcal{A} := \{ \alpha A_1, \dots, \alpha A_m \}.
+    \alpha \mathcal{A} := \left\{ \alpha A_1, \dots, \alpha A_m \right\}.
 $$
 
 \section{Motivation of the JSR}
@@ -54,8 +54,9 @@ A key question is whether the system is \emph{uniformly asymptotically stable}, 
 \[
 \lim_{k \to \infty} x_k = 0.
 \]
-This behavior is governed by a generalization of the spectral radius for a single matrix the so-called \emph{joint spectral radius (JSR)} of a matrix set $\mathcal{A}$.
+This behavior is governed by a generalization of the spectral radius for a single matrix the so-called \emph{joint spectral radius (JSR)} of a matrix set $\mathcal{A}$. \textcolor{red}{reference}
 \begin{definition}
+    \textcolor{red}{reference}
     For a finite set of matrices $\mathcal{A} = \{A_1, \dots, A_m\}$, the JSR is defined as:
     \begin{equation} \label{eq:jsr_def}
         \JSR(\mathcal{A}) := \lim_{k \to \infty} \max_{P \in \mathcal{A}^k}  \|P\|^{1/k}.
@@ -103,12 +104,13 @@ has spectral radius of approximately
 \]
 This example shows that switching can amplify the effects of individual matrices, leading to divergent behavior even if all single matrices are contractive. Thus, the JSR can exceed the spectral radius of any individual matrix in the set.
 
-The following result by \citep{blondelSurveyComputationalComplexity2000} motivates the importance of bounding or approximating $\JSR(\mathcal{A})$. It is known that:
+The following result motivates the importance of bounding or approximating $\JSR(\mathcal{A})$. It is known that:
 \begin{samepage}
     \begin{itemize}
         \item The system~\eqref{eq:switched_system} is \emph{uniformly bounded} (i.e., $\sup_k \|x_k\| < \infty$ for all $x_0 \in \R^d$) if and only if $\JSR(\mathcal{A}) \leq 1$.
         \item It is \emph{uniformly asymptotically stable} if and only if $\JSR(\mathcal{A}) < 1$. 
     \end{itemize}
+    \citep{blondelSurveyComputationalComplexity2000}
 \end{samepage}
 
 Understanding the JSR is therefore critical for analyzing the asymptotic behavior of switched systems and motivates the development of reliable algorithms for finding or approximating the JSR, such as the hybrid algorithm proposed in \citep{mejstrikHybridApproachJoint2024}.
@@ -129,7 +131,7 @@ Therfore we have that
 
 \begin{align*}
 & \lim_{k \to \infty} \max_{P \in \mathcal{A}^k} \|P\|_{1}^{1/k} 
-\le  \lim_{k \to \infty} {(\frac{1}{c})}^{\frac{1}{k}} \max_{P \in \mathcal{A}^k} \|P\|_{2}^{1/k} \\
+\le  \lim_{k \to \infty} {\left(\frac{1}{c}\right)}^{\frac{1}{k}} \max_{P \in \mathcal{A}^k} \|P\|_{2}^{1/k} \\
 = & \lim_{k \to \infty} \max_{P \in \mathcal{A}^k} \|P\|_{2}^{1/k} 
 \le  \lim_{k \to \infty} {C}^{\frac{1}{k}} \max_{P \in \mathcal{A}^k} \|P\|_{1}^{1/k}\\
 = & \lim_{k \to \infty} \max_{P \in \mathcal{A}^k} \|P\|_{1}^{1/k},
@@ -160,22 +162,22 @@ To facilitate the analysis of the algorithms and presentation of the main result
 \subsection*{Three-member inequality}
 \textcolor{red}{reference}
 \begin{proposition}
-    The $\JSR$ can be equally defined as:
+    The $\JSR$ can be equally defined as
     $$
-    \JSR(\mathcal{A}) = \limsup_{k \to \infty} \max_{P \in \mathcal{A}^k} \rho(P)^{1/k}.
+    \JSR(\mathcal{A}) = \limsup_{k \to \infty} \max_{P \in \mathcal{A}^k} \rho(P)^{1/k},
     $$
-    If $\mathcal{A}$ is a finite (or compact) set.
+    if $\mathcal{A}$ is a finite (or compact) set.
 \end{proposition}
 
 \textcolor{red}{proof here}
 
 \begin{proposition}
-    For any submultiplicative matrix norm $\|\cdot\|$, the inequality
+    Let $\|\cdot\|$ be a matrix norm. The inequality
     \begin{equation}
-    \max_{P \in \mathcal{A}^k} \rho(P)^{\frac{1}{k}} \leq \JSR(\mathcal{A}) \leq \max_{P \in \mathcal{A}^k} \| P\|^{\frac{1}{k}},
+    \max_{P \in \mathcal{A}^k} \rho(P)^{\frac{1}{k}} \leq \JSR(\mathcal{A}) \leq \max_{P \in \mathcal{A}^k} \| P\|^{\frac{1}{k}}
     \label{eq:three-member}
     \end{equation}
-    holds for every $k \in \mathbb{N}$ where $\rho(P)$ is the spectral radius of the matrix $P$.
+    holds for every $k \in \mathbb{N}$.
 \end{proposition}
 \begin{proof}
     For a fixed $k \in \N$ let 
