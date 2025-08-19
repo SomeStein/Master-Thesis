@@ -15,12 +15,12 @@ The remainder of this thesis is structured as follows: Chapter~\ref{ch:introduct
 
 In this thesis, the spectral radius of a matrix $A$ is denoted by $\rho(A)$. Unless stated otherwise, all matrices considered are assumed to have real entries, and all matrix norms are presumed to be submultiplicative. The analogous results for complex matrices follow similarly and may be reduced to the real case when necessary.
 
-Let $\mathcal{A} = \{A_1, \dots, A_m\}$ denote a finite collection of matrices, each of size $d \times d$.
+Let $\mathcal{A} = \{A_1, \dots, A_n\}$ denote a finite collection of matrices, each of size $d \times d$.
 
 For any positive integer $k \in \mathbb{N}$, we define the set of positive multi-indices of length $k$ as
 
 $$
-    \mathcal{I}_k := \{1, \dots, m\}^k.
+    \mathcal{I}_k := \{1, \dots, n\}^k.
 $$
 
 Given a positive multi-index $I = [i_1, \dots, i_k] \in \mathcal{I}_k$, we define the associated matrix product by
@@ -28,6 +28,7 @@ Given a positive multi-index $I = [i_1, \dots, i_k] \in \mathcal{I}_k$, we defin
 $$
     A_I = A_{[i_1, \dots, i_k]} := A_{i_k} \cdots A_{i_1}.
 $$
+Note that the indices are in reversed order compared to the multiplications.
 
 The set of all possible products of length $k$ formed from elements of $\mathcal{A}$ is then given by
 
@@ -38,17 +39,17 @@ $$
 For any scalar $\alpha \in \mathbb{R}$, we define the scaled matrix set by
 
 $$
-    \alpha \mathcal{A} := \left\{ \alpha A_1, \dots, \alpha A_m \right\}.
+    \alpha \mathcal{A} := \left\{ \alpha A_1, \dots, \alpha A_n \right\}.
 $$
 
 \section{Motivation of the JSR}
 
-Let $\mathcal{A} = \{A_1, \cdots, A_m\}$ be a finite set of $d\times d$ matrices. 
+Let $\mathcal{A} = \{A_1, \cdots, A_n\}$ be a finite set of $d\times d$ matrices. 
 Consider a discrete-time linear switched system of the form:
 \begin{equation} \label{eq:switched_system}
 x_{k+1} = A_{\sigma(k)} x_k, \quad x_0 \in \mathbb{R}^d,
 \end{equation}
-where $\sigma: \mathbb{N} \to \{1, \dots, m\}$ is a switching signal.
+where $\sigma: \mathbb{N} \to \{1, \dots, n\}$ is a switching signal.
 
 A key question is whether the system is \emph{uniformly asymptotically stable}, i.e., whether every trajectory $(x_k)$ converges to zero for all initial states and switching sequences:
 \[
@@ -56,8 +57,9 @@ A key question is whether the system is \emph{uniformly asymptotically stable}, 
 \]
 This behavior is governed by a generalization of the spectral radius for a single matrix the so-called \emph{joint spectral radius (JSR)} of a matrix set $\mathcal{A}$. \textcolor{red}{reference}
 \begin{definition}
+    \label{def:JSR}
     \textcolor{red}{reference}
-    For a finite set of matrices $\mathcal{A} = \{A_1, \dots, A_m\}$, the JSR is defined as:
+    For a finite set of matrices $\mathcal{A} = \{A_1, \dots, A_n\}$, the JSR is defined as:
     \begin{equation} \label{eq:jsr_def}
         \JSR(\mathcal{A}) := \lim_{k \to \infty} \max_{P \in \mathcal{A}^k}  \|P\|^{1/k}.
     \end{equation}
@@ -105,13 +107,11 @@ has spectral radius of approximately
 This example shows that switching can amplify the effects of individual matrices, leading to divergent behavior even if all single matrices are contractive. Thus, the JSR can exceed the spectral radius of any individual matrix in the set.
 
 The following result motivates the importance of bounding or approximating $\JSR(\mathcal{A})$. It is known that:
-\begin{samepage}
-    \begin{itemize}
-        \item The system~\eqref{eq:switched_system} is \emph{uniformly bounded} (i.e., $\sup_k \|x_k\| < \infty$ for all $x_0 \in \R^d$) if and only if $\JSR(\mathcal{A}) \leq 1$.
-        \item It is \emph{uniformly asymptotically stable} if and only if $\JSR(\mathcal{A}) < 1$. 
-    \end{itemize}
-    \citep{blondelSurveyComputationalComplexity2000}
-\end{samepage}
+\begin{itemize}
+    \item The system~\eqref{eq:switched_system} is \emph{uniformly bounded} (i.e., $\sup_k \|x_k\| < \infty$ for all $x_0 \in \R^d$) if and only if $\JSR(\mathcal{A}) \leq 1$.
+    \item It is \emph{uniformly asymptotically stable} if and only if $\JSR(\mathcal{A}) < 1$. 
+\end{itemize}
+\citep{blondelSurveyComputationalComplexity2000}‚
 
 Understanding the JSR is therefore critical for analyzing the asymptotic behavior of switched systems and motivates the development of reliable algorithms for finding or approximating the JSR, such as the hybrid algorithm proposed in \citep{mejstrikHybridApproachJoint2024}.
 \textcolor{red}{also other important results depending on JSR}
@@ -150,7 +150,7 @@ To facilitate the analysis of the algorithms and presentation of the main result
     \end{equation}
 \end{proposition}
 \begin{proof}
-    Let $\mathcal{A} = \{A_1, \dots, A_m\}$ and $\alpha \in \mathbb{R}$. Then:
+    Let $\mathcal{A} = \{A_1, \dots, A_n\}$ and $\alpha \in \mathbb{R}$. Then:
     \begin{align*}
         \JSR(\alpha \mathcal{A}) & = \lim_{k \to \infty} \max_{A_{i} \in \mathcal{A}^k} \|\alpha A_{i_k} \cdots \alpha A_{i_1}\|^{1/k} \\
         & = |\alpha| \lim_{k \to \infty} \max_{A_{i} \in \mathcal{A}^k} \|A_{i_k} \cdots A_{i_1}\|^{1/k} \\
@@ -232,7 +232,7 @@ This result forms a starting point for many computational approaches as the boun
     \begin{equation}
         \JSR(\mathcal{A}) = \max \{ \JSR(\mathcal{B}), \JSR(\mathcal{D}) \},
     \end{equation}
-    where $\mathcal{B} = \{B_1,\dots, B_m\}$ and $\mathcal{D} = \{D_1,\dots, D_m\}$ are the blocks of the block-triangularized matrices
+    where $\mathcal{B} = \{B_1,\dots, B_n\}$ and $\mathcal{D} = \{D_1,\dots, D_n\}$ are the blocks of the block-triangularized matrices
     \[
         T^{-1}A_jT = 
         \begin{bmatrix}
@@ -303,7 +303,7 @@ For the following considerations we can now assume $\mathcal{A}$ to be irreducib
 
 \subsection*{Finiteness property}
 \begin{definition}
-    A matrix set $\mathcal{A} = \{ A_1, \dots, A_m \}$ is said to possess the \emph{finiteness property} if there exists a finite sequence of matrices $A_{i_1}, \dots, A_{i_k}$ such that
+    A matrix set $\mathcal{A} = \{ A_1, \dots, A_n \}$ is said to possess the \emph{finiteness property} if there exists a finite sequence of matrices $A_{i_1}, \dots, A_{i_k}$ such that
     \begin{equation}
         \operatorname{JSR}(\mathcal{A}) = \|A_{i_k} \cdots A_{i_1}\|^{1/k}.
     \end{equation}

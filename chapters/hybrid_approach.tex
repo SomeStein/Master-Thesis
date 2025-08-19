@@ -2,18 +2,32 @@
 \chapter{Hybrid approach} 
 \label{ch:hybrid}
 
-In this chapter we want to explore some possible combinations of the before mentioned algorithm schemes and then present the main result of this work, the tree-flavored-invariant-polytope-algorithm and its termination results. 
+In this chapter we will explore some possible combinations of the abeforementioned algorithms and then present the main result of this work. The tree-flavored-invariant-polytope-algorithm and its termination results. 
 
 \begin{section}{Goal and options}
-In its heart the invariant-polytope algorithm tries to find a polytope, which corrisponding minkowski-norm is specifically optimized on the given problem, whilst the finite-tree algorithm connects growth-rate to decompositions of products. A clear combination scheme arises naturally, where we use the optimized polytope norm to estimate the products of the finite-tree. From there we can choose a specific order or level of concurrency.
+In its heart the invariant-polytope algorithm tries to find a polytope, whose corrisponding Minkowski norm is specifically optimized on the given problem, whilst the finite-tree algorithm connects growth-rate to decompositions of products. A clear combination scheme arises naturally, where we use the optimized polytope norm to estimate the products of the finite-tree. From there we can choose a specific order or level of concurrency.
 \newline
-The most modular approach would be to first run the invariant-polytope algorithm for a couple of runs and then use the calculated norm thats specially optimized for the finite-tree algorithm. But that seems to be wasteful since valuable matrix calculations from the finite-tree algorithm could have been used for an even more optimized norm and some polytopes might have already cleared insight for the decompositions that the finite-tree algorithm tries to find. In \citep{mejstrikHybridApproachJoint} the authors came up with a more concurrent algorithm that builds up norms and decompositions in every step. 
+A modular approach would be to first run the invariant-polytope algorithm for a couple of runs and then use the calculated norm thats already optimized for the finite-tree algorithm. But that seems to be wasteful since valuable matrix calculations from the finite-tree algorithm could have been used for an even more optimized norm and some polytopes might have already cleared insight for the decompositions that the finite-tree algorithm tries to find. In \citep{mejstrikHybridApproachJoint2024} the authors came up with a more concurrent algorithm that builds up norms and decompositions in every step. 
 \end{section}
 
 \section{Structure of the hybrid algorithm}
 
-We try to decompose arbitrary products $P \in \mathcal{A}^k$, such that their polytope-norms are less then $p(k)$ where $p$ is a monotone polynomial.
-This removes the invariance property of the polytope to be build up, since the norms dont have to be less than 1 but it still proofes the JSR identity because we take the averaged norms in the length of the products in the three-member-inequality~\ref{eq:three-member}.
+\subsection{Objective}
+After the preprocessing stage from \ref{sec:preprocessing} is done, we end up with a scaled set of matrices $\tilde{\mathcal{A}}$ and from the chosen candidate and the three-member-inequality \eqref{eq:three-member} we already know $\JSR(\tilde{\mathcal{A}}) \geq 1$. 
+Such that our goal of establishing $\JSR(\tilde{\mathcal{A}}) = 1$ becomes equivalent to  $\JSR(\tilde{\mathcal{A}}) \leq 1$. 
+For this we want to show that there exists a polynomial $p$ and a norm $\lVert \cdot \rVert$, such that, similarly to chapter \ref{ch:finite-tree}, every norm of a product of matrices from $\tilde{\mathcal{A}}$ can be bounded by this polynomial in its length i.e. $$ \lVert P \rVert \leq p(k) \quad \forall P \in \tilde{\mathcal{A}}^k, k \in \N $$.
+We find the polynomial by decomposing every multi-index into leaf 
+
+\subsection{Process}
+The algorithm starts just as the invariant-polytope algorithm. After the initial set of vertices was calculated we now choose a
+$(\mathcal{A},\mathbf{G})\text{-tree } T_v$ like in \citep{mejstrikHybridApproachJoint2024} for every vertex $v \in V$.
+If there exists a product with $ \lVert \rVert$
+- after initial, start with A-G-trees in every branch of invariant-poly
+- refine norm for not 1-bounded trees
+- old trees stay bounded for new norms
+
+We try to decompose arbitrary products $P \in \mathcal{A}^k$, such that their polytope-norms are less then $p(k)$ where $p$ is a strictly-positive, monotone polynomial.
+This removes the invariance property of the polytope to be build up, since the norms dont have to be less than 1 but it still proofes the JSR identity because we take the averaged norms in the length of the products in the definition of the $\JSR$.
 \newline 
 Starting the loop of the invariant-polytope algorithm with a cycle on top that is connected via the generators factors and also the first branches represented by images from the missing $J-1$ factors from $\mathcal{A}$. Instead of only adding images under vertices from $V$ and matrices from $\mathcal{A}$ directly, from now on we try to find an $(\mathcal{A},\mathbf{G})\text{-tree}$ which is one-bounded i.e its leafage-polytope-norm is less than 1, for every $v \in V$.
 For that we generate $(\mathcal{A},\mathbf{G})\text{-tree}$ patterns in the beginning and just go through every remaining vertex and calculate the leafage-norms. From the structure of those trees we can assume that every matrix in $\mathcal{A}$ represents a node for the first branches.
@@ -31,7 +45,8 @@ After termination the set of trees generated promise a valid decomposition for e
   \caption{Tree-flavored-invariant-polytope-algorithm}
   \label{alg:hybrid}
   \begin{algorithmic}
-      \State $V := \{v_1, \cdots, v_M\}$
+      \State \Input{$\mathcal{A} = \{A_1, \ldots, A_n\}$, $\mathbf{G} = \{ g_1, \cdots, g_m \}$ and $V = \{v_1, \cdots, v_M\}$}
+      \State \Output{A boolean value indicating whether the tree condition holds (True/False)}
       \State $V_{\text{new}} \gets V$
       \While {$V_{\text{new}} \ne \emptyset$}
           \State $V_{\text{rem}} \gets V_{\text{new}}$
@@ -44,7 +59,7 @@ After termination the set of trees generated promise a valid decomposition for e
               \EndIf  
           \EndFor
       \EndWhile \\
-      \Return \\
+      \Return $\text{True}$
   \end{algorithmic}
 \end{algorithm}
 
@@ -124,6 +139,9 @@ The following figure~\ref{fig:cyclic_tree_structure} shows an example of the gen
 \end{figure}
 
 Now the finite-tree theory comes in and every vertex gets tested by a $(\mathcal{A},\mathbf{G})\text{-tree}$ (dashed arrows). Take the vector $v_6$ for example it has been tested by an tree and the branch starting with the matrix $B$ was sufficient i.e. every leaf-node has a polytope-norm of less than 1 (at the time the polytope consists of the vertices $V = \{v_1, \cdots, v_6\}$). The branch starting with the matrix $A$ on the other hand did not, so the vertex $v_7 = Av_6$ has been added to $V$ and the next tree was tested, which was fully sufficient (on every branch). Since the other branches also terminated earlier the algorithm stops, no more vertices are beeing added and the candidate $\Pi$ was proofen to be a s.m.p product. 
+
+\subsection{Outline of proof}
+- when all trees 1-bounded valid decomp and norm is found 
 
 \section{Termination results}
 
