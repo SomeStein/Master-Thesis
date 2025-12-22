@@ -17,7 +17,7 @@ A modular approach would be to first run the invariant-polytope algorithm for a 
 After the preprocessing stage from \ref{sec:preprocessing} is done, we end up with a scaled set of matrices $\tilde{\mathcal{A}}$ and from the chosen candidate and the three-member-inequality \eqref{eq:three-member} we already know $\JSR(\tilde{\mathcal{A}}) \geq 1$. 
 Such that our goal of establishing $\JSR(\tilde{\mathcal{A}}) = 1$ becomes equivalent to  $\JSR(\tilde{\mathcal{A}}) \leq 1$. 
 For this we want to show that there exists a polynomial $p$ and a norm $\lVert \cdot \rVert$, such that, similarly to chapter \ref{ch:finite-tree}, every norm of a product of matrices from $\tilde{\mathcal{A}}$ can be bounded by this polynomial in its length i.e. $$ \lVert P \rVert \leq p(k) \quad \forall P \in \tilde{\mathcal{A}}^k, k \in \N. $$
-We find the polynomial by decomposing every multi-index into leaf 
+We find the polynomial by decomposing every multi-index into a leaf node followed by a series of bounded products. Where the leaf nodes are expected to be bounded in their lengths. 
 
 \subsection{Process}
 The algorithm starts just as the invariant-polytope algorithm. After the initial set of vertices was calculated we now choose a
