@@ -6,7 +6,7 @@
 % License: MIT License
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\documentclass[oneside,tikz,12pt,pagesize,twoside,DIV=12,headsepline=0.4pt]{scrbook}
+\documentclass[oneside,tikz,12pt,pagesize,twoside,DIV=12,headsepline=0.4pt,parskip=half]{scrbook}
 \usepackage{scrhack}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -19,7 +19,7 @@
 
 % Citation and References
 \usepackage[round]{natbib}                       % For (Author, Year) style
-\bibliographystyle{apalike}                     % Plain bibliography with natbib
+\bibliographystyle{apalike}                      % Plain bibliography with natbib
 
 % Mathematics and Algorithms
 \usepackage{amsmath,amsthm,amssymb}              % Math tools
@@ -35,7 +35,7 @@
 
 % Graphics and Figures
 \usepackage{graphicx}                            % For including graphics
-\graphicspath{{renders/}}  % Output PDF in the 'renders' folder
+\graphicspath{{renders/}}                        % Output PDF in the 'renders' folder
 \usepackage{tikz}                                % TikZ for diagrams
 \usetikzlibrary{calc,trees}
 \usepackage{caption}
@@ -48,7 +48,6 @@
 \usepackage{setspace}                            % Line spacing
 \usepackage[colorlinks=true, linkcolor=black, citecolor=black, urlcolor=gray]{hyperref}
 \usepackage{scrlayer-scrpage}                    % Custom headers and footers
-\usepackage{parskip}
 \let\cleardoublepage\clearpage
 \pagestyle{scrheadings}
 \automark[chapter]{chapter}
@@ -92,7 +91,10 @@
 % Custom Commands
 \newcommand{\N}{\mathbb{N}}
 \newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
 \newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\F}{\mathbb{F}}
 
 % Remove ending keywords in algorithms
 \algtext*{EndIf}
@@ -104,12 +106,12 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Personal Data 
 
-\renewcommand{\title}{Termination results for hybrid approach of Joint Spectral Radius computation} % Thesis title
-\renewcommand{\author}{Aaron Pumm, B.Sc.}                        % Author name
-\newcommand{\matrikelnummer}{11921970}                        % Matriculation number
-\newcommand{\studienkennzahl}{UA 066 821}                    % Study code
-\newcommand{\studienrichtung}{Masterstudium Mathematik}       % Program
-\newcommand{\betreuerin}{Assoz. Prof. Dr. Martin Ehler}       % Supervisor
+\renewcommand{\title}{Termination results for hybrid approach of Joint Spectral Radius computation}
+\renewcommand{\author}{Aaron Pumm, B.Sc.}
+\newcommand{\matrikelnummer}{11921970}
+\newcommand{\studienkennzahl}{UA 066 821}
+\newcommand{\studienrichtung}{Masterstudium Mathematik}
+\newcommand{\betreuerin}{Assoz. Prof. Dr. Martin Ehler}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Begin Document
