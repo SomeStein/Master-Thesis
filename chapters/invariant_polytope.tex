@@ -25,7 +25,7 @@ We are actually interested in norms with a weaker condition.
 
 \begin{definition}
     \citep{protasov1996joint}
-    A norm $\lVert \cdot \rVert$ is called \emph{extremal} or \emph{protasov} for a family of matrices $\mathcal{A}$ if 
+    A norm $\lVert \cdot \rVert$ is called \emph{extremal} for a family of matrices $\mathcal{A}$ if 
     $$\max\limits_{A \in \mathcal{A}}\lVert A x \rVert \leq \JSR(\mathcal{A}) \lVert x \rVert \quad \forall x \in \mathbb{R}^d$$
 \end{definition}
 
@@ -66,7 +66,7 @@ In the following we are trying to build up an extremal norm whose unit ball is a
 
 \begin{definition}
     A polytope $\mathcal{P}$ is called \emph{balanced} if it spans the whole space and is equal to the symmetriced convex hull of a finite set of vertices.
-    $$\mathcal{P} = \text{co}_{\text{s}}(V) := \text{co}(V, -V) = \{x \in \R^d : x = \sum_{i=1}^M \alpha_i v_i \text{ and } \sum_{i=1}^M |\alpha_i| = 1\}$$
+    $$\mathcal{P} = \text{co}_{\text{s}}(V) := \text{co}(V, -V) = \{x \in \R^d : x = \sum_{i=1}^M \alpha_i v_i \text{ and } \sum_{i=1}^M |\alpha_i| \le 1\}$$
     If a polytope fulfills $\mathcal{A}\mathcal{P} \subseteq \mathcal{P}$ for some family $\mathcal{A}$ it is called \emph{invariant under $\mathcal{A}$}.
 \end{definition}
 
@@ -75,7 +75,7 @@ In the following we are trying to build up an extremal norm whose unit ball is a
     Let $C \subseteq \R^d$ be a nonempty, convex set such that $0 \in \operatorname{int}(C)$.
     The \emph{Minkowski functional} (or \emph{gauge function}) associated to $C$ is the mapping $p_C : \R^d \to [0,\infty)$ defined by:
     \[
-    p_C(x) = \inf\left\{ \lambda > 0 \ \middle| \ x \in \lambda C \right\} \quad \forall x \in \R^d
+    p_C(x) = \inf\left\{ \lambda > 0 \ \middle| \ x \in \lambda C \right\} \quad \forall x \in \R^d.
     \]
     This is in general a semi-norm on $\R^d$.
 
@@ -87,7 +87,7 @@ In the following we are trying to build up an extremal norm whose unit ball is a
 
 \begin{theorem}
     If a balanced polytope $\mathcal{P}$ is invariant under $\tilde{\mathcal{A}}$ from~\eqref{sec:preprocessing}
-    the according Minkowski functional is an extremal norm for the family $\mathcal{A}$ and $ \JSR(\mathcal{A}) = \hat{\rho}$.
+    the according Minkowski functional is an extremal norm for the family $\mathcal{A}$ and $ \JSR(\mathcal{A}) \le \hat{\rho}$.
 \end{theorem}
 
 \begin{proof}
@@ -99,21 +99,16 @@ In the following we are trying to build up an extremal norm whose unit ball is a
     & \implies \max \limits_{A \in \mathcal{A}} \lVert A \rVert _\mathcal{P} \le \hat{\rho} \\
     \end{aligned}
     $$
-    In \ref{sec:preprocessing} already established $\max \limits_{P \in \mathcal{A}^{k}} \rho(P)^{\frac{1}{k}} = \hat{\rho}$ for a particular $k$ \textcolor{red}{depending on our search space for preprocessing}
-    and by the three-member-inequality~\eqref{eq:three-member} we have $ \hat{\rho} \le \JSR(\mathcal{A}) \le \hat{\rho} \implies \JSR(\mathcal{A}) = \hat{\rho}$ .
 \end{proof}
 So by that last theorem we just need to find a balanced polytope that is invariant under the action of $\tilde{\mathcal{A}}$ and we have proven that the chosen candidate from the preprocessing is indeed a s.m.p..
 
 \section{Structure of the invariant-polytope algorithm}
-After the preprocessing has been carried out we end up with a candidate $\tilde{\Pi} = \tilde{A_{d_k}} \cdots \tilde{A_{d_1}}$ for our finiteness property hypothesis. We want to establish $\JSR(\tilde{\mathcal{A}}) = 1$ by finding an invariant balanced polytope $\mathcal{P} = \text{co}_{\text{s}}(V)$. Now we define $V := \{ v_1, \cdots, v_k \}$ where $v_1$ is the leading eigenvector of $\Pi$ which is assumed to be real and $v_i := \tilde{A_{d_{i-1}}}\cdot ... \cdot \tilde{A_{d_1}}v_1$ an leading eigenvectors of the cyclic-permutations of $\Pi$. 
+After the preprocessing has been carried out we end up with a candidate $\tilde{\Pi} = \tilde{A_{d_k}} \cdots \tilde{A_{d_1}}$ for our finiteness property hypothesis. We want to establish $\JSR(\tilde{\mathcal{A}}) = 1$ by finding an invariant balanced polytope $\mathcal{P} = \text{co}_{\text{s}}(V)$. Now we define $V := \{ v_1, \cdots, v_k \}$ where $v_1$ is the leading eigenvector of $\Pi$ which is assumed to be real and $v_i := \tilde{A_{d_{i-1}}}\cdot ... \cdot \tilde{A_{d_1}}v_1$ are the leading eigenvectors of the cyclic-permutations of $\Pi$. 
 Now we add new vertices to $V$ iteratively by multiplying with the matrices from $\tilde{\mathcal{A}}$ i.e. $$ V \xleftarrow{\cup} \mathcal{A}V :\iff V \leftarrow V \, \cup \, \mathcal{A}V. $$ All vertices that fall into the symmetriced convex hull of $V$ can technically be disregarded as they dont contribute to a change of the polytope $\mathcal{P}$, which will lessen the computational effort. In practice it is very important to drop as many vertices as possible since $V$ grows exponentially. This is done by solving a standard linear programming problem to find whether $\lVert Av \rVert _{\text{co}_{\text{s}}(V)} \geq 1$. 
 If the algorithm does not produce new vertices that lie outside of the current polytope for every $\tilde{A} \in \tilde{\mathcal{A}}$ it is by definition invariant and the finiteness property was proven for the used candidate.
 
-\vspace{1cm}
 
-\FloatBarrier
-
-\begin{algorithm}
+\begin{algorithm}[ht]
 \caption{invariant-polytope algorithm}
 \label{alg:exact}
 \begin{algorithmic}
@@ -137,13 +132,9 @@ If the algorithm does not produce new vertices that lie outside of the current p
 \end{algorithmic} 
 \end{algorithm}
 
-%\FloatBarrier
-
-%\vspace{2cm}
-
 \section{Stopping criterion}
-The runtime of algorithm \ref{alg:exact} is not finite in general. 
-In \citep{guglielmiExactComputationJoint2013} it is proposed, in the case of the candidate $\tilde{\Pi}$ having an unique simple leading eigenvalue and there also exists only one s.m.p., to define $v_1^{*}$ as the leading eigenvector of $\tilde{\Pi}^{*}$ the conjugate operator of the candidate $\tilde{\Pi}$ normalized by $(v_1, v_1^{*}) = 1$ as well as $v_i^{*} := \tilde{A_{d_i}^{*}} \cdots \tilde{A_{d_k}^{*}} v_1^{*}$ which are the leading eigenvectors of the conjugates of the cyclic-permutations of $\Pi \in \mathcal{A}^k$.
+The runtime of algorithm \ref{alg:exact} can be very big. It is in general at least exponentially in the dimension. In cases where the s.m.p.-candidate is not a s.m.p., or where there are multiple leading eigenvectors the algorithm never terminates. It is thus of importance to identify cases where the algorithm will not terminate in a reasonable amount of time. Regarding the exponential runtime one sets an upper bound on the number of vertices in $V$. Regarding the s.m.p. candidate \citep{guglielmiExactComputationJoint2013} proposed the following method.
+In the case of the candidate $\tilde{\Pi}$ having an unique simple leading eigenvalue and the existence of only one s.m.p., to define $v_1^{*}$ as the leading eigenvector of $\tilde{\Pi}^{*}$ the conjugate operator of the candidate $\tilde{\Pi}$ normalized by $(v_1, v_1^{*}) = 1$ as well as $v_i^{*} := \tilde{A_{d_i}^{*}} \cdots \tilde{A_{d_k}^{*}} v_1^{*}$ which are the leading eigenvectors of the conjugates of the cyclic-permutations of $\Pi \in \mathcal{A}^k$.
 If now $\lVert Av \rVert _{\text{co}_{\text{s}}(V)}  > 1$ if there exists a $j$
 such that $| ( v_j^{*}, Av) | > 1$ then the chosen candidate is not a s.m.p. and the algorithm either stops ore restarts with a new candidate. 
 
@@ -154,8 +145,8 @@ There exist some rare cases where the finiteness property either does not hold o
 Three years after publishing the fundamental algorithm with the provided stopping criterion, the writers released a new paper on rebalancing multiple s.m.p.s as well as starting with some extra vertices so the polytope is conditioned better \citep{guglielmi2016invariant} in that case its possible to even terminate with multiple s.m.p.s..
 
 \section{Eigenvector cases}
-If the eigenvector is complex, then a different norm must be used, a so called complex-balanced-polytope norm. 
-Also in the case of nonnegative matrices a different norm can be used to vastly increase the efficiency. 
-In case of the implementation just the linear programming problem changes. 
-
-
+If the leading eigenvector associated with a candidate product is complex, then the real balanced polytope norm is no longer sufficient and must be replaced by an appropriate \emph{complex-balanced polytope norm}. 
+In addition, for families of nonnegative matrices one may exploit positivity to construct specialized norms that can substantially improve numerical efficiency. 
+From an implementation perspective, these extensions typically affect only the membership test for the (symmetrized) convex hull, i.e., the underlying linear programming subproblem, while the overall structure of the algorithm remains unchanged. 
+In the present thesis, we restrict attention to the real case in order to keep the exposition focused. 
+For further details and algorithmic variants, we refer to \textcolor{red}{reference}.

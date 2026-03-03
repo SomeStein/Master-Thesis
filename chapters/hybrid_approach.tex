@@ -2,10 +2,10 @@
 \chapter{Hybrid approach} 
 \label{ch:hybrid}
 
-In this chapter we will explore some possible combinations of the abeforementioned algorithms and then present the main result of this work. The tree-flavored-invariant-polytope-algorithm and its termination results. 
+In this chapter we will explore some possible combinations of the aforementioned algorithms and then present the main result of this work. The tree-flavored-invariant-polytope-algorithm and its termination results. 
 
 \begin{section}{Goal and options}
-In its heart the invariant-polytope algorithm tries to find a polytope, whose corrisponding Minkowski norm is specifically optimized on the given problem, whilst the finite-tree algorithm connects growth-rate to decompositions of products. A clear combination scheme arises naturally, where we use the optimized polytope norm to estimate the products of the finite-tree. From there we can choose a specific order or level of concurrency.
+In its heart the invariant-polytope algorithm tries to find a polytope, whose corresponding Minkowski norm is specifically optimized on the given problem, whilst the finite-tree algorithm connects growth-rate to decompositions of products. A clear combination scheme arises naturally, where we use the optimized polytope norm to estimate the products of the finite-tree. From there we can choose a specific order or level of concurrency.
 \newline
 A modular approach would be to first run the invariant-polytope algorithm for a couple of runs and then use the calculated norm thats already optimized for the finite-tree algorithm. But that seems to be wasteful since valuable matrix calculations from the finite-tree algorithm could have been used for an even more optimized norm and some polytopes might have already cleared insight for the decompositions that the finite-tree algorithm tries to find. In \citep{mejstrikHybridApproachJoint2024} the authors came up with a more concurrent algorithm that builds up norms and decompositions in every step. 
 \end{section}
@@ -14,9 +14,9 @@ A modular approach would be to first run the invariant-polytope algorithm for a 
 \textcolor{red}{This section needs rewriting of 3 subsections, and new notation}
 
 \subsection{Objective}
-After the preprocessing stage from \ref{sec:preprocessing} is done, we end up with a scaled set of matrices $\tilde{\mathcal{A}}$ and from the chosen candidate and the three-member-inequality \eqref{eq:three-member} we already know $\JSR(\tilde{\mathcal{A}}) \geq 1$. 
+After the preprocessing stage from Section \ref{sec:preprocessing} is done, we end up with a scaled set of matrices $\tilde{\mathcal{A}}$ and from the chosen candidate and the three-member-inequality \eqref{eq:three-member} we already know $\JSR(\tilde{\mathcal{A}}) \geq 1$. 
 Such that our goal of establishing $\JSR(\tilde{\mathcal{A}}) = 1$ becomes equivalent to  $\JSR(\tilde{\mathcal{A}}) \leq 1$. 
-For this we want to show that there exists a polynomial $p$ and a norm $\lVert \cdot \rVert$, such that, similarly to chapter \ref{ch:finite-tree}, every norm of a product of matrices from $\tilde{\mathcal{A}}$ can be bounded by this polynomial in its length i.e. $$ \lVert P \rVert \leq p(k) \quad \forall P \in \tilde{\mathcal{A}}^k, k \in \N. $$
+For this we want to show that there exists a polynomial $p$ and a norm $\lVert \cdot \rVert$, such that, similarly to Chapter \ref{ch:finite-tree}, every norm of a product of matrices from $\tilde{\mathcal{A}}$ can be bounded by this polynomial in its length i.e. $$ \lVert P \rVert \leq p(k) \quad \forall P \in \tilde{\mathcal{A}}^k, k \in \N. $$
 We find the polynomial by decomposing every multi-index into a leaf node followed by a series of bounded products. Where the leaf nodes are expected to be bounded in their lengths. 
 
 \subsection{Process}

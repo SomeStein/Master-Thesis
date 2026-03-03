@@ -2,14 +2,14 @@
 \chapter{Introduction}
 \label{ch:introduction} % für einen Textverweis auf das Kapitel: \ref{ch:introduction}
 
-The \textit{Joint Spectral Radius} (JSR) was first introduced by G.-C. Rota and G. Strang in 1960 \citep{rotaNoteJointSpectral1960}. They described the JSR as the maximal exponential growth rate of a product of matrices taken from a finite set. Since its inception, the JSR has become a cornerstone in various mathematical and engineering disciplines due to its ability to encapsulate the asymptotic behavior of matrix long products. 
+The \textit{Joint Spectral Radius} (JSR) was first introduced by G.-C. Rota and G. Strang in 1960 \citep{rotaNoteJointSpectral1960}. They described the JSR as the maximal exponential growth rate of a product of matrices taken from a finite set. Since its inception, the JSR has become a cornerstone in various mathematical and engineering disciplines due to its ability to encapsulate the asymptotic behavior of matrix products. 
 
 The concept gained significant traction in the 1990s when researchers began exploring its theoretical properties and practical implications. Notable advancements include its application in wavelet theory, where it assists in the construction of refinable functions \citep{daubechies1992sets} as well as in control theory, where it is used to analyze the stability of switched linear systems \citep{blondelSurveyComputationalComplexity2000}, for which we will give a small example in the following. The computational challenges associated with determining the JSR have inspired the development of several algorithms, such as the invariant-polytope method \citep{guglielmiExactComputationJoint2013} and the finite-tree method \citep{mollerTreebasedApproachJoint2014}.
 
 Despite the progress, the JSR computation remains a challenging problem, particularly due to the exponential complexity of exploring all possible matrix products. This thesis seeks to contribute to this ongoing effort by leveraging the invariant-polytope algorithm and the finite-tree algorithm to create a hybrid methodology that mitigates their respective limitations.
 
 \section*{Structure of the Thesis}
-The remainder of this thesis is structured as follows: Chapter~\ref{ch:introduction} provides a sufficient background on the JSR and its basic properties. Chapters~\ref{ch:inv.poly} and~\ref{ch:finite-tree} present the ideas and concepts of the algorithms that will be exploited to create the proposed hybrid approach, outlining their theoretical foundation and algorithmic implementation. Chapter~\ref{ch:hybrid} discusses possible combinations of former approaches, proposes the so-called Tree-flavored-invariant-polytope algorithm, and brings proofs of termination which is the main result of this thesis. Chapter~\ref{ch:numerics} presents numerical results to analyze the efficiency and applicability of the hybrid algorithm. Chapter~\ref{ch:conclusion} concludes with insights and future directions.
+This thesis is structured as follows: Chapter~\ref{ch:introduction} provides background on the JSR and its basic properties. Chapters~\ref{ch:inv.poly} and~\ref{ch:finite-tree} present the ideas and concepts of the algorithms that will be exploited to create the proposed hybrid approach, outlining their theoretical foundation and algorithmic implementation. Chapter~\ref{ch:hybrid} discusses possible combinations of former approaches, proposes the so-called Tree-flavored-invariant-polytope algorithm, and brings proofs of its termination properties which is the main result of this thesis. Chapter~\ref{ch:numerics} presents numerical results to analyze the efficiency and applicability of the hybrid algorithm. Chapter~\ref{ch:conclusion} concludes with insights and future directions.
 
 \section{Preliminaries}
 
@@ -108,15 +108,53 @@ This example shows that switching can amplify the effects of individual matrices
 
 The following result motivates the importance of bounding or approximating $\JSR(\mathcal{A})$. It is known that:
 \begin{itemize}
-    \item The system~\eqref{eq:switched_system} is \emph{uniformly bounded} (i.e., $\sup_k \|x_k\| < \infty$ for all $x_0 \in \R^d$) if and only if $\JSR(\mathcal{A}) \leq 1$.
+    \item The system~\eqref{eq:switched_system} is \emph{uniformly bounded} (i.e., $\sup_k \|x_k\| < \infty$ for all $x_0 \in \R^d$) if and only if $\JSR(\mathcal{A}) \leq 1$ and $\mathcal{A}$ is irreducible.
     \item It is \emph{uniformly asymptotically stable} if and only if $\JSR(\mathcal{A}) < 1$. 
 \end{itemize}
 \citep{blondelSurveyComputationalComplexity2000}‚
 
-Understanding the JSR is therefore critical for analyzing the asymptotic behavior of switched systems and motivates the development of reliable algorithms for finding or approximating the JSR, such as the hybrid algorithm proposed in \citep{mejstrikHybridApproachJoint2024}.
-\textcolor{red}{also other important results depending on JSR}
+Understanding the joint spectral radius (JSR) is therefore critical for analyzing the
+asymptotic behavior of switched linear systems and motivates the development of
+reliable algorithms for determining or approximating it. Beyond control theory, the JSR plays a central role in a variety of mathematical disciplines. Important applications include the study of regularity of wavelets and subdivision schemes \cite{daubechies1992sets}, the analysis of code capacities in information theory \cite{MoisionOrlitskySiegel2001}, and the investigation of combinatorial structures such as those related to the Euler partition function \cite{Protasov2000}. These broad connections highlight the JSR as a unifying concept across operator theory, approximation theory, dynamical systems, and discrete mathematics, further underlining the importance of developing efficient and robust computational methods such as the hybrid algorithm introduced in \cite{MejstrikReif2024}.
 
 \section{Theoretical background}
+
+\begin{lemma}[Fekete's Lemma]\label{lem:fekete}
+Let $(a_n)_{n\ge 1}$ be a sequence of real, nonnegative numbers such that
+\begin{equation}\label{eq:subadditive}
+a_{m+n} \le a_m + a_n \qquad \text{for all } m,n\ge 1.
+\end{equation}
+Then the limit
+\[
+\lim_{n\to\infty}\frac{a_n}{n}
+\]
+exists and is equal to $ \inf_{n\ge 1} \left(\frac{a_n}{n} \right)$.
+\end{lemma}
+
+\begin{proof}
+Set $b_n := a_n/n$ and let $\alpha := \inf_{n\ge 1} b_n$.
+Fix $n\ge 1$ and write any $k\ge 1$ as $k = qn + r$ with integers $q\ge 0$ and
+$0 \le r < n$. By subadditivity \eqref{eq:subadditive},
+\[
+a_k = a_{qn+r} \le q a_n + a_r.
+\]
+Dividing by $k$ gives
+\[
+\frac{a_k}{k} \le \frac{q a_n}{qn+r} + \frac{a_r}{qn+r}
+\le \frac{a_n}{n} + \frac{a_r}{qn}.
+\]
+Taking $\limsup_{k\to\infty}$ (equivalently $q\to\infty$) yields
+\[
+\limsup_{k\to\infty}\frac{a_k}{k} \le \frac{a_n}{n}.
+\]
+Since $n$ was arbitrary, we obtain
+\[
+\limsup_{k\to\infty}\frac{a_k}{k} \le \inf_{n\ge 1}\frac{a_n}{n} = \alpha.
+\]
+On the other hand, by definition of infimum we always have
+$\alpha \le a_k/k$ for all $k$, hence $\alpha \le \liminf_{k\to\infty} a_k/k$.
+Therefore $\liminf = \limsup = \alpha$, so the limit exists and equals $\alpha$.
+\end{proof}
 
 \begin{theorem}
     The JSR is well-defined and independent of the choice of the matrix norm.
@@ -137,7 +175,7 @@ Therfore we have that
 = & \lim_{k \to \infty} \max_{P \in \mathcal{A}^k} \|P\|_{1}^{1/k},
 \end{align*}
 which makes the limit independent of the choice of the used matrix norm. 
-The existence of this limit is a special result from Fekete's Lemma which can bee seen in the appendix. \textcolor{red}{appendix ref} 
+The existence of this limit is a special result from Fekete's Lemma.
 \end{proof}
 
 To facilitate the analysis of the algorithms and presentation of the main results, we first establish fundamental properties of the JSR.
@@ -155,9 +193,10 @@ To facilitate the analysis of the algorithms and presentation of the main result
         \JSR(\alpha \mathcal{A}) & = \lim_{k \to \infty} \max_{A_{i} \in \mathcal{A}^k} \|\alpha A_{i_k} \cdots \alpha A_{i_1}\|^{1/k} \\
         & = |\alpha| \lim_{k \to \infty} \max_{A_{i} \in \mathcal{A}^k} \|A_{i_k} \cdots A_{i_1}\|^{1/k} \\
         & = |\alpha| JSR(\mathcal{A}) \\
+        & \qedhere
     \end{align*}
+
 \end{proof}
-\textcolor{red}{qedhere}
 
 \subsection*{Three-member inequality}
 \textcolor{red}{reference}
@@ -169,44 +208,97 @@ To facilitate the analysis of the algorithms and presentation of the main result
     if $\mathcal{A}$ is a finite (or compact) set.
 \end{proposition}
 
-\textcolor{red}{proof here}
-
-\begin{proposition}
-    Let $\|\cdot\|$ be a matrix norm. The inequality
-    \begin{equation}
-    \max_{P \in \mathcal{A}^k} \rho(P)^{\frac{1}{k}} \leq \JSR(\mathcal{A}) \leq \max_{P \in \mathcal{A}^k} \| P\|^{\frac{1}{k}}
-    \label{eq:three-member}
-    \end{equation}
-    holds for every $k \in \mathbb{N}$.
+\textcolor{red}{reference}
+\begin{proposition}\label{prop:three_member}
+Let $\|\cdot\|$ be a matrix norm. Then for every $k\in\mathbb{N}$,
+\begin{equation}\label{eq:three_member}
+\max_{P\in\mathcal{A}_k}\rho(P)^{1/k}\ \le\ \mathrm{JSR}(\mathcal{A})\ \le\ \max_{P\in\mathcal{A}_k}\|P\|^{1/k}.
+\end{equation}
 \end{proposition}
+
 \begin{proof}
-    For a fixed $k \in \N$ let 
-    $$
-    P_{\text{max}} = \argmax_{P \in \mathcal{A}^k} \rho(P)^{\frac{1}{k}}.
-    $$ 
+Fix $k\in\mathbb{N}$ and choose
+\[
+P_{\max}\in\operatorname*{arg\,max}_{P\in\mathcal{A}_k}\rho(P)^{1/k}.
+\]
+For the left-hand side we obtain, for any $r\in\mathbb{N}$,
+\begin{equation}\label{eq:left_bound_three_member}
+\begin{aligned}
+\max_{P\in\mathcal{A}_k}\rho(P)^{1/k}
+&= \rho(P_{\max})^{1/k} \\
+&= \rho(P_{\max})^{r/(kr)} \\
+&= \rho(P_{\max}^r)^{1/(kr)} \\
+&\le \max_{P\in\mathcal{A}_{kr}}\rho(P)^{1/(kr)} \\
+&\le \limsup_{r\to\infty}\max_{P\in\mathcal{A}_{kr}}\rho(P)^{1/(kr)} \\
+&\le \limsup_{n\to\infty}\max_{P\in\mathcal{A}_n}\rho(P)^{1/n} \\
+&= \mathrm{JSR}(\mathcal{A}).
+\end{aligned}
+\end{equation}
 
-    Then for the left-hand side we have
+For the right-hand side, set
+\[
+M_n := \max_{P\in\mathcal{A}_n}\|P\|\qquad (n\in\mathbb{N}).
+\]
+By submultiplicativity of the norm, every $Q\in\mathcal{A}_{m+n}$ can be written
+as $Q=RS$ with $R\in\mathcal{A}_m$ and $S\in\mathcal{A}_n$, hence
+\begin{equation}\label{eq:Mn_submult}
+\begin{aligned}
+\|Q\|
+&\le \|R\|\,\|S\|
+\le M_m M_n,
+\end{aligned}
+\end{equation}
+and taking maxima over $Q\in\mathcal{A}_{m+n}$ yields
+\begin{equation}\label{eq:M_subadd}
+\begin{aligned}
+M_{m+n}\le M_m M_n
+\qquad\text{for all } m,n\in\mathbb{N}.
+\end{aligned}
+\end{equation}
 
-    \begin{align*}
-        \max_{P \in \mathcal{A}^k} \rho(P)^{\frac{1}{k}} & = \rho(P_{\text{max}})^{\frac{1}{k}} \\
-        & = \rho(P_{\text{max}})^{\frac{r}{kr}} \quad \forall r \in \N \\
-        & = \rho(P_{\text{max}}^{r})^{\frac{1}{kr}} \quad \forall r \in \N\\
-        & \leq \max_{P \in \mathcal{A}^{kr}} \rho(P)^{\frac{1}{kr}} \quad \forall r \in \N\\
-        & \leq \limsup_{r \to \infty} \max_{P \in \mathcal{A}^{kr}} \rho(P)^{1/kr}\\
-        & \leq \limsup_{r \to \infty} \max_{P \in \mathcal{A}^{r}} \rho(P)^{1/r}\\
-        & = \JSR(\mathcal{A}).
-    \end{align*}
+Define the real sequence $a_n := \log M_n$. Then from \eqref{eq:M_subadd},
+\begin{equation}\label{eq:an_subadd}
+\begin{aligned}
+a_{m+n}
+=\log M_{m+n}
+\le \log(M_m M_n)
+=\log M_m + \log M_n
+=a_m+a_n,
+\end{aligned}
+\end{equation}
+so $(a_n)_{n\ge 1}$ is subadditive. By Fekete's lemma, the limit
+$\lim_{n\to\infty} a_n/n$ exists and equals $\inf_{n\ge 1} a_n/n$. In particular,
+for the fixed $k$ we have
+\begin{equation}\label{eq:fekete_step}
+\begin{aligned}
+\lim_{n\to\infty}\frac{a_n}{n}
+=\inf_{n\ge 1}\frac{a_n}{n}
+\le \frac{a_k}{k}.
+\end{aligned}
+\end{equation}
+Exponentiating \eqref{eq:fekete_step} gives
+\begin{equation}\label{eq:rhs_bound_three_member}
+\begin{aligned}
+\lim_{n\to\infty} M_n^{1/n}
+&= \exp\!\Big(\lim_{n\to\infty}\frac{a_n}{n}\Big) \\
+&\le \exp\!\Big(\frac{a_k}{k}\Big) \\
+&= \exp\!\Big(\frac{\log M_k}{k}\Big) \\
+&= M_k^{1/k}
+= \max_{P\in\mathcal{A}_k}\|P\|^{1/k}.
+\end{aligned}
+\end{equation}
 
-    The right-hand side of the equation follows from a special case of Fekete's lemma which can be seen in the appendix. 
-    \textcolor{red}{appendix ref No. [DL1992]} 
+Since $\mathrm{JSR}(\mathcal{A})=\lim_{n\to\infty}\max_{P\in\mathcal{A}_n}\|P\|^{1/n}
+=\lim_{n\to\infty}M_n^{1/n}$ by definition, the right-hand inequality in
+\ref{eq:three_member} follows.
 \end{proof}
-This result forms a starting point for many computational approaches as the bounds are sharp in the sense that both sides converge to the JSR as $k\rightarrow \infty$ (left side in $\limsup$).
-\textcolor{red}{left side is not generally converging but but its lim sup}
+
+This inequality underlies many computational methods, since it yields computable lower and upper bounds on $\mathrm{JSR}(\mathcal A)$. Moreover, as $k\to\infty$ the upper bound $\max_{P\in\mathcal A_k}\|P\|^{1/k}$ converges to $\mathrm{JSR}(\mathcal A)$, while the lower bound $\max_{P\in\mathcal A_k}\rho(P)^{1/k}$ approaches $\mathrm{JSR}(\mathcal A)$ in the sense of a $\limsup$.
 
 \subsection*{Similarity and reducibility}
 
 \begin{proposition}
-    The $\JSR$ is invariant under similarity transformations i.e. for any invertable matrix $T$ we have
+    The $\JSR$ is invariant under similarity transformations i.e. for any invertible matrix $T$ we have
     \begin{equation}
        \JSR(\mathcal{A}) = \JSR(T^{-1}\mathcal{A}T).
     \end{equation}
@@ -242,7 +334,7 @@ This result forms a starting point for many computational approaches as the boun
     \]
     under some invertable matrix $T$. 
 \end{proposition}
-\textcolor{red}{proof here}
+\textcolor{red}{reference Protasov}
 \begin{example}
     \[
     A_1 = \begin{bmatrix} 2 & 1 \\ 1 & 2 \end{bmatrix}, \quad
@@ -295,11 +387,11 @@ For the following considerations we can now assume $\mathcal{A}$ to be irreducib
     Now, using the induced matrix norm we arrive at: 
     $$ \sup _{A \in \mathcal{A}} \|Ax\|_{\epsilon} \leq \lambda + \epsilon$$
 
-\textcolor{red}{qedhere and if $\mathcal{A} is irreducible than the infimum is attained [BergerWang]$}
+    \qedhere 
+
+if $\mathcal{A} is irreducible than the infimum is attained [BergerWang]$
 
 \end{proof}
-
-\textcolor{red}{might not be needed so may be disregarded in the future}
 
 \subsection*{Finiteness property}
 \begin{definition}
@@ -308,7 +400,7 @@ For the following considerations we can now assume $\mathcal{A}$ to be irreducib
         \operatorname{JSR}(\mathcal{A}) = \|A_{i_k} \cdots A_{i_1}\|^{1/k}.
     \end{equation}
     Any such product is referred to as a \emph{spectrum-maximizing product} (s.m.p.).
-    \textcolor{red}{[Begarias, Wang 1995]}
+    \textcolor{red}{[Lagarias, Wang 1995]}
 \end{definition}
 Although the finiteness property does not hold for all matrix sets, it is crucial for the effectiveness and termination of most algorithmic approaches.
 \textcolor{red}{[Bousch, Mairesse 2002]}
@@ -317,9 +409,7 @@ Although the finiteness property does not hold for all matrix sets, it is crucia
 
 The computation of the joint spectral radius (JSR) is theoretically challenging due to several complexity results.
 
-Determining whether the JSR of a given set of matrices is below a threshold is \textbf{NP-hard} \citep{tsitsiklis1997lyapunov}, meaning no polynomial-time algorithm is expected unless $\text{P} = \text{NP}$. Moreover, for general sets of matrices, even deciding whether the JSR is strictly less than one is \textbf{undecidable} \citep{blondel2000boundedness}. Despite these theoretical limitations, many practical cases allow for efficient numerical estimation.
-
-\textcolor{red}{Unlike the spectral radius of a single matrix, the JSR is often \textbf{non-algebraic} \citep{guglielmiExactComputationJoint2011}, meaning it cannot always be expressed as a root of a polynomial with rational coefficients.(needs refactoring from result of [Kozyakin])}
+Approximating the JSR is \textbf{NP-hard} \citep{tsitsiklis1997lyapunov}, meaning no polynomial-time algorithm is expected unless $\text{P} = \text{NP}$. Moreover, for general sets of matrices, even deciding whether the JSR is strictly less than one is \textbf{undecidable} \citep{blondel2000boundedness}. Despite these theoretical limitations, many practical cases allow for efficient numerical estimation.
 
 These complexity results highlight fundamental challenges. There are still applied settings where efficient approximation algorithms provide useful results.
 
