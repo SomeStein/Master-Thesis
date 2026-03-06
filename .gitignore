@@ -80,4 +80,4 @@ ENV/
 !*.svg
 
 # Keep thesis output PDF tracked
-!masterthesis.pdf
+!build/masterthesis.pdf

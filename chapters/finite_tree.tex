@@ -1,11 +1,13 @@
 
 \chapter{Finite-tree algorithm}
-\label{ch:finite-tree}
+\label{ch:finiteTree}
 In this chapter we introduce basic definitions and concepts to another approach of $\JSR$ computation. It is called \emph{finite-tree algrithm} as it is trying to decompose arbitrary products $P \in \mathcal{A}^k$ into sub-products that can be 1-bounded by an a priori chosen norm.  
 
 \section{Notation and definitions}
+\label{sec:finiteNotationDefinitions}
 
 \begin{definition}
+    \label{def:treeGraph}
     A \emph{tree} is a connected, acyclic graph \( T \) with a distinguished node \( t_0\) called the \emph{root}. The tree structure induces a natural hierarchy: for any node $t_i$, there exists a unique path from \( t_0 \) to \( t_i \). The tree can then be described in terms of the following concepts:
     \begin{itemize}
         \item \textbf{Parent}: For any node \( t \in T \), the node preceding \( t \) on the path from the root $t_0$ is called its \emph{parent}.
@@ -15,7 +17,7 @@ In this chapter we introduce basic definitions and concepts to another approach 
     \end{itemize}
 \end{definition}
 
- We define $T_{\mathcal{A}}$ as the tree consisting of all products in the set $\bigcup \limits_ {k \in \mathbb{N}_0}\mathcal{A}^k$ where every multi-index represents a node. For the empty index ($k = 0$)  we set $A_{[]} = I_d$ the identity matrix in $\R^{d\times d}$. An example can be seen in Figure~\ref{fig:matrix-product-tree}.
+ We define $T_{\mathcal{A}}$ as the tree consisting of all products in the set $\bigcup \limits_ {k \in \mathbb{N}_0}\mathcal{A}^k$ where every multi-index represents a node. For the empty index ($k = 0$)  we set $A_{[]} = I_d$ the identity matrix in $\R^{d\times d}$. An example can be seen in Figure~\ref{fig:finiteMatrixProductTree}.
 
 \begin{figure}[ht]
 \centering
@@ -54,7 +56,7 @@ In this chapter we introduce basic definitions and concepts to another approach 
 ]
 \end{forest}
 \caption{An example of the tree $T_{\mathcal{A}}$ on $\bigcup_ {k \in \mathbb{N}_0}\mathcal{A}^k$ with $\mathcal{A} = \{A_1, A_2\}.$}
-\label{fig:matrix-product-tree}
+\label{fig:finiteMatrixProductTree}
 \end{figure}
 
 The objective is now to find a sub-tree $T \subset T_{\mathcal{A}}$ for a chosen norm, with the condition of every leaf encoding a product that has a norm less then 1 and every node that is not a leaf having all possible children $A_1,\cdots,A_J$.
@@ -62,13 +64,14 @@ If such a tree has been found it easily allows for a decomposition of every poss
 Leading to a proof of $\JSR(\tilde{\mathcal{A}}) = 1$.
 \newline
 Such sub-trees are in general not finite and therefore unusable for a computational tree-search algorithm.
-In the paper \citep{mollerTreebasedApproachJoint2014}, the writers propose to use a different kind of encoding making use of so-called generators and set-valued nodes.
+In the paper \citep{MoellerReif2014TreeBasedJSR}, the writers propose to use a different kind of encoding making use of so-called generators and set-valued nodes.
 
 We fix a set $\mathbf{G} = \{ g_1, \cdots, g_m \}$ with $g_i \in \mathcal{A}^k_i$ and $\rho(g_i)^{\frac{1}{k_i}} \le 1$.
 All products from this set will be called \emph{generators}.
 We also define $A_l := g_{-l}$ for $l \in \{-m, \dots, -1\}$.
 
-\begin{definition}
+\begin{definition}\citep{MoellerReif2014TreeBasedJSR}
+    \label{def:extendedMultiIndexSet}
     
     The set \( \mathcal{J}^k := \{-m, \dots, -1, 1, \dots, n\}^k \) denotes the collection of all multi-indeces of length \( k \) with entries in $\{-m, \dots, -1, 1, \dots, n\}$. 
     For a multi-index \( J = [j_1, \dots, j_k] \in \mathcal{J}^k \), the corresponding matrix product set is defined by:
@@ -81,12 +84,14 @@ We also define $A_l := g_{-l}$ for $l \in \{-m, \dots, -1\}$.
 Again, this creates a tree structure in a similar way to positive multi-indeces, except now the nodes represent (possibly infinite) sets of products. 
 
 \begin{definition}
+    \label{def:multiIndexExtension}
     Let $J = [j_1, \cdots, j_k]$ be a multi-index. We define the multi-index extension with $J + [j_{k+1}] := [j_1, \cdots, j_k, j_{k+1}].$
 \end{definition}
 
 \textcolor{red}{your proposal $[J, j_{k+1}]$ is blunt since it would be nested like $[[j_1, \cdots, j_k], j_{k+1}]$}
 
 \begin{definition}
+    \label{def:childType}
     Let $t \in T$ be a node with the multi-index $J$.
     A child node $\tilde{t}$ with the multi-index $J + [j_{k+1}]$ is called:
     \begin{itemize}
@@ -97,8 +102,8 @@ Again, this creates a tree structure in a similar way to positive multi-indeces,
 
 Now we want to find a subtree of a special form. 
 
-\begin{definition}
-    \label{def:tree}
+\begin{definition}\citep{MoellerReif2014TreeBasedJSR}
+    \label{def:agTree}
     \begin{samepage}
     A so-called $(\mathcal{A},\mathbf{G})\text{-tree } T$ has the following structure: 
 \begin{itemize}
@@ -115,7 +120,8 @@ Now we want to find a subtree of a special form.
 \end{definition}
 
 
-\begin{definition}
+\begin{definition}\citep{MoellerReif2014TreeBasedJSR}
+    \label{def:coveredNode}
     A node in the tree is called \emph{covered} if it is a subset of one of its ancestors in the tree. Otherwise, it is called \emph{uncovered}. 
     The set of uncovered leaves is denoted as
 \[
@@ -124,7 +130,8 @@ Now we want to find a subtree of a special form.
 and called \emph{leafage} of the tree $T$.
 \end{definition}
 
-\begin{definition}
+\begin{definition}\citep{MoellerReif2014TreeBasedJSR}
+\label{def:oneBoundedTree}
 An $(\mathcal{A},\mathbf{G})\text{-tree}$ $T$ is called \emph{1-bounded} with respect to a matrix norm \( \| \cdot \| \) if
 \[
     \sup_{L \in \mathcal{L}(T)} \| L \| \leq 1.
@@ -133,11 +140,12 @@ If \( \sup_{L \in \mathcal{L}(T)} \| L \| < 1 \), then the tree is called \emph{
 \end{definition}
 
 \section{Structure of the finite-tree algorithm}
+\label{sec:finiteAlgorithmStructure}
 The finite-tree algorithm tries to find a 1-bounded $(\mathcal{A},\mathbf{G})\text{-tree}$. We start with only the root node $t_0 = \{I\}$ and iteratively check in every step $ \sup \{\lVert P \rVert: P \in L\} \le 1$ for every leaf $L$ in the current tree. If for one particular leaf the bound does not hold, we add either all positive children or an arbitrary amount of generator children.
 
 \begin{algorithm}[ht]
     \caption{Finite-tree-algorithm}
-    \label{alg:tree}
+    \label{alg:finiteTree}
     \begin{algorithmic}
         \State \Input{$\mathcal{A} = \{A_1, \ldots, A_n\}$ and $\mathbf{G} = \{ g_1, \cdots, g_m \}$}
         \State \Output{If the algorithm terminates the tree condition holds}
@@ -155,12 +163,12 @@ The finite-tree algorithm tries to find a 1-bounded $(\mathcal{A},\mathbf{G})\te
     \end{algorithmic}
 \end{algorithm}
 
-\begin{remark}\label{rem:moller}
-The procedure \textproc{selectChildren} determines whether all positive children (from $1$ to $n$) or a subset of negative children (from $-1$ to $-m$) is chosen, according to the theory established in~\citep{mollerTreebasedApproachJoint2014}.
+\begin{remark}\citep{MoellerReif2014TreeBasedJSR}\label{rem:moller}
+The procedure \textproc{selectChildren} determines whether all positive children (from $1$ to $n$) or a subset of negative children (from $-1$ to $-m$) is chosen, according to the theory established there.
 \end{remark}
 
 \begin{lemma}
-    \label{lem:poly_bound}
+    \label{lem:finitePolynomialBound}
     For every $(\mathcal{A},\mathbf{G})\text{-tree } T$ there exists a strictly-positive, monotone polynomial $p$ such that for every node $t \in T$ and every product $P \in \mathcal{A}^k$ encoded by $t$, $\lVert P \rVert \le p(k)$ holds.
 \end{lemma}
   
@@ -195,8 +203,8 @@ The procedure \textproc{selectChildren} determines whether all positive children
     Since the node $t$ and the product $P$ were chosen arbitrary, this concludes the proof. 
 \end{proof}
 
-\begin{theorem}
-\label{thm:tree_JSR_found}
+\begin{theorem}\citep{MoellerReif2014TreeBasedJSR}
+\label{thm:finiteTreeTermination}
     If a 1-bounded $(\mathcal{A},\mathbf{G})\text{-tree}$ was found for a given matrix set $\mathcal{A}$ and generator set $\mathbf{G}$ then $\JSR(\mathcal{A}) = 1$
 \end{theorem}
 ~
@@ -206,7 +214,7 @@ The procedure \textproc{selectChildren} determines whether all positive children
     $$ 
     A_I = A_{I_k}A_{I_{k-1}}\cdots A_{I_1}.
     $$ 
-    Each sub-multi-index $I_j \quad j = 1, \cdots,k-1$ encodes either a leaf of $T$ or is the empty set and $I_k$ encodes any node of $T$. Now due to Lemma~\ref{lem:poly_bound} there exists a polynomial $p$ such that
+    Each sub-multi-index $I_j \quad j = 1, \cdots,k-1$ encodes either a leaf of $T$ or is the empty set and $I_k$ encodes any node of $T$. Now due to Lemma~\ref{lem:finitePolynomialBound} there exists a polynomial $p$ such that
     \[ 
         \lVert A_{I}  \rVert =  \lVert A_{I_k}A_{I_{k-1}}\cdots A_{I_1}\rVert \le  \lVert A_{I_k} \rVert \cdot \lVert A_{I_{k-1}}\rVert \cdots \lVert A_{I_1} \rVert \le \lVert A_{I_k} \rVert\le p(k).
     \]
@@ -217,16 +225,16 @@ The procedure \textproc{selectChildren} determines whether all positive children
     since the chosen multi-index was arbitrary.
 \end{proof}
 
-\begin{remark}
-    The decomposition used in the proof of Theorem~\ref{thm:tree_JSR_found} exists and is unique due to the structure of an $(\mathcal{A},\mathbf{G})\text{-tree}$.
+\begin{remark}\citep{MoellerReif2014TreeBasedJSR}
+    \label{rem:finiteTreeDecomposition}
+    The decomposition used in the proof of Theorem~\ref{thm:finiteTreeTermination} exists and is unique due to the structure of an $(\mathcal{A},\mathbf{G})\text{-tree}$.
     \textcolor{red}{glueing tree on covered nodes creating an infinite tree that allows huffman encoding directly. Empty sets for every $I_i$ if product already lies on internal node before $I_k$}
-    For more info see \citep{mollerTreebasedApproachJoint2014}.
 \end{remark}
 
 \section{Conditions of termination}
+\label{sec:finiteTerminationConditions}
 
-\begin{remark}
-    In~\citep{mollerTreebasedApproachJoint2014}, the authors show that the use of generators is essential for ensuring termination in cases where the original invariant-polytope algorithm fails to terminate. But deciding when to use generators instead of all positive children is still part of active research and is handled via highly heuristical approaches. 
+\begin{remark}\citep{MoellerReif2014TreeBasedJSR}
+    \label{rem:finiteGeneratorNecessity}
+    In the cited work, the authors show that the use of generators is essential for ensuring termination in cases where the original invariant-polytope algorithm fails to terminate. But deciding when to use generators instead of all positive children is still part of active research and is handled via highly heuristical approaches. 
 \end{remark}
-
-
