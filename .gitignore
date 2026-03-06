@@ -40,7 +40,7 @@ __pycache__/
 *$py.class
 *.so
 .Python
-build/
+build/*
 develop-eggs/
 dist/
 downloads/
@@ -78,5 +78,6 @@ ENV/
 !*.jpeg
 !*.gif
 !*.svg
-!*.pdf
+
+# Keep thesis output PDF tracked
 !build/masterthesis.pdf
