@@ -4,41 +4,28 @@
 
 In this chapter we will explore some possible combinations of the aforementioned algorithms and then present the main result of this work. The tree-flavored-invariant-polytope-algorithm and its termination results. 
 
-\begin{section}{Goal and options}
+\begin{section}{Combination options}
 In its heart the invariant-polytope algorithm tries to find a polytope, whose corresponding Minkowski norm is specifically optimized on the given problem, whilst the finite-tree algorithm connects growth-rate to decompositions of products. A clear combination scheme arises naturally, where we use the optimized polytope norm to estimate the products of the finite-tree. From there we can choose a specific order or level of concurrency.
 \newline
-A modular approach would be to first run the invariant-polytope algorithm for a couple of runs and then use the calculated norm thats already optimized for the finite-tree algorithm. But that seems to be wasteful since valuable matrix calculations from the finite-tree algorithm could have been used for an even more optimized norm and some polytopes might have already cleared insight for the decompositions that the finite-tree algorithm tries to find. In \citep{mejstrikHybridApproachJoint2024} the authors came up with a more concurrent algorithm that builds up norms and decompositions in every step. 
+A modular approach would be to first run the invariant-polytope algorithm for a couple of steps and then use the calculated norm thats already optimized for the finite-tree algorithm. But that seems to be wasteful since valuable matrix calculations from the finite-tree algorithm could have been used for an even more optimized norm and some polytopes might have already cleared insight for the decompositions that the finite-tree algorithm tries to find. In \citep{mejstrikHybridApproachJoint2024} the authors came up with a more concurrent algorithm that builds up norms and decompositions in every step. 
 \end{section}
 
-\section{Structure of the hybrid algorithm}
-\textcolor{red}{This section needs rewriting of 3 subsections, and new notation}
-
-\subsection{Objective}
+\begin{section}{Objective}
 After the preprocessing stage from Section \ref{sec:preprocessing} is done, we end up with a scaled set of matrices $\tilde{\mathcal{A}}$ and from the chosen candidate and the three-member-inequality \eqref{eq:three-member} we already know $\JSR(\tilde{\mathcal{A}}) \geq 1$. 
 Such that our goal of establishing $\JSR(\tilde{\mathcal{A}}) = 1$ becomes equivalent to  $\JSR(\tilde{\mathcal{A}}) \leq 1$. 
 For this we want to show that there exists a polynomial $p$ and a norm $\lVert \cdot \rVert$, such that, similarly to Chapter \ref{ch:finite-tree}, every norm of a product of matrices from $\tilde{\mathcal{A}}$ can be bounded by this polynomial in its length i.e. $$ \lVert P \rVert \leq p(k) \quad \forall P \in \tilde{\mathcal{A}}^k, k \in \N. $$
-We find the polynomial by decomposing every multi-index into a leaf node followed by a series of bounded products. Where the leaf nodes are expected to be bounded in their lengths. 
-
-\subsection{Process}
-The algorithm starts just as the invariant-polytope algorithm. After the initial set of vertices was calculated we now choose a
-$(\mathcal{A},\mathbf{G})\text{-tree } T_v$ like in \citep{mejstrikHybridApproachJoint2024} for every vertex $v \in V$.
-If there exists a product with $ \lVert \rVert$
-- after initial, start with A-G-trees in every branch of invariant-poly
-- refine norm for not 1-bounded trees
-- old trees stay bounded for new norms
-
-We try to decompose arbitrary products $P \in \mathcal{A}^k$, such that their polytope-norms are less then $p(k)$ where $p$ is a strictly-positive, monotone polynomial.
-This removes the invariance property of the polytope to be build up, since the norms dont have to be less than 1 but it still proofes the JSR identity because we take the averaged norms in the length of the products in the definition of the $\JSR$.
-\newline 
-Starting the loop of the invariant-polytope algorithm with a cycle on top that is connected via the generators factors and also the first branches represented by images from the missing $J-1$ factors from $\mathcal{A}$. Instead of only adding images under vertices from $V$ and matrices from $\mathcal{A}$ directly, from now on we try to find an $(\mathcal{A},\mathbf{G})\text{-tree}$ which is one-bounded i.e its leafage-polytope-norm is less than 1, for every $v \in V$.
-For that we generate $(\mathcal{A},\mathbf{G})\text{-tree}$ patterns in the beginning and just go through every remaining vertex and calculate the leafage-norms. From the structure of those trees we can assume that every matrix in $\mathcal{A}$ represents a node for the first branches.
-For the branches that lead to a leafage-norm less than or equal 1 we are done, for the other branches we have the choice to go deeper or just add some points to $V$ that changes the leafage-norm of those branches to less than 1. Here we decided to add the points since going deeper just would mean to consider possibly the same products but the tree generation would be more complex with options for depth-first- or breadth-first-search and even using some s.m.p and generator trickery. [might change it in the future]
-\newline
-First points that come to mind are the leafage-points itself since this is what we have tested but generators could be involved meaning there are possibly infinitely many leafage-points. So the next best thing would be the roots of the branches which are guaranteed to be a single matrix from $\mathcal{A}$. This makes tree generation easy and adds points with likely more distance to the faces of the polytope and makes the norm stronger more quickly.
-\newline
-So in principle for every $v \in V_{\text{rem}}$ take a tree from the generating pool, check the leafage-norm for every root branch, if it is larger than 1 add the point from the root branch to $V_{\text{new}}$ and $V$. Repeat this as long as new vertices have been added. We use $V$ for the polytope-norms and since new points are only being added the norms decrease over time so all 1-bounded trees stay bounded.
-\newline
-After termination the set of trees generated promise a valid decomposition for every product from $\mathcal{A}$ into chunks of norm lesser 1 and one suffix thats of norm less than $p(k)$ for some monotone polynomial, which proofes the question if the chosen radius is maximal.
+We find the polynomial $p$ by decomposing every multi-index $J = [j_1, ... , j_n]$ into a finite series of 1-bounded sub-products followed by one leaf node $J = J_{1} + ... + J_{r} + J_{leaf}$. 
+We dont know the leaf-subproduct for every multi-index directly but we can bound it by the theory of Chapter \ref{ch:finite-tree}. 
+The following describes the process of the developed algorithm together with its pseudocode, states the main theorem, outlines the proof and finally gives all theoretical results to prove this statement.
+We want to conclude this Chapter with some theoretical remarks as well as technical details for implementation.
+\end{section}
+\begin{section}{Hybrid-Algorithm}
+The algorithm starts just like the invariant-polytope algorithm with an set $V_0$ of starting-vertices.
+Every set of Vertices $V_k$ defines a vector-polytope-norm $\lVert \cdot \rVert _{V_k}$. 
+Now, at step $k$ for every vertex $v \in V_k$ we take a test-$(\mathcal{A},\mathbf{G})\text{-tree}$ $T_v$.
+If there exists a matrix $L$ in the leafage of $T_v$ with $\lVert Lv \rVert _{V_k} \ge 1$ we add $Lv$ to the set $V_{k+1}$.
+If all test-tree-leafages within a step $k$ are 1-bounded by the polytope-norm, the algorithm terminates. 
+\end{section}
 
 \vspace{1cm}
 
@@ -47,7 +34,6 @@ After termination the set of trees generated promise a valid decomposition for e
   \label{alg:hybrid}
   \begin{algorithmic}
       \State \Input{$\mathcal{A} = \{A_1, \ldots, A_n\}$, $\mathbf{G} = \{ g_1, \cdots, g_m \}$ and $V = \{v_1, \cdots, v_M\}$}
-      \State \Output{A boolean value indicating whether the tree condition holds (True/False)}
       \State $V_{\text{new}} \gets V$
       \While {$V_{\text{new}} \ne \emptyset$}
           \State $V_{\text{rem}} \gets V_{\text{new}}$
@@ -59,17 +45,20 @@ After termination the set of trees generated promise a valid decomposition for e
                   \State $V_{\text{new}} \xleftarrow{\cup} \mathcal{A}v$
               \EndIf  
           \EndFor
-      \EndWhile \\
-      \Return $\text{True}$
+      \EndWhile 
   \end{algorithmic}
 \end{algorithm}
 
 \vspace{1cm}
+\begin{section}{Theory}
+
+\begin{theorem}
+  \label{thm:JSRFoundHybrid}
+  If algorithm 3 terminates $\JSR(\tilde{\mathcal{A}}) \leq 1$.
+\end{theorem}
 
 \subsection{Outline of proof}
-The following figure~\ref{fig:cyclic_tree_structure} shows an example of the generated tree structure as well as the tested $(\mathcal{A},\mathbf{G})\text{-trees}$ that have been used to bound the products. Here $\mathcal{A}$ consists of two matrices $A$ and $B$ and the chosen candidate is $ \Pi = ABA$. At the top you can see the cycle generated by the candidate and the starting vector $v_1$ as well as branches coming of, that are the products that stay in contrast to the cycle. This is what i call the crown and it is generated for every matrix set at the beginning, so no testing has been made so far. All the nodes that are connected through a solid arrow have been added to the vertices $V$.
-
-\textcolor{red}{example graph from code}
+Figure~\ref{fig:cyclic_tree_structure} shows an example of a generated tree after the algorithm has terminated as well as the $(\mathcal{A},\mathbf{G})\text{-trees}$ that have been used to bound the products. Here $\mathcal{A}$ consists of two matrices $A$ and $B$ and the chosen candidate is $ \Pi = ABA$. At the top, you can see the eigenvector $v_1$ and the rest of the cycle, generated by the candidate $\Pi$, as well as branches coming of. All the nodes that are connected through a solid arrow have been added to the vertices $V$ in a particular step $k$. All dashed lines show a test tree that is 1-bounded. You can see the 1-bounded matrix-vector products at the end of the dashed arrows where $n$ can be every natural number including 0. Note that these products are bounded by the norm constructed in their respective steps but due to submultiplicativity the final norm bounds all products in general. So in the following we just reference the final norm $\lVert \cdot \rVert _{V}$ for the final set of vertices $V$.
 
 \begin{figure}
   \centering
@@ -142,9 +131,9 @@ The following figure~\ref{fig:cyclic_tree_structure} shows an example of the gen
   \label{fig:cyclic_tree_structure}
 \end{figure}
 
-Now the finite-tree theory comes in and every vertex gets tested by a $(\mathcal{A},\mathbf{G})\text{-tree}$ (dashed arrows). Take the vector $v_6$ for example it has been tested by an tree and the branch starting with the matrix $B$ was sufficient i.e. every leaf-node has a polytope-norm of less than 1 (at the time the polytope consists of the vertices $V = \{v_1, \cdots, v_6\}$). The branch starting with the matrix $A$ on the other hand did not, so the vertex $v_7 = Av_6$ has been added to $V$ and the next tree was tested, which was fully sufficient (on every branch). Since the other branches also terminated earlier the algorithm stops, no more vertices are beeing added and the candidate $\Pi$ was proofen to be a s.m.p product. 
+\textcolor{red}{explanations here: using testtrees, linear-combination trick for recursive bounding, huffmancoding, glueing from covered nodes into infinite tree, polynomial, growth rates, starting vertices, flat polytopes, etc.}
 
-\section{Termination results}
+\subsection{Termination results}
 
 \begin{lemma}
   \label{lem:arb.prod.bound}
@@ -187,12 +176,10 @@ $$
 Here the first inequality works since after $k$ steps the prefix $P'_{i}$ is guaranteed to be in the tree $T_{v_{i_k}}$ and thus the norm is bounded by $p_{v_{i_k}}(k)$, which in turn is of course less then $p(k)$ by definition. The second to last inequality works since those sums of the absolute values of the coefficients of a linear combination of vectors are less than or equal to 1 from the 1-boundedness of the $(\mathcal{A},\mathbf{G})\text{-trees}$.
 \end{proof}
 
-\begin{theorem}{}\label{thm:hybrid-found}
-If algorithm~\ref{alg:hybrid} terminates then $\JSR(\mathcal{A}) \leq 1$
-\end{theorem}
+\subsection{Main result}
 
 \begin{proof}
-  Due to the prework in the lemmas this is now easy to show. 
+  Due to the prework in the lemmas theorem \ref{thm:JSRFoundHybrid} is now easy to show. 
   Lemma \ref{lem:arb.prod.bound} implies that for every $P \in \mathcal{A}^k$ and $v \in V$, $\lVert Pv \rVert _{\text{co}_{\text{s}}(V)} \le p(k)$
   trivially this implies: 
   $$
@@ -210,18 +197,21 @@ Of course, if the candidate had a spectral radius of $1 \implies \JSR(\mathcal{A
   If the chosen trees are always $T_v = \mathcal{A}$, then we would have exactly the invariant-polytope algorithm \ref{alg:exact}. 
   Which makes the new approach a real generalization of the original. \\
 \end{corollary}
+\end{section}
 
 \section{Remarks}
 
-\subsection*{Used trees}
+\subsection{Used trees}
 It was proven in \citep{mollerTreebasedApproachJoint2014} that in order to have a bigger solution space then algorithm \ref{alg:exact} the use of generators is mandatory. 
 The choice of the testing-trees is not trivial and subject to active research. 
 We propose to use so-called \emph{minimal trees} that fulfill every necessary and beneficial condition of the $(\mathcal{A},\mathbf{G})\text{-trees}$ but keep the amount of nodes minimal.
 
-\subsection*{Polytope invariance}
+\subsection{Polytope invariance}
 Since the polytope-norms of matrices in $\mathcal{A}$ are allowed to be bigger than 1 just less than $p(1)$ it is possible and very likely the construccted polytope is not invariant under $\mathcal{A}$ in general anymore but eventually invariant.
 
 \section{Implementation}
+
+\textcolor{red}{which trees are used, how does the bounding of leafage work, approximations if over max iterations, differences to before, memory layout, exponential growth exponent/branching, memory and speed in Landau, ideas in parallelism}
 
 \begin{definition}
   An $(\mathcal{A},\mathbf{G})\text{-tree}$ with just one generator at the root, one path from root to the covered node and all neccessarily added branches, to make it comply with definition~\ref{def:tree}, is called a \emph{minimal tree}. This tree only depends on the set $\mathcal{A}$ and the chosen generator $G$. Its denoted by $T_{(\mathcal{A},\mathbf{G})}$ and if the context of $\mathcal{A}$ is clear, it is shortened to $T_\mathbf{G}$.
@@ -276,3 +266,5 @@ Since the polytope-norms of matrices in $\mathcal{A}$ are allowed to be bigger t
     \end{tikzpicture}
     \caption{Minimal tree structure $T_{(G, \mathcal{A})}$ for the candidate $G = ABA$ and $\mathcal{A} = \{A,B\}$. The arrows marked with circles are uncovered-leafs, the arrow marked with a square is a covered-leaf}
 \end{figure}
+
+
