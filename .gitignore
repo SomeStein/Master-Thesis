@@ -78,5 +78,6 @@ ENV/
 !*.jpeg
 !*.gif
 !*.svg
-!*.pdf
-!build/masterthesis.pdf
+
+# Keep thesis output PDF tracked
+!masterthesis.pdf
