@@ -420,19 +420,50 @@ These complexity results highlight fundamental challenges. There are still appli
 Approximating the JSR, using the invariant-polytope or the finite-tree algorithms, requires identifying candidate products or \emph{generators} of the matrix set that contribute most significantly to the asymptotic growth rate. These generators are often derived through optimization techniques and their identification is a key step in computational algorithms.
 
 \subsection*{Spectral gap}
-\begin{definition}
+\begin{definition}\citep[Definition 1.9]{MejstrikReif2025HybridApproachJSR}
 \label{def:spectralGap}
-\textcolor{red}{Include definition.}
+    A finite matrix family $\mathcal{A}$ is said to possess a \emph{spectral gap} if there exists a constant $\gamma \in [0,1)$ such that for every $k \in \mathbb{N}$ and every product $A_I \in \mathcal{A}^k$,
+    \[
+    \rho(A_I) = \JSR(\mathcal{A})^k
+    \quad \text{or} \quad
+    \rho(A_I) \le \gamma\,\JSR(\mathcal{A})^k.
+    \]
+    Equivalently, every non-s.m.p.\ product is uniformly separated from the maximal growth rate by the factor $\gamma < 1$.
 \end{definition}
 
-\begin{remark}
+\begin{remark}\citep{MejstrikReif2025HybridApproachJSR,GuglielmiProtasov2024SpectralGapFamilyMatrices}
 \label{rem:spectralGapHybrid}
-    \textcolor{red}{For the hybrid approach, a spectral gap might not be necessary if the JSR is guessed correctly upfront.}
+    In the invariant-polytope setting, a spectral gap is part of the standard finite-termination assumptions together with uniqueness (up to cyclic permutations and powers) and simplicity of the leading eigenvalue of the s.m.p.\ candidate. 
+    The hybrid/tree-based framework relaxes this: once preprocessing yields a correctly scaled candidate with $\rho(\Pi)=1$, proving existence of a suitable $V$-closed tree is sufficient to conclude $\JSR(\mathcal{A}) \le 1$, hence no explicit spectral-gap estimate is required for correctness.
+    We also note that \citep{GuglielmiProtasov2024SpectralGapFamilyMatrices} studies a closely related notion of gap as separation between the first and second Lyapunov exponents for matrix families.
 \end{remark}
 
 \begin{example}
 \label{ex:spectralGap}
-    \textcolor{red}{Include example.}
+    Consider
+    \[
+    A_1=\begin{bmatrix}2&0\\0&1\end{bmatrix},
+    \qquad
+    A_2=\begin{bmatrix}1&0\\0&2\end{bmatrix},
+    \qquad
+    \mathcal{A}=\{A_1,A_2\}.
+    \]
+    Since $\max\{\rho(A_1),\rho(A_2)\}=2$ and $\|A_1\|_\infty=\|A_2\|_\infty=2$, we get $\JSR(\mathcal{A})=2$.
+    Any product $A_I \in \mathcal{A}^k$ has the form
+    \[
+    A_I = A_1^m A_2^{k-m}
+        = \begin{bmatrix}2^m&0\\0&2^{k-m}\end{bmatrix},
+    \]
+    so
+    \[
+    \rho(A_I)=2^{\max\{m,k-m\}}.
+    \]
+    If $m=0$ or $m=k$, then $\rho(A_I)=2^k=\JSR(\mathcal{A})^k$ and $A_I$ is an s.m.p.\ product.
+    If $1\le m\le k-1$, then
+    \[
+    \rho(A_I)\le 2^{k-1}=\tfrac12\,\JSR(\mathcal{A})^k.
+    \]
+    Hence Definition~\ref{def:spectralGap} holds with $\gamma=\tfrac12$.
 \end{example}
 
 \section{Preprocessing}
