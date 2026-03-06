@@ -135,7 +135,7 @@ If \( \sup_{L \in \mathcal{L}(T)} \| L \| < 1 \), then the tree is called \emph{
 \section{Structure of the finite-tree algorithm}
 The finite-tree algorithm tries to find a 1-bounded $(\mathcal{A},\mathbf{G})\text{-tree}$. We start with only the root node $t_0 = \{I\}$ and iteratively check in every step $ \sup \{\lVert P \rVert: P \in L\} \le 1$ for every leaf $L$ in the current tree. If for one particular leaf the bound does not hold, we add either all positive children or an arbitrary amount of generator children.
 
-\begin{algorithm}[h]
+\begin{algorithm}[ht]
     \caption{Finite-tree-algorithm}
     \label{alg:tree}
     \begin{algorithmic}
