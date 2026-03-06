@@ -64,9 +64,9 @@ Every invariant norm is, of course, extremal, which guarantees the existence of 
     In particular, when $k = 1$, we have $\max\limits_{A \in \mathcal{A}} \lVert A \rVert = \mathrm{JSR}(\mathcal{A})$. The existence of an extremal norm for $\mathcal{A}$ therefore enables the exact computation of the joint spectral radius.
 \end{remark}
 
-In the following, we build an extremal norm whose unit ball is a balanced polytope, as introduced in \citep{protasov1996joint} and \citep{guglielmi2008algorithm}.
+In the following, we build an extremal norm whose unit ball is a balanced polytope, as introduced in \citep{Protasov1996JSRInvariantSets} and \citep{GuglielmiZennaro2008ExtremalPolytopeNorms}.
 
-\begin{definition}\citep{Protasov1996JSRInvariantSets,GuglielmiZennaro2008ExtremalPolytopeNorms}
+\begin{definition}
     \label{def:balancedPolytope}
     A polytope $\mathcal{P}$ is called \emph{balanced} if it spans the whole space and is equal to the symmetrized convex hull of a finite set of vertices.
     $$\mathcal{P} = \text{co}_{\text{s}}(V) := \text{co}(V, -V) = \{x \in \R^d : x = \sum_{i=1}^M \alpha_i v_i \text{ and } \sum_{i=1}^M |\alpha_i| \le 1\}$$
@@ -142,7 +142,7 @@ If the algorithm does not produce new vertices that lie outside the current poly
 
 \section{Stopping criterion}
 \label{sec:invStoppingCriterion}
-The runtime of Algorithm~\ref{alg:invariantPolytope} can be very large. In general, it is at least exponential in the dimension. In cases where the s.m.p. candidate is not an s.m.p., or where there are multiple leading eigenvectors, the algorithm may fail to terminate. It is therefore important to identify such cases early. To handle exponential growth, one sets an upper bound on the number of vertices in $V$. For rejecting an incorrect s.m.p. candidate, \citep{guglielmiExactComputationJoint2013} proposed the following method.
+The runtime of Algorithm~\ref{alg:invariantPolytope} can be very large. In general, it is at least exponential in the dimension. In cases where the s.m.p. candidate is not an s.m.p., or where there are multiple leading eigenvectors, the algorithm may fail to terminate. It is therefore important to identify such cases early. To handle exponential growth, one sets an upper bound on the number of vertices in $V$. For rejecting an incorrect s.m.p. candidate, \citep{GuglielmiProtasov2013ExactComputationJSR} proposed the following method.
 In the case where the candidate $\tilde{\Pi}$ has a unique simple leading eigenvalue and there exists only one s.m.p., define $v_1^{*}$ as the leading eigenvector of $\tilde{\Pi}^{*}$ (the conjugate operator of $\tilde{\Pi}$), normalized by $(v_1, v_1^{*}) = 1$, and define $v_i^{*} := \tilde{A_{d_i}^{*}} \cdots \tilde{A_{d_k}^{*}} v_1^{*}$, which are the leading eigenvectors of the conjugates of the cyclic permutations of $\Pi \in \mathcal{A}^k$.
 If $\lVert Av \rVert _{\text{co}_{\text{s}}(V)} > 1$ and there exists a $j$ such that $| ( v_j^{*}, Av) | > 1$, then the chosen candidate is not an s.m.p., and the algorithm either stops or restarts with a new candidate.
 
@@ -152,7 +152,7 @@ There are rare cases where the finiteness property does not hold, or where no in
 
 \section{Rebalancing and added starting vertices}
 \label{sec:invRebalancing}
-Three years after publishing the fundamental algorithm with the stopping criterion, the authors released a new paper on rebalancing multiple s.m.p.s, as well as starting with extra vertices so that the polytope is better conditioned \citep{guglielmi2016invariant}. In that setting, it is even possible to terminate with multiple s.m.p.s.
+Three years after publishing the fundamental algorithm with the stopping criterion, the authors released a new paper on rebalancing multiple s.m.p.s, as well as starting with extra vertices so that the polytope is better conditioned \citep{GuglielmiProtasov2016InvariantPolytopes}. In that setting, it is even possible to terminate with multiple s.m.p.s.
 
 \section{Eigenvector cases}
 \label{sec:invEigenvectorCases}
