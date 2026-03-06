@@ -1,9 +1,9 @@
 
-\chapter{Finite-tree algorithm}
+\chapter{Finite-Tree Algorithm}
 \label{ch:finiteTree}
 In this chapter we introduce basic definitions and concepts to another approach of $\JSR$ computation. It is called \emph{finite-tree algrithm} as it is trying to decompose arbitrary products $P \in \mathcal{A}^k$ into sub-products that can be 1-bounded by an a priori chosen norm.  
 
-\section{Notation and definitions}
+\section{Tree-Based Notation and Definitions}
 \label{sec:finiteNotationDefinitions}
 
 \begin{definition}
@@ -139,7 +139,7 @@ An $(\mathcal{A},\mathbf{G})\text{-tree}$ $T$ is called \emph{1-bounded} with re
 If \( \sup_{L \in \mathcal{L}(T)} \| L \| < 1 \), then the tree is called \emph{strictly 1-bounded}.
 \end{definition}
 
-\section{Structure of the finite-tree algorithm}
+\section{Algorithmic Structure}
 \label{sec:finiteAlgorithmStructure}
 The finite-tree algorithm tries to find a 1-bounded $(\mathcal{A},\mathbf{G})\text{-tree}$. We start with only the root node $t_0 = \{I\}$ and iteratively check in every step $ \sup \{\lVert P \rVert: P \in L\} \le 1$ for every leaf $L$ in the current tree. If for one particular leaf the bound does not hold, we add either all positive children or an arbitrary amount of generator children.
 
@@ -231,7 +231,7 @@ The procedure \textproc{selectChildren} determines whether all positive children
     \textcolor{red}{glueing tree on covered nodes creating an infinite tree that allows huffman encoding directly. Empty sets for every $I_i$ if product already lies on internal node before $I_k$}
 \end{remark}
 
-\section{Conditions of termination}
+\section{Termination Conditions}
 \label{sec:finiteTerminationConditions}
 
 \begin{remark}\citep{MoellerReif2014TreeBasedJSR}

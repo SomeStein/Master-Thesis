@@ -1,12 +1,12 @@
 
-\chapter{Invariant-polytope algorithm}
+\chapter{Invariant Polytope Algorithm}
 \label{ch:invariantPolytope}
 
 In this chapter, we focus on the invariant-polytope algorithm.
 At its core, this algorithm seeks a polytope $\mathcal{P} \subset \R^d$ that is invariant under the action of the already scaled matrices in $\tilde{\mathcal{A}}$. The corresponding Minkowski functional of this polytope is then a so-called extremal norm for the family $\mathcal{A}$.
 As we will see, this is enough to prove that the chosen candidate is indeed an s.m.p., which is our goal.
 
-\section{Extremal norms}
+\section{Extremal and Invariant Norms}
 \label{sec:invExtremalNorms}
 
 \begin{definition}\citep{Barabanov1988LyapunovIndicatorDiscreteInclusions}
@@ -107,7 +107,7 @@ In the following, we build an extremal norm whose unit ball is a balanced polyto
 \end{proof}
 By the previous theorem, we only need to find a balanced polytope that is invariant under the action of $\tilde{\mathcal{A}}$. Then we have proved that the chosen candidate from the preprocessing is indeed an s.m.p.
 
-\section{Structure of the invariant-polytope algorithm}
+\section{Algorithmic Structure}
 \label{sec:invAlgorithmStructure}
 After preprocessing has been carried out, we end up with a candidate $\tilde{\Pi} = \tilde{A_{d_k}} \cdots \tilde{A_{d_1}}$ for our finiteness-property hypothesis. We want to establish $\JSR(\tilde{\mathcal{A}}) = 1$ by finding an invariant balanced polytope $\mathcal{P} = \text{co}_{\text{s}}(V)$. We define $V := \{ v_1, \cdots, v_k \}$, where $v_1$ is the leading eigenvector of $\tilde{\Pi}$ (assumed to be real) and $v_i := \tilde{A_{d_{i-1}}}\cdot ... \cdot \tilde{A_{d_1}}v_1$ are the leading eigenvectors of the cyclic permutations of $\tilde{\Pi}$.
 Now we add new vertices to $V$ iteratively by multiplying with matrices from $\tilde{\mathcal{A}}$, i.e.
@@ -140,21 +140,21 @@ If the algorithm does not produce new vertices that lie outside the current poly
 \end{algorithmic} 
 \end{algorithm}
 
-\section{Stopping criterion}
+\section{Stopping Criterion and Candidate Rejection}
 \label{sec:invStoppingCriterion}
 The runtime of Algorithm~\ref{alg:invariantPolytope} can be very large. In general, it is at least exponential in the dimension. In cases where the s.m.p. candidate is not an s.m.p., or where there are multiple leading eigenvectors, the algorithm may fail to terminate. It is therefore important to identify such cases early. To handle exponential growth, one sets an upper bound on the number of vertices in $V$. For rejecting an incorrect s.m.p. candidate, \citep{GuglielmiProtasov2013ExactComputationJSR} proposed the following method.
 In the case where the candidate $\tilde{\Pi}$ has a unique simple leading eigenvalue and there exists only one s.m.p., define $v_1^{*}$ as the leading eigenvector of $\tilde{\Pi}^{*}$ (the conjugate operator of $\tilde{\Pi}$), normalized by $(v_1, v_1^{*}) = 1$, and define $v_i^{*} := \tilde{A_{d_i}^{*}} \cdots \tilde{A_{d_k}^{*}} v_1^{*}$, which are the leading eigenvectors of the conjugates of the cyclic permutations of $\Pi \in \mathcal{A}^k$.
 If $\lVert Av \rVert _{\text{co}_{\text{s}}(V)} > 1$ and there exists a $j$ such that $| ( v_j^{*}, Av) | > 1$, then the chosen candidate is not an s.m.p., and the algorithm either stops or restarts with a new candidate.
 
-\section{Termination conditions}
+\section{Termination Conditions}
 \label{sec:invTerminationConditions}
 There are rare cases where the finiteness property does not hold, or where no invariant polytopes exist. In those cases, the algorithm will not find the value of the $\JSR$.
 
-\section{Rebalancing and added starting vertices}
+\section{Rebalancing and Additional Initial Vertices}
 \label{sec:invRebalancing}
 Three years after publishing the fundamental algorithm with the stopping criterion, the authors released a new paper on rebalancing multiple s.m.p.s, as well as starting with extra vertices so that the polytope is better conditioned \citep{GuglielmiProtasov2016InvariantPolytopes}. In that setting, it is even possible to terminate with multiple s.m.p.s.
 
-\section{Eigenvector cases}
+\section{Complex and Nonnegative Variants}
 \label{sec:invEigenvectorCases}
 If the leading eigenvector associated with a candidate product is complex, then the real balanced polytope norm is no longer sufficient and must be replaced by an appropriate \emph{complex-balanced polytope norm}. 
 In addition, for families of nonnegative matrices one may exploit positivity to construct specialized norms that can substantially improve numerical efficiency. 
