@@ -5,13 +5,13 @@
 In this chapter we will explore some possible combinations of the aforementioned algorithms and then present the main result of this work. The tree-flavored-invariant-polytope-algorithm and its termination results. 
 
 \section{Hybridization Strategies}
-\label{sec:hybridGoalOptions}
+\label{sec:hybridStrategies}
 In its heart the invariant-polytope algorithm tries to find a polytope, whose corresponding Minkowski norm is specifically optimized on the given problem, whilst the finite-tree algorithm connects growth-rate to decompositions of products. A clear combination scheme arises naturally, where we use the optimized polytope norm to estimate the products of the finite-tree. From there we can choose a specific order or level of concurrency.
 \newline
 A modular approach would be to first run the invariant-polytope algorithm for a couple of steps and then use the calculated norm thats already optimized for the finite-tree algorithm. But that seems to be wasteful since valuable matrix calculations from the finite-tree algorithm could have been used for an even more optimized norm and some polytopes might have already cleared insight for the decompositions that the finite-tree algorithm tries to find. In \citep{MejstrikReif2025HybridApproachJSR} the authors came up with a more concurrent algorithm that builds up norms and decompositions in every step. 
 
 \section{Problem Formulation}
-\label{subsec:hybridObjective}
+\label{sec:hybridProblemFormulation}
 After the preprocessing stage from Section \ref{sec:introPreprocessing} is done, we end up with a scaled set of matrices $\tilde{\mathcal{A}}$ and from the chosen candidate and the three-member-inequality \eqref{eq:three_member} we already know $\JSR(\tilde{\mathcal{A}}) \geq 1$. 
 Such that our goal of establishing $\JSR(\tilde{\mathcal{A}}) = 1$ becomes equivalent to  $\JSR(\tilde{\mathcal{A}}) \leq 1$. 
 For this we want to show that there exists a polynomial $p$ and a norm $\lVert \cdot \rVert$, such that, similarly to Chapter \ref{ch:finiteTree}, every norm of a product of matrices from $\tilde{\mathcal{A}}$ can be bounded by this polynomial in its length i.e. $$ \lVert P \rVert \leq p(k) \quad \forall P \in \tilde{\mathcal{A}}^k, k \in \N. $$
@@ -19,8 +19,9 @@ We find the polynomial $p$ by decomposing every multi-index $J = [j_1, ... , j_n
 We dont know the leaf-subproduct for every multi-index directly but we can bound it by the theory of Chapter \ref{ch:finiteTree}. 
 The following describes the process of the developed algorithm together with its pseudocode, states the main theorem, outlines the proof and finally gives all theoretical results to prove this statement.
 We want to conclude this Chapter with some theoretical remarks as well as technical details for implementation.
+
 \section{Hybrid Algorithm}
-\label{sec:hybridAlgorithmStructure}
+\label{sec:hybridAlgorithm}
 The algorithm starts just like the invariant-polytope algorithm with an set $V_0$ of starting-vertices.
 Every set of Vertices $V_k$ defines a vector-polytope-norm $\lVert \cdot \rVert _{V_k}$. 
 Now, at step $k$ for every vertex $v \in V_k$ we take a test-$(\mathcal{A},\mathbf{G})\text{-tree}$ $T_v$.
@@ -30,24 +31,22 @@ If all test-tree-leafages within a step $k$ are 1-bounded by the polytope-norm, 
 \vspace{1cm}
 
 \begin{algorithm}
-  \caption{Tree-flavored-invariant-polytope-algorithm}
+  \caption{Invariant-tree-algorithm}
   \label{alg:hybridApproach}
   \begin{algorithmic}
       \State \Input{$\mathcal{A} = \{A_1, \ldots, A_n\}$, $\mathbf{G} = \{ g_1, \cdots, g_m \}$ and $V = \{v_1, \cdots, v_M\}$}
-      \State \Output{A boolean value indicating whether the tree condition holds (True/False)}
       \State $V_{\text{new}} \gets V$
       \While {$V_{\text{new}} \ne \emptyset$}
           \State $V_{\text{rem}} \gets V_{\text{new}}$
           \State $V_{\text{new}} \gets \emptyset$
           \For {$v \in V_{\text{rem}}$}
-              \State $\text{Construct} (\mathcal{A},\mathbf{G})\text{-tree } \mathbf{T} \text{ with sepcifications from \citep{MejstrikReif2025HybridApproachJSR}}$
-              \If {$\exists L \in \mathcal{L}(T) \text{ with } \lVert Lv \rVert _{\text{co}_{\text{s}}(V)} \geq 1$}
+              \State $\text{Construct minimal } (\mathcal{A},\mathbf{G})\text{-tree } \mathbf{T}$ \text{like discussed in Section~\ref{sec:hybridImplementation}}
+              \If {$\exists L \in \mathcal{L}(\mathbf{T}) \text{ with } \lVert Lv \rVert _{\text{co}_{\text{s}}(V)} \geq 1$}
                   \State $V \xleftarrow{\cup}\mathcal{A} v$
                   \State $V_{\text{new}} \xleftarrow{\cup} \mathcal{A}v$
               \EndIf  
           \EndFor
-      \EndWhile \\
-      \Return \text{True}
+      \EndWhile 
   \end{algorithmic}
 \end{algorithm}
 
@@ -62,7 +61,8 @@ If all test-tree-leafages within a step $k$ are 1-bounded by the polytope-norm, 
 
 \subsection{Proof Strategy}
 \label{subsec:hybridProofOutline}
-Figure~\ref{fig:hybridCyclicTree} shows an example of a generated tree after the algorithm has terminated as well as the $(\mathcal{A},\mathbf{G})\text{-trees}$ that have been used to bound the products. Here $\mathcal{A}$ consists of two matrices $A$ and $B$ and the chosen candidate is $ \Pi = ABA$. At the top, you can see the eigenvector $v_1$ and the rest of the cycle, generated by the candidate $\Pi$, as well as branches coming of. All the nodes that are connected through a solid arrow have been added to the vertices $V$ in a particular step $k$. All dashed lines show a test tree that is 1-bounded. You can see the 1-bounded matrix-vector products at the end of the dashed arrows where $n$ can be every natural number including 0. Note that these products are bounded by the norm constructed in their respective steps but due to submultiplicativity the final norm bounds all products in general. So in the following we just reference the final norm $\lVert \cdot \rVert _{V}$ for the final set of vertices $V$.
+Products are bounded by the norm constructed in their respective steps but due to submultiplicativity the final norm bounds all products in general. So in the following we just reference the final norm $\lVert \cdot \rVert _{V}$ for the final set of vertices $V = \cup_{i = 1}^{K} V_i$ where $K$ is the final step. After termination we end up with a set of vertices $V$ as well as testing-trees that bound particular products. 
+The idea is to generalize the proof of the finite-tree algorithm using linear combinations and bounding every projection eperately. Since the 1-boundedness of the norm guarantees bounded coefficients for the linear combinations.
 
 \begin{figure}
   \centering
@@ -131,7 +131,7 @@ Figure~\ref{fig:hybridCyclicTree} shows an example of a generated tree after the
   \node[above] at ($(v6)!0.6!(v6-2)$) {$B$};
   
   \end{tikzpicture}
-  \caption{Cyclic tree structure generated by the algorithm. Vertices added to $V$ (solid arrows) and finite-trees for bounding products (dashed arrows).}
+  \caption{Cyclic tree structure generated by the algorithm. Here $\mathcal{A}$ consists of two matrices $A$ and $B$ and the chosen candidate is $ \Pi = ABA$. $(\mathcal{A},\mathbf{G})\text{-trees}$ that have been used to bound the products have dashed arrows. At the top, you can see the eigenvector $v_1$ and the rest of the cycle, generated by the candidate $\Pi$, as well as branches coming of, connecting nodes through a solid arrow. These vertices have been added to the set $V$ in a particular step $k$. You can see the 1-bounded matrix-vector products at the end of the dashed arrows where $n$ can be every natural number including 0.}
   \label{fig:hybridCyclicTree}
 \end{figure}
 
@@ -195,7 +195,7 @@ Here the first inequality works since after $k$ steps the prefix $P'_{i}$ is gua
   $$ 
 \end{proof}
 
-Of course, if the candidate had a spectral radius of $1 \implies \JSR(\mathcal{A}) = 1$.
+Of course, since the candidate has a spectral radius of 1 this implies $\JSR(\mathcal{A}) = 1$ like it was discussed in Section~\ref{sec:hybridProblemFormulation}.
 
 \begin{corollary}
   If the chosen trees are always $T_v = \mathcal{A}$, then we would have exactly the invariant-polytope algorithm \ref{alg:invariantPolytope}. 
