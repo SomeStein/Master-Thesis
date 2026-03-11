@@ -1,7 +1,7 @@
 
 \chapter{Finite-Tree Algorithm}
 \label{ch:finiteTree}
-In this chapter we introduce basic definitions and concepts to another approach of $\JSR$ computation. It is called \emph{finite-tree algrithm} as it is trying to decompose arbitrary products $P \in \mathcal{A}^k$ into sub-products that can be 1-bounded by an a priori chosen norm.  
+In this chapter we introduce definitions and concepts for another approach to $\JSR$ computation. The \emph{finite-tree algorithm} decomposes arbitrary products $P \in \mathcal{A}^k$ into sub-products that are 1-bounded with respect to a chosen norm.
 
 \section{Tree-Based Notation and Definitions}
 \label{sec:finiteNotationDefinitions}
@@ -17,7 +17,7 @@ In this chapter we introduce basic definitions and concepts to another approach 
     \end{itemize}
 \end{definition}
 
- We define $T_{\mathcal{A}}$ as the tree consisting of all products in the set $\bigcup \limits_ {k \in \mathbb{N}_0}\mathcal{A}^k$ where every multi-index represents a node. For the empty index ($k = 0$)  we set $A_{[]} = I_d$ the identity matrix in $\R^{d\times d}$. An example can be seen in Figure~\ref{fig:finiteMatrixProductTree}.
+We define $T_{\mathcal{A}}$ as the tree consisting of all products in the set $\bigcup \limits_ {k \in \mathbb{N}_0}\mathcal{A}^k$ where every multi-index represents a node. For the empty index ($k = 0$) we set $A_{[]} = I_d$, the identity matrix in $\R^{d\times d}$, and call this node the root. An example can be seen in Figure~\ref{fig:finiteMatrixProductTree}.
 
 \begin{figure}[ht]
 \centering
@@ -59,12 +59,10 @@ In this chapter we introduce basic definitions and concepts to another approach 
 \label{fig:finiteMatrixProductTree}
 \end{figure}
 
-The objective is now to find a sub-tree $T \subset T_{\mathcal{A}}$ for a chosen norm, with the condition of every leaf encoding a product that has a norm less then 1 and every node that is not a leaf having all possible children $A_1,\cdots,A_n$.
-If such a tree has been found it easily allows for a decomposition of every possible product $P = A_{[i_1,\cdots,i_k]} \in \mathcal{A}^k$ into sub-products encoded by leafs and one possible rest term encoded by an internal-node. 
-Leading to a proof of $\JSR(\tilde{\mathcal{A}}) = 1$.
-\newline
-Such sub-trees are in general not finite and therefore unusable for a computational tree-search algorithm.
-In the paper \citep{MoellerReif2014TreeBasedJSR}, the writers propose to use a different kind of encoding making use of so-called generators and set-valued nodes.
+The objective of the finite-tree algorithm is to find a sub-tree $T \subset T_{\mathcal{A}}$ such that every leaf of $T$ has norm less than $1$ and every node that is not a leaf has all positive children $A_1,\dots,A_n$.
+If such a tree is found, every product $P = A_{[i_1,\dots,i_k]} \in \mathcal{A}^k$ can be decomposed into factors encoded by leaves and one possible remainder term encoded by an internal node. This suffices to prove $\JSR(\tilde{\mathcal{A}}) = 1$.
+
+In general, such trees are not finite and are therefore not directly usable for computation. In \citep{MoellerReif2014TreeBasedJSR}, the authors introduce an encoding with generators and set-valued nodes to obtain a tractable search procedure.
 
 We fix a set $\mathcal{G} = \{ G_1, \cdots, G_m \}$ with $G_i \in \mathcal{A}^{k_i}$ and $\rho(G_i)^{\frac{1}{k_i}} \le 1$.
 All products from this set will be called \emph{generators}.
@@ -73,7 +71,7 @@ We also define $A_l := G_{-l}$ for $l \in \{-m, \dots, -1\}$.
 \begin{definition}\citep{MoellerReif2014TreeBasedJSR}
     \label{def:extendedMultiIndexSet}
     
-    The set \( \mathcal{J}^k := \{-m, \dots, -1, 1, \dots, n\}^k \) denotes the collection of all multi-indeces of length \( k \) with entries in $\{-m, \dots, -1, 1, \dots, n\}$. 
+    The set \( \mathcal{J}^k := \{-m, \dots, -1, 1, \dots, n\}^k \) denotes the collection of all multi-indices of length \( k \) with entries in $\{-m, \dots, -1, 1, \dots, n\}$. 
     For a multi-index \( J = [j_1, \dots, j_k] \in \mathcal{J}^k \), the corresponding matrix product set is defined by:
     $$
     A_J := \{ A_{j_k}^{e_k} \cdots A_{j_1}^{e_1} \mid  e_i = 1  \text{ if } j_i > 0 \text{ or } e_i \in \mathbb{N}_0 \text{ otherwise}\} 
@@ -85,18 +83,20 @@ Again, this creates a tree structure in a similar way to positive multi-indeces,
 
 \begin{definition}
     \label{def:multiIndexExtension}
-    Let $J = [j_1, \cdots, j_k]$ be a multi-index. We define the multi-index extension with $J + [j_{k+1}] := [j_1, \cdots, j_k, j_{k+1}].$
+    Let $J = [j_1, \cdots, j_k]$ be a multi-index and let $j_{k+1} \in \mathcal{J}$. We define the extension
+    \[
+    [J, j_{k+1}] := [j_1, \cdots, j_k, j_{k+1}].
+    \]
+    Nested concatenations are always flattened a priori.
 \end{definition}
-
-\textcolor{red}{your proposal $[J, j_{k+1}]$ is blunt since it would be nested like $[[j_1, \cdots, j_k], j_{k+1}]$}
 
 \begin{definition}
     \label{def:childType}
     Let $t \in T$ be a node with the multi-index $J$.
-    A child node $\tilde{t}$ with the multi-index $J + [j_{k+1}]$ is called:
+    A child node $\tilde{t}$ with the multi-index $[J, j_{k+1}]$ is called:
     \begin{itemize}
         \item \emph{positive} if $j_{k+1}$ is positive.
-        \item \emph{negative} or \emph{generator} if $j_{k+1}$ is negative.
+        \item \emph{generator} if $j_{k+1}$ is negative.
     \end{itemize}
 \end{definition}
 
@@ -108,12 +108,13 @@ Now we want to find a subtree of a special form.
     A so-called $(\mathcal{A},\mathcal{G})\text{-tree } T$ has the following structure: 
 \begin{itemize}
     \item The root node contains the identity matrix: \( t_0 = \{I_d\} \).
+    \item For every node \( t \in T \setminus \{t_0\} \), there is exactly one parent node in \(T\).
     
     \item Each node \( t \in T \) is either:
     \begin{itemize}
         \item A leaf,
         \item A parent of exactly \( n \) positive children.
-        \item A parent of only generators.
+        \item A parent with at least one generator child.
     \end{itemize}
 \end{itemize}
 \end{samepage}
@@ -125,7 +126,7 @@ Now we want to find a subtree of a special form.
     A node in the tree is called \emph{covered} if it is a subset of one of its ancestors in the tree. Otherwise, it is called \emph{uncovered}. 
     The set of uncovered leaves is denoted as
 \[
-    \mathcal{L}(T) := \{ L \in t : t \in T \text{ is an uncovered leaf} \}.
+    \mathcal{L}(T) := \{ t \in T : t \text{ is an uncovered leaf} \}
 \]
 and called \emph{leafage} of the tree $T$.
 \end{definition}
@@ -141,21 +142,25 @@ If \( \sup_{L \in \mathcal{L}(T)} \| L \| < 1 \), then the tree is called \emph{
 
 \section{Algorithmic Structure}
 \label{sec:finiteAlgorithmStructure}
-The finite-tree algorithm tries to find a 1-bounded $(\mathcal{A},\mathcal{G})\text{-tree}$. We start with only the root node $t_0 = \{I_d\}$ and iteratively check in every step $ \sup \{\lVert P \rVert: P \in L\} \le 1$ for every leaf $L$ in the current tree. If for one particular leaf the bound does not hold, we add either all positive children or an arbitrary amount of generator children.
+The finite-tree algorithm starts with the root node $t_0 = \{I_d\}$ and performs a non-exhaustive depth-first search in the space of $(\mathcal{A},\mathcal{G})$-trees. In each iteration, it checks whether every active leaf satisfies
+\[
+\sup \{\lVert P \rVert: P \in L\} \le 1.
+\]
+If this fails for a leaf, the procedure \textproc{selectChildren} chooses either all positive children or a selected subset of generator children.
 
 \begin{algorithm}[ht]
-    \caption{Finite-tree-algorithm}
+    \caption{Finite-tree algorithm}
     \label{alg:finiteTree}
     \begin{algorithmic}
         \State \Input{$\mathcal{A} = \{A_1, \ldots, A_n\}$ and $\mathcal{G} = \{ G_1, \cdots, G_m \}$}
-        \State \Output{If the algorithm terminates the tree condition holds}
+        \State \Output{If the algorithm terminates, the tree condition holds}
         \State $Q \leftarrow \{[1], \cdots, [n]\}$
         \While{$Q \ne \emptyset$}
             \State $Q_{\text{new}} \leftarrow \emptyset$
             \For{$J \in Q$} 
                 \If{$\sup \{ \lVert P \rVert : P \in A_J \} > 1$}
-                    \State $\textbf{J} \leftarrow \textproc{selectChildren}(J, \mathcal{A}, \mathcal{G})$ % See Remark~\ref{rem:moller}
-                    \State $Q_{\text{new}} \xleftarrow{\cup} \{J + j: j \in \textbf{J}\}$
+                    \State $\mathcal{C} \leftarrow \textproc{selectChildren}(J, \mathcal{A}, \mathcal{G})$ % See Remark~\ref{rem:moller}
+                    \State $Q_{\text{new}} \xleftarrow{\cup} \{[J,j]: j \in \mathcal{C}\}$
                 \EndIf
             \EndFor
             \State $Q \leftarrow Q_{\text{new}}$
@@ -164,20 +169,20 @@ The finite-tree algorithm tries to find a 1-bounded $(\mathcal{A},\mathcal{G})\t
 \end{algorithm}
 
 \begin{remark}\citep{MoellerReif2014TreeBasedJSR}\label{rem:moller}
-The procedure \textproc{selectChildren} determines whether all positive children (from $1$ to $n$) or a subset of negative children (from $-1$ to $-m$) is chosen, according to the theory established there.
+The procedure \textproc{selectChildren} determines whether all positive children (from $1$ to $n$) or a subset of generator children (from $-1$ to $-m$) is chosen, according to the theory established there.
 \end{remark}
 
 \begin{lemma}
     \label{lem:finitePolynomialBound}
-    For every $(\mathcal{A},\mathcal{G})\text{-tree } T$ there exists a strictly-positive, monotone polynomial $p$ such that for every node $t \in T$ and every product $P \in \mathcal{A}^k$ encoded by $t$, $\lVert P \rVert \le p(k)$ holds.
+    For every $(\mathcal{A},\mathcal{G})\text{-tree } T$ there exists a strictly positive, monotone polynomial $p$ such that for every node $t \in T$ and every product $P \in \mathcal{A}^k$ encoded by $t$, $\lVert P \rVert \le p(k)$ holds.
 \end{lemma}
   
 \begin{proof}
     Take an arbitrary node $t \in T$ with multi-index $J = [j_1, \cdots, j_l]$. 
     Now every $j_i$ encodes either a matrix from $\mathcal{A}$ or arbitrary powers of a generator from $\mathcal{G}$. 
-    Since all those matrices have spectral radius less then or equal to 1, its Jordan normal forms grow utmost polynomially und thus, due to equivalence of norms in finite-dimensional vector spaces, there exists a strictly-positive, monotone polynomial $p_i$ with 
+    Since all those matrices have spectral radius less than or equal to $1$, their Jordan normal forms grow at most polynomially and thus, by norm equivalence in finite-dimensional vector spaces, there exists a strictly positive, monotone polynomial $p_i$ with 
     $$ 
-    \lVert A_{j_i}^{e} \rVert \le p_i(e) \quad \forall e \in \mathbb{N}_0.
+    \lVert A_{j_i}^{e} \rVert \le p_i(e) \quad \text{for all } e \in \mathbb{N}_0.
     $$
 
     We define: 
@@ -205,7 +210,7 @@ The procedure \textproc{selectChildren} determines whether all positive children
 
 \begin{theorem}\citep{MoellerReif2014TreeBasedJSR}
 \label{thm:finiteTreeTermination}
-    If a 1-bounded $(\mathcal{A},\mathcal{G})\text{-tree}$ was found for a given matrix set $\mathcal{A}$ and generator set $\mathcal{G}$ then $\JSR(\mathcal{A}) = 1$
+    If a 1-bounded $(\mathcal{A},\mathcal{G})\text{-tree}$ is found for a given matrix set $\mathcal{A}$ and generator set $\mathcal{G}$, then $\JSR(\mathcal{A}) = 1$.
 \end{theorem}
 ~
 \begin{proof}
@@ -219,16 +224,15 @@ The procedure \textproc{selectChildren} determines whether all positive children
         \lVert A_{I}  \rVert =  \lVert A_{I_k}A_{I_{k-1}}\cdots A_{I_1}\rVert \le  \lVert A_{I_k} \rVert \cdot \lVert A_{I_{k-1}}\rVert \cdots \lVert A_{I_1} \rVert \le \lVert A_{I_k} \rVert\le p(k).
     \]
     The last equality holds since all $I_j \quad j = 1, \cdots,k-1$ are either the empty multi-index or leafs such that their products $A_{I_j}$ are bounded by 1. 
-    Furthermore $A_{I_k}$ can be bounded by the polynomial $p$ and the length of the product, which is less then $k$. 
+    Furthermore $A_{I_k}$ can be bounded by the polynomial $p$ and the length of the product, which is less than $k$. 
     Now we have
-      $$\JSR(\mathcal{A}) = \lim_k \max_{P \in \mathcal{A}^k} \lVert P \rVert ^{\frac{1}{k}} \leq \lim_k p(k) ^{\frac{1}{k}}  = 1$$
+      $$\JSR(\mathcal{A}) = \lim_{k \to \infty} \max_{P \in \mathcal{A}^k} \lVert P \rVert ^{\frac{1}{k}} \leq \lim_{k \to \infty} p(k) ^{\frac{1}{k}}  = 1$$
     since the chosen multi-index was arbitrary.
 \end{proof}
 
 \begin{remark}\citep{MoellerReif2014TreeBasedJSR}
     \label{rem:finiteTreeDecomposition}
     The decomposition used in the proof of Theorem~\ref{thm:finiteTreeTermination} exists and is unique due to the structure of an $(\mathcal{A},\mathcal{G})\text{-tree}$.
-    \textcolor{red}{glueing tree on covered nodes creating an infinite tree that allows huffman encoding directly. Empty sets for every $I_i$ if product already lies on internal node before $I_k$}
 \end{remark}
 
 \section{Termination Conditions}
@@ -236,5 +240,5 @@ The procedure \textproc{selectChildren} determines whether all positive children
 
 \begin{remark}\citep{MoellerReif2014TreeBasedJSR}
     \label{rem:finiteGeneratorNecessity}
-    In the cited work, the authors show that the use of generators is essential for ensuring termination in cases where the original invariant-polytope algorithm fails to terminate. But deciding when to use generators instead of all positive children is still part of active research and is handled via highly heuristical approaches. 
+    In the cited work, the authors show that the use of generators is essential for ensuring termination in cases where the original invariant-polytope algorithm fails to terminate. Deciding when to use generators instead of all positive children is still part of active research and is handled by heuristics. In particular, termination with multiple s.m.p.\ candidates is substantially more delicate.
 \end{remark}

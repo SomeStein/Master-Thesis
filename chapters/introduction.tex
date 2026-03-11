@@ -6,7 +6,7 @@ The \textit{Joint Spectral Radius} (JSR) was first introduced by G.-C. Rota and 
 
 The concept gained significant traction in the 1990s when researchers began exploring its theoretical properties and practical implications. Notable advancements include its application in wavelet theory, where it assists in the construction of refinable functions \citep{DaubechiesLagarias1992TwoScaleII}, as well as in control theory, where it is used to analyze the stability of switched linear systems \citep{Jungers2009JointSpectralRadius}, for which we provide a small example below. The computational challenges associated with determining the JSR have inspired the development of several algorithms, such as the invariant-polytope method \citep{GuglielmiProtasov2013ExactComputationJSR} and the finite-tree method \citep{MoellerReif2014TreeBasedJSR}.
 
-Despite the progress, the JSR computation remains a challenging problem, particularly due to the exponential complexity of exploring all possible matrix products. This thesis seeks to contribute to this ongoing effort by leveraging the invariant-polytope algorithm and the finite-tree algorithm to create a hybrid methodology that mitigates their respective limitations.
+Despite the progress, JSR computation remains challenging, particularly due to the exponential complexity of exploring all possible matrix products. This thesis contributes to this line of work by combining the invariant-polytope algorithm and the finite-tree algorithm into a hybrid approach that mitigates their respective limitations.
 
 \section*{Thesis Outline}
 This thesis is structured as follows: Chapter~\ref{ch:introduction} provides background on the JSR and its basic properties. Chapters~\ref{ch:invariantPolytope} and~\ref{ch:finiteTree} present the key ideas behind the algorithms used to construct the proposed hybrid approach, including their theoretical foundations and algorithmic implementations. Chapter~\ref{ch:hybridApproach} discusses possible combinations of the former approaches, proposes the so-called Tree-flavored invariant-polytope algorithm, and provides proofs of its termination properties, which form the main results of this thesis. Chapter~\ref{ch:numericalTesting} presents numerical results to analyze the efficiency and applicability of the hybrid algorithm. Chapter~\ref{ch:thesisConclusion} concludes with insights and future directions. Appendix~\ref{app:notation} collects a complete notation glossary for quick reference.
@@ -56,7 +56,7 @@ A key question is whether the system is \emph{uniformly asymptotically stable}, 
 \[
 \lim_{t \to \infty} x_t = 0.
 \]
-This behavior is governed by a generalization of the spectral radius for a single matrix, the so-called \emph{joint spectral radius (JSR)} of a matrix set $\mathcal{A}$ \citep{RotaStrang1960NoteJSR}.
+This stability question is answered by a generalization of the spectral radius for a single matrix, the so-called \emph{joint spectral radius (JSR)} of a matrix set $\mathcal{A}$ \citep{RotaStrang1960NoteJSR}.
 \begin{definition}\citep{RotaStrang1960NoteJSR}
     \label{def:jsrDefinition}
     For a finite set of matrices $\mathcal{A} = \{A_1, \dots, A_n\}$, the JSR is defined as:
@@ -65,7 +65,7 @@ This behavior is governed by a generalization of the spectral radius for a singl
     \end{equation}
     where $\|\cdot\|$ denotes any matrix norm.
 \end{definition}
-This formulation captures the maximal asymptotic growth rate of matrix products.
+This definition quantifies the maximal asymptotic growth rate of matrix products from $\mathcal{A}$.
 
 \subsection*{Illustrative Example}
 
@@ -96,22 +96,22 @@ A_1 A_2 =
 \end{bmatrix}
 =
 \begin{bmatrix}
-1.3 & 0.3 \\
-0.15 & 0.15
+1.15 & 0.3 \\
+0.5 & 0.15
 \end{bmatrix}
 \]
 has spectral radius of approximately
 \[
-\rho(A_1 A_2) \approx 1.2929 > 1.
+\rho(A_1 A_2) \approx 1.2825 > 1.
 \]
 This example shows that switching can amplify the effects of individual matrices, leading to divergent behavior even if all single matrices are contractive. Thus, the JSR can exceed the spectral radius of any individual matrix in the set.
 
-The following result motivates the importance of bounding or approximating $\JSR(\mathcal{A})$. It is known that:
+The following results motivate the importance of bounding or approximating $\JSR(\mathcal{A})$ \citep{Jungers2009JointSpectralRadius}:
 \begin{itemize}
     \item The system~\eqref{eq:switched_system} is \emph{uniformly bounded} (i.e., $\sup_t \|x_t\| < \infty$ for all $x_0 \in \R^d$) if and only if $\JSR(\mathcal{A}) \leq 1$ and $\mathcal{A}$ is irreducible.
     \item It is \emph{uniformly asymptotically stable} if and only if $\JSR(\mathcal{A}) < 1$. 
 \end{itemize}
-Understanding the joint spectral radius (JSR) is therefore critical for analyzing the asymptotic behavior of switched linear systems, as illustrated by the example above, and motivates the development of reliable algorithms for determining or approximating it \citep{Jungers2009JointSpectralRadius}. Beyond control theory, the JSR plays a central role in several other areas. In approximation theory, it governs regularity questions for two-scale/refinement equations and wavelets \citep{DaubechiesLagarias1992TwoScaleII,Maesumi2000JSRHolderWavelets}. It is also used in the convergence and smoothness analysis of subdivision schemes \citep{GuglielmiManniVitale2011HermiteSubdivisionJSR}. In information theory, capacities of constrained codes can be studied through spectral characteristics of matrix families, leading to problems closely connected to JSR computation \citep{BlondelJungersProtasov2006CapacityCodes}. In discrete mathematics and combinatorics, JSR techniques appear in asymptotic counting problems such as partition-related functions and growth of structured matrix products \citep{Protasov2000PartitionFunctionAsymptotic,JungersProtasovBlondel2008IntegerMatrixGrowth,JungersProtasovBlondel2009OverlapFreeWordsSpectra}. These connections highlight the JSR as a unifying concept across operator theory, approximation theory, dynamical systems, information theory, and discrete mathematics, and further motivate efficient computational methods such as the hybrid algorithm based on works of \citep{MejstrikReif2025HybridApproachJSR}, which will be explored in this thesis.
+Understanding the joint spectral radius is therefore critical for analyzing the asymptotic behavior of switched linear systems and motivates reliable computational methods \citep{Jungers2009JointSpectralRadius}. Beyond control theory, the JSR also appears in approximation theory, for example in regularity questions for two-scale and refinement equations \citep{DaubechiesLagarias1992TwoScaleII,Maesumi2000JSRHolderWavelets}. Related spectral-growth ideas are used in coding-theoretic capacity problems \citep{BlondelJungersProtasov2006CapacityCodes} and in discrete mathematics and combinatorics \citep{Protasov2000PartitionFunctionAsymptotic,JungersProtasovBlondel2008IntegerMatrixGrowth,JungersProtasovBlondel2009OverlapFreeWordsSpectra}. These links motivate efficient computational methods, including the hybrid algorithm studied in this thesis \citep{MejstrikReif2025HybridApproachJSR}.
 
 \section{Fundamental Theoretical Results}
 \label{sec:introTheoreticalBackground}
@@ -161,7 +161,7 @@ Therefore $\liminf = \limsup = \alpha$, so the limit exists and equals $\alpha$.
 \begin{proof}
 Let $\| \cdot \|_1$   and $ \| \cdot \|_2 $ be two matrix norms on $ \mathbb{R}^{n \times n} $. By equivalence of norms in finite-dimensional vector spaces, there exist constants $ c, C > 0 $ such that:
 $$
-c \|P\|_1 \leq \|P\|_2 \leq C \|P\|_1 \quad \forall P \in \mathbb{R}^{d \times d}
+c \|P\|_1 \leq \|P\|_2 \leq C \|P\|_1 \quad \text{for all } P \in \mathbb{R}^{d \times d}
 .$$
 Therefore, we have
 
@@ -207,7 +207,7 @@ To facilitate the analysis of the algorithms and presentation of the main result
     if $\mathcal{A}$ is a finite (or compact) set.
 \end{proposition}
 
-\begin{proposition}\citep{Jungers2009JointSpectralRadius}\label{prop:threeMemberInequality}
+\begin{proposition}\citep{RotaStrang1960NoteJSR,Jungers2009JointSpectralRadius}\label{prop:threeMemberInequality}
 Let $\|\cdot\|$ be a matrix norm. Then for every $k\in\mathbb{N}$,
 \begin{equation}\label{eq:three_member}
 \max_{P\in\mathcal{A}^k}\rho(P)^{1/k}\ \le\ \JSR(\mathcal{A})\ \le\ \max_{P\in\mathcal{A}^k}\|P\|^{1/k}.
@@ -291,7 +291,7 @@ Since $\JSR(\mathcal{A})=\lim_{n\to\infty}\max_{P\in\mathcal{A}^n}\|P\|^{1/n}
 \ref{eq:three_member} follows.
 \end{proof}
 
-This inequality underlies many computational methods, since it yields computable lower and upper bounds on $\JSR(\mathcal A)$. Moreover, as $k\to\infty$ the upper bound $\max_{P\in\mathcal A^k}\|P\|^{1/k}$ converges to $\JSR(\mathcal A)$, while the lower bound $\max_{P\in\mathcal A^k}\rho(P)^{1/k}$ approaches $\JSR(\mathcal A)$ in the sense of a $\limsup$.
+This inequality underlies many computational methods, since it yields computable lower and upper bounds on $\JSR(\mathcal A)$. As $k\to\infty$, the upper bound $\max_{P\in\mathcal A^k}\|P\|^{1/k}$ converges to $\JSR(\mathcal A)$. The lower bounds $\max_{P\in\mathcal A^k}\rho(P)^{1/k}$ need not converge, but their limit superior equals $\JSR(\mathcal A)$ by Proposition~\ref{prop:bergerWangCharacterization}.
 
 \subsection*{Similarity Invariance and Reducibility}
 
@@ -377,7 +377,7 @@ For the following considerations we can now assume $\mathcal{A}$ to be irreducib
     \label{def:finitenessProperty}
     A matrix set $\mathcal{A} = \{ A_1, \dots, A_n \}$ is said to possess the \emph{finiteness property} if there exists a finite sequence of matrices $A_{i_1}, \dots, A_{i_k}$ such that
     \begin{equation}
-        \operatorname{JSR}(\mathcal{A}) = \|A_{i_k} \cdots A_{i_1}\|^{1/k}.
+        \JSR(\mathcal{A}) = \|A_{i_k} \cdots A_{i_1}\|^{1/k}.
     \end{equation}
     Any such product is referred to as a \emph{spectrum-maximizing product} (s.m.p.).
 \end{definition}
@@ -388,11 +388,9 @@ This is shown, for example, in \citep{BlondelTheysVladimirov2003CounterexampleFi
 
 The computation of the joint spectral radius (JSR) is theoretically challenging due to several complexity results.
 
-Approximating the JSR is \textbf{NP-hard} \citep{TsitsiklisBlondel1997HardToComputeJSR}, meaning no polynomial-time algorithm is expected unless $\text{P} = \text{NP}$. Moreover, for general sets of matrices, even deciding whether the JSR is strictly less than one is \textbf{undecidable} \citep{BlondelTsitsiklis2000NPHardMaxAlgebra}. Despite these theoretical limitations, many practical cases allow for efficient numerical estimation.
+Approximating the JSR is NP-hard \citep{TsitsiklisBlondel1997HardToComputeJSR}, meaning no polynomial-time algorithm is expected unless $\text{P} = \text{NP}$. Moreover, for general sets of matrices, even deciding whether the JSR is strictly less than one is undecidable \citep{BlondelTsitsiklis2000NPHardMaxAlgebra}. Despite these limitations, many structured instances still allow efficient numerical approximation.
 
-These complexity results highlight fundamental challenges. There are still applied settings where efficient approximation algorithms provide useful results.
-
-\subsection*{Candidate Products and Generators}
+\subsection*{S.m.p.-Candidates and Generators}
 Approximating the JSR, using the invariant-polytope or the finite-tree algorithms, requires identifying candidate products or \emph{generators} of the matrix set that contribute most significantly to the asymptotic growth rate. These generators are often derived through optimization techniques and their identification is a key step in computational algorithms.
 
 \subsection*{Spectral Gap}
@@ -409,9 +407,9 @@ Approximating the JSR, using the invariant-polytope or the finite-tree algorithm
 
 \begin{remark}\citep{MejstrikReif2025HybridApproachJSR,GuglielmiProtasov2024SpectralGapFamilyMatrices}
 \label{rem:spectralGapHybrid}
-    In the invariant-polytope setting, a spectral gap is part of the standard finite-termination assumptions together with uniqueness (up to cyclic permutations and powers) and simplicity of the leading eigenvalue of the s.m.p.\ candidate. 
-    The hybrid/tree-based framework relaxes this: once preprocessing yields a correctly scaled candidate with $\rho(\Pi)=1$, proving existence of a suitable $V$-closed tree is sufficient to conclude $\JSR(\mathcal{A}) \le 1$, hence no explicit spectral-gap estimate is required for correctness.
-    We also note that \citep{GuglielmiProtasov2024SpectralGapFamilyMatrices} studies a closely related notion of gap as separation between the first and second Lyapunov exponents for matrix families.
+    In the invariant-polytope setting, a spectral gap is a key finite-termination assumption together with uniqueness (up to cyclic permutations and powers) and simplicity of the leading eigenvalue of the s.m.p.\ candidate.
+    Later chapters show where this gap condition enters the algorithmic termination analysis.
+    We also note that \citep{GuglielmiProtasov2024SpectralGapFamilyMatrices} studies a related notion of gap as separation between the first and second Lyapunov exponents for matrix families.
 \end{remark}
 
 \begin{example}
@@ -444,15 +442,14 @@ Approximating the JSR, using the invariant-polytope or the finite-tree algorithm
 
 \section{Preprocessing and Normalization}
 \label{sec:introPreprocessing}
-This thesis aims to address the challenge of computing the JSR by combining two existing algorithms that have demonstrated practical effectiveness in calculating the JSR for nontrivial sets of matrices. Both algorithms are based on the following simple concept:
+Both algorithms use the same preprocessing pipeline:
 
 We want to find the JSR of the finite set of matrices $\mathcal{A} = \{A_1, \cdots, A_n\}$.
 \begin{enumerate}
     \item \textbf{Assumptions}: $\mathcal{A}$ is irreducible. 
-    \item \textbf{Candidates}: Efficiently find products $P = A_{i_k} \cdots A_{i_1}$ of matrices from $\mathcal{A}$ that maximize the averaged spectral radius $\hat{\rho} := \rho(P)^\frac{1}{k}$.
-    \item \textbf{Rescaling}: Transform $\mathcal{A} \to \tilde{\mathcal{A}}$ with $\tilde{A_i} := \frac{1}{\hat{\rho}} A_i$.
-    \item \textbf{Verification}: Establish that $\JSR(\tilde{\mathcal{A}}) = 1$ using the three-member inequality. By homogeneity, this is equivalent to $\JSR(\mathcal{A}) = \hat{\rho}$.
+    \item \textbf{Candidates}: Efficiently find products $P = A_{i_k} \cdots A_{i_1}$ of matrices from $\mathcal{A}$ that maximize the averaged spectral radius $\lambda := \rho(P)^\frac{1}{k}$.
+    \item \textbf{Rescaling}: Transform $\mathcal{A} \to \tilde{\mathcal{A}}$ with $\tilde{A_i} := \frac{1}{\lambda} A_i$.
+    \item \textbf{Verification}: Establish that $\JSR(\tilde{\mathcal{A}}) = 1$ using the three-member inequality. By homogeneity, this is equivalent to $\JSR(\mathcal{A}) = \lambda$.
 \end{enumerate}
 
 The considered algorithms differ only in step 4. The invariant-polytope algorithm tries to find a vector norm whose induced matrix norm already bounds the matrices from $\mathcal{A}$ sufficiently. The finite-tree algorithm, on the other hand, bounds products using a partitioning space that separates each product into terms bounded by 1 and a remainder term that does not grow fast enough to overcome the $k$-th root in the JSR definition (polynomial growth).
-By integrating these algorithms into a hybrid approach, this work advances the computational tools available for JSR analysis by combining efficiency with a broad class of matrix sets for which the algorithm terminates.

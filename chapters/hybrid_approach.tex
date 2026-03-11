@@ -2,31 +2,31 @@
 \chapter{Hybrid Polytope-Tree Approach} 
 \label{ch:hybridApproach}
 
-In this chapter we will explore some possible combinations of the aforementioned algorithms and then present the main result of this work. The tree-flavored-invariant-polytope-algorithm and its termination results. 
+In this chapter we discuss two hybridization strategies for the previously introduced algorithms and then present the main result of this thesis: the tree-flavored invariant-polytope algorithm with its termination result.
 
 \section{Hybridization Strategies}
 \label{sec:hybridStrategies}
-In its heart the invariant-polytope algorithm tries to find a polytope, whose corresponding Minkowski norm is specifically optimized on the given problem, whilst the finite-tree algorithm connects growth-rate to decompositions of products. A clear combination scheme arises naturally, where we use the optimized polytope norm to estimate the products of the finite-tree. From there we can choose a specific order or level of concurrency.
-\newline
-A modular approach would be to first run the invariant-polytope algorithm for a couple of steps and then use the calculated norm thats already optimized for the finite-tree algorithm. But that seems to be wasteful since valuable matrix calculations from the finite-tree algorithm could have been used for an even more optimized norm and some polytopes might have already cleared insight for the decompositions that the finite-tree algorithm tries to find. In \citep{MejstrikReif2025HybridApproachJSR} the authors came up with a more concurrent algorithm that builds up norms and decompositions in every step. 
+At its core, the invariant-polytope algorithm constructs a polytope norm adapted to the matrix family, while the finite-tree algorithm controls growth through product decompositions. This naturally suggests a hybridization.
+
+One option is modular: first run the invariant-polytope algorithm for several iterations, then use the resulting norm inside the finite-tree phase. A second option is concurrent: update norm information and tree-decomposition information in each iteration. Following \citep{MejstrikReif2025HybridApproachJSR}, we use the concurrent variant.
 
 \section{Problem Formulation}
 \label{sec:hybridProblemFormulation}
-After the preprocessing stage from Section \ref{sec:introPreprocessing} is done, we end up with a scaled set of matrices $\tilde{\mathcal{A}}$ and from the chosen candidate and the three-member-inequality \eqref{eq:three_member} we already know $\JSR(\tilde{\mathcal{A}}) \geq 1$. 
-Such that our goal of establishing $\JSR(\tilde{\mathcal{A}}) = 1$ becomes equivalent to  $\JSR(\tilde{\mathcal{A}}) \leq 1$. 
-For this we want to show that there exists a polynomial $p$ and a norm $\lVert \cdot \rVert$, such that, similarly to Chapter \ref{ch:finiteTree}, every norm of a product of matrices from $\tilde{\mathcal{A}}$ can be bounded by this polynomial in its length i.e. $$ \lVert P \rVert \leq p(k) \quad \forall P \in \tilde{\mathcal{A}}^k, k \in \N. $$
-We find the polynomial $p$ by decomposing every multi-index $J = [j_1, ... , j_n]$ into a finite series of 1-bounded sub-products followed by one leaf node $J = J_{1} + ... + J_{r} + J_{leaf}$. 
-We dont know the leaf-subproduct for every multi-index directly but we can bound it by the theory of Chapter \ref{ch:finiteTree}. 
-The following describes the process of the developed algorithm together with its pseudocode, states the main theorem, outlines the proof and finally gives all theoretical results to prove this statement.
-We want to conclude this Chapter with some theoretical remarks as well as technical details for implementation.
+After preprocessing from Section~\ref{sec:introPreprocessing}, we obtain a scaled family $\tilde{\mathcal{A}}$. From the chosen candidate and the three-member inequality \eqref{eq:three_member}, we already know $\JSR(\tilde{\mathcal{A}}) \geq 1$. Hence proving $\JSR(\tilde{\mathcal{A}}) \leq 1$ is sufficient.
+
+To do this, we show that there exist a polynomial $p$ and a norm $\lVert \cdot \rVert$ such that, similarly to Chapter~\ref{ch:finiteTree}, every product can be bounded polynomially in its length:
+\[
+\lVert P \rVert \leq p(k) \quad \text{for all } P \in \tilde{\mathcal{A}}^k, \ k \in \N.
+\]
+The polynomial bound is obtained by decomposing each multi-index into finitely many 1-bounded parts plus one residual part controlled by finite-tree arguments.
 
 \section{Hybrid Algorithm}
 \label{sec:hybridAlgorithm}
-The algorithm starts just like the invariant-polytope algorithm with an set $V_0$ of starting-vertices.
-Every set of Vertices $V_k$ defines a vector-polytope-norm $\lVert \cdot \rVert _{V_k}$. 
-Now, at step $k$ for every vertex $v \in V_k$ we take a test-$(\mathcal{A},\mathbf{G})\text{-tree}$ $T_v$.
-If there exists a matrix $L$ in the leafage of $T_v$ with $\lVert Lv \rVert _{V_k} \ge 1$ we add $Lv$ to the set $V_{k+1}$.
-If all test-tree-leafages within a step $k$ are 1-bounded by the polytope-norm, the algorithm terminates. 
+The algorithm starts, as in the invariant-polytope method, from a set $V_0$ of starting vertices.
+Each vertex set $V_r$ defines a vector polytope norm $\lVert \cdot \rVert _{V_r}$.
+At iteration $r$, for every vertex $v \in V_r$, we build a test $(\mathcal{A},\mathbf{G})$-tree $T_v$.
+If some $L$ in the leafage of $T_v$ satisfies $\lVert Lv \rVert _{V_r} \ge 1$, then $Lv$ is added as a new vertex candidate.
+If all test-tree leafages in one iteration are 1-bounded by the current polytope norm, the algorithm terminates.
 
 \vspace{1cm}
 
@@ -34,16 +34,17 @@ If all test-tree-leafages within a step $k$ are 1-bounded by the polytope-norm, 
   \caption{Invariant-tree-algorithm}
   \label{alg:hybridApproach}
   \begin{algorithmic}
-      \State \Input{$\mathcal{A} = \{A_1, \ldots, A_n\}$, $\mathbf{G} = \{ g_1, \cdots, g_m \}$ and $V = \{v_1, \cdots, v_M\}$}
+      \State \Input{$\mathcal{A}$ (set of matrices), $\mathbf{G}$ (set of generators), $V$ (set of starting vertices)}
       \State $V_{\text{new}} \gets V$
       \While {$V_{\text{new}} \ne \emptyset$}
           \State $V_{\text{rem}} \gets V_{\text{new}}$
           \State $V_{\text{new}} \gets \emptyset$
           \For {$v \in V_{\text{rem}}$}
-              \State $\text{Construct minimal } (\mathcal{A},\mathbf{G})\text{-tree } \mathbf{T}$ \text{like discussed in Section~\ref{sec:hybridImplementation}}
-              \If {$\exists L \in \mathcal{L}(\mathbf{T}) \text{ with } \lVert Lv \rVert _{\text{co}_{\text{s}}(V)} \geq 1$}
-                  \State $V \xleftarrow{\cup}\mathcal{A} v$
-                  \State $V_{\text{new}} \xleftarrow{\cup} \mathcal{A}v$
+              \State Construct minimal $(\mathcal{A},\mathbf{G})$-tree $\mathbf{T}$ as discussed in Section~\ref{sec:hybridImplementation}
+              \State $\mathcal{W} \gets \{Lv : L \in \mathcal{L}(\mathbf{T}) \text{ and } \lVert Lv \rVert _{\text{co}_{\text{s}}(V)} \geq 1\}$
+              \If {$\mathcal{W} \ne \emptyset$}
+                  \State $V \xleftarrow{\cup} \mathcal{W}$
+                  \State $V_{\text{new}} \xleftarrow{\cup} \mathcal{W}$
               \EndIf  
           \EndFor
       \EndWhile 
@@ -56,13 +57,13 @@ If all test-tree-leafages within a step $k$ are 1-bounded by the polytope-norm, 
 
 \begin{theorem}
   \label{thm:hybridTermination}
-  If algorithm~\ref{alg:hybridApproach} terminates $\JSR(\mathcal{A}) \leq 1$.
+  If Algorithm~\ref{alg:hybridApproach} terminates, then $\JSR(\mathcal{A}) \leq 1$.
 \end{theorem}
 
 \subsection{Proof Strategy}
 \label{subsec:hybridProofOutline}
-Products are bounded by the norm constructed in their respective steps but due to submultiplicativity the final norm bounds all products in general. So in the following we just reference the final norm $\lVert \cdot \rVert _{V}$ for the final set of vertices $V = \cup_{i = 1}^{K} V_i$ where $K$ is the final step. After termination we end up with a set of vertices $V$ as well as testing-trees that bound particular products. 
-The idea is to generalize the proof of the finite-tree algorithm using linear combinations and bounding every projection eperately. Since the 1-boundedness of the norm guarantees bounded coefficients for the linear combinations.
+Products are bounded by norms built during intermediate iterations, and submultiplicativity allows us to pass to the final norm. Therefore, we work with $\lVert \cdot \rVert _V$ for the final vertex set $V = \cup_{i=1}^{K} V_i$, where $K$ is the final iteration.
+The proof generalizes the finite-tree argument by repeatedly expanding linear combinations and controlling their coefficients via 1-boundedness.
 
 \begin{figure}
   \centering
@@ -131,17 +132,15 @@ The idea is to generalize the proof of the finite-tree algorithm using linear co
   \node[above] at ($(v6)!0.6!(v6-2)$) {$B$};
   
   \end{tikzpicture}
-  \caption{Cyclic tree structure generated by the algorithm. Here $\mathcal{A}$ consists of two matrices $A$ and $B$ and the chosen candidate is $ \Pi = ABA$. $(\mathcal{A},\mathbf{G})\text{-trees}$ that have been used to bound the products have dashed arrows. At the top, you can see the eigenvector $v_1$ and the rest of the cycle, generated by the candidate $\Pi$, as well as branches coming of, connecting nodes through a solid arrow. These vertices have been added to the set $V$ in a particular step $k$. You can see the 1-bounded matrix-vector products at the end of the dashed arrows where $n$ can be every natural number including 0.}
+  \caption{Cyclic tree structure generated by the algorithm. Here $\mathcal{A}$ consists of two matrices $A$ and $B$ and the chosen candidate is $\Pi = ABA$. Dashed arrows indicate $(\mathcal{A},\mathbf{G})$-trees used for bounds. Solid arrows indicate vertices added to $V$ in one iteration. Leaf labels with powers $G^n$ represent 1-bounded matrix-vector products for all $n \in \mathbb{N}_0$.}
   \label{fig:hybridCyclicTree}
 \end{figure}
-
-\textcolor{red}{explanations here: using testtrees, linear-combination trick for recursive bounding, huffmancoding, glueing from covered nodes into infinite tree, polynomial, growth rates, starting vertices, flat polytopes, etc.}
 
 \subsection{Auxiliary Termination Results}
 
 \begin{lemma}
   \label{lem:hybridArbitraryProductBound}
-  If algorithm~\ref{alg:hybridApproach} terminates there exists an monotone polynomial $p$ such that for every product $P \in \mathcal{A}^k$ and $v \in V$, $\lVert Pv \rVert _{\text{co}_{\text{s}}(V)} \le p(k)$ holds.
+  If Algorithm~\ref{alg:hybridApproach} terminates, there exists a monotone polynomial $p$ such that for every product $P \in \mathcal{A}^k$ and $v \in V$, $\lVert Pv \rVert _{\text{co}_{\text{s}}(V)} \le p(k)$ holds.
 \end{lemma}
 
 \begin{proof}
@@ -157,8 +156,7 @@ $$
   \text{Where } i_j \in \mathcal{I} & := \{1, \cdots, m \}\\
 \end{aligned}
 $$
-These decompositions exist and are unique because of the special structure of $(\mathcal{A},\mathbf{G})\text{-trees}$.
-A simple prrof can be found in the appendix \textcolor{red}{[appendix proof of decomp]} and an in-depth explanaition of finding the decomposition can be found in \citep{MoellerReif2014TreeBasedJSR}.
+These decompositions exist and are unique because of the special structure of $(\mathcal{A},\mathbf{G})\text{-trees}$; details can be found in \citep{MoellerReif2014TreeBasedJSR}.
 \newline
 Now we have:
 $$
@@ -177,46 +175,43 @@ $$
   & \leq p(k)
 \end{aligned}
 $$
-Here the first inequality works since after $k$ steps the prefix $P'_{i}$ is guaranteed to be in the tree $T_{v_{i_k}}$ and thus the norm is bounded by $p_{v_{i_k}}(k)$, which in turn is of course less then $p(k)$ by definition. The second to last inequality works since those sums of the absolute values of the coefficients of a linear combination of vectors are less than or equal to 1 from the 1-boundedness of the $(\mathcal{A},\mathbf{G})\text{-trees}$.
+Here the first inequality works since after $k$ steps the prefix $P'_{i}$ is guaranteed to be in the tree $T_{v_{i_k}}$, and thus the norm is bounded by $p_{v_{i_k}}(k)$, which is less than $p(k)$ by definition. The second-to-last inequality follows because the sums of absolute coefficients in the corresponding linear combinations are bounded by $1$ due to 1-boundedness of the $(\mathcal{A},\mathbf{G})\text{-trees}$.
 \end{proof}
 
 \subsection{Main Termination Result}
 
 \begin{proof}
-  Due to the prework in the lemmas theorem \ref{thm:hybridTermination} is now easy to show. 
-  Lemma \ref{lem:hybridArbitraryProductBound} implies that for every $P \in \mathcal{A}^k$ and $v \in V$, $\lVert Pv \rVert _{\text{co}_{\text{s}}(V)} \le p(k)$
-  trivially this implies: 
+  Due to the auxiliary lemmata, Theorem~\ref{thm:hybridTermination} is now straightforward.
+  Lemma~\ref{lem:hybridArbitraryProductBound} implies that for every $P \in \mathcal{A}^k$ and $v \in V$, $\lVert Pv \rVert _{\text{co}_{\text{s}}(V)} \le p(k)$.
+  In particular, this implies
   $$
-    \forall P \in \mathcal{A}^k: \lVert P \rVert _{\text{co}_{\text{s}}(V)} \le p(k)
+    \lVert P \rVert _{\text{co}_{\text{s}}(V)} \le p(k) \quad \text{for all } P \in \mathcal{A}^k.
   $$
-  Now we take the definition of the $\JSR$ and get:
+  Taking the definition of $\JSR$ gives
   $$
-    \JSR(\mathcal{A}) = \lim_{k \geq 1} \max_{P \in \mathcal{A}^k} \lVert P \rVert^\frac{1}{k} \le \lim_{k \geq 1} p(k)^\frac{1}{k} = 1
+    \JSR(\mathcal{A}) = \lim_{k \to \infty} \max_{P \in \mathcal{A}^k} \lVert P \rVert^\frac{1}{k} \le \lim_{k \to \infty} p(k)^\frac{1}{k} = 1.
   $$ 
 \end{proof}
 
-Of course, since the candidate has a spectral radius of 1 this implies $\JSR(\mathcal{A}) = 1$ like it was discussed in Section~\ref{sec:hybridProblemFormulation}.
-
 \begin{corollary}
-  If the chosen trees are always $T_v = \mathcal{A}$, then we would have exactly the invariant-polytope algorithm \ref{alg:invariantPolytope}. 
-  Which makes the new approach a real generalization of the original. \\
+  If the chosen trees are always $T_v = \mathcal{A}$, then Algorithm~\ref{alg:hybridApproach} reduces to the invariant-polytope algorithm~\ref{alg:invariantPolytope}. Hence, the hybrid approach generalizes the original method.
 \end{corollary}
 
-\section{Discussion}
+\section{Remarks}
 \label{sec:hybridRemarks}
 
 \subsection{Eventual Polytope Invariance}
 \label{subsec:hybridPolytopeInvariance}
-Since the polytope-norms of matrices in $\mathcal{A}$ are allowed to be bigger than 1 just less than $p(1)$ it is possible and very likely the construccted polytope is not invariant under $\mathcal{A}$ in general anymore but eventually invariant.
+A notable disadvantage of the hybrid algorithm is that the computed polytope $\mathrm{co}_{\mathrm{s}}(V)$ is generally not invariant under $\mathcal{A}$. Therefore, the polytope alone is not a certificate for an upper bound on $\JSR(\mathcal{A})$; the corresponding tree information must also be reported.
 
 \section{Implementation Considerations}
 \label{sec:hybridImplementation}
 
-\textcolor{red}{which trees are used, how does the bounding of leafage work, approximations if over max iterations, differences to before, memory layout, exponential growth exponent/branching, memory and speed in Landau, ideas in parallelism}
+This section fixes the tree class used in Algorithm~\ref{alg:hybridApproach} and states the corresponding minimal-tree definition used in implementation.
 
 \begin{definition}
 \label{def:hybridMinimalTree}
-  An $(\mathcal{A},\mathbf{G})\text{-tree}$ with just one generator at the root, one path from root to the covered node and all neccessarily added branches, to make it comply with definition~\ref{def:agTree}, is called a \emph{minimal tree}. This tree only depends on the set $\mathcal{A}$ and the chosen generator $G$. Its denoted by $T_{(\mathcal{A},\mathbf{G})}$ and if the context of $\mathcal{A}$ is clear, it is shortened to $T_\mathbf{G}$.
+  An $(\mathcal{A},\mathbf{G})\text{-tree}$ with one generator branch at the root, one path from the root to the covered node, and all branches required to satisfy Definition~\ref{def:agTree}, is called a \emph{minimal tree}. This tree depends only on $\mathcal{A}$ and the chosen generator $G$. It is denoted by $T_{(\mathcal{A},\mathbf{G})}$ and, when $\mathcal{A}$ is clear from context, shortened to $T_\mathbf{G}$.
 \end{definition}
 
 \tikzset{every picture/.style={line width=0.75pt}} %set default line width to 0.75pt        
@@ -269,5 +264,3 @@ Since the polytope-norms of matrices in $\mathcal{A}$ are allowed to be bigger t
     \caption{Minimal tree structure $T_{(G, \mathcal{A})}$ for the candidate $G = ABA$ and $\mathcal{A} = \{A,B\}$. The arrows marked with circles are uncovered-leafs, the arrow marked with a square is a covered-leaf}
     \label{fig:hybridMinimalTree}
 \end{figure}
-
-
