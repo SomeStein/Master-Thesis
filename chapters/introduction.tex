@@ -373,29 +373,6 @@ This can be applied iteratively until the sets of blocks are all irreducible.
 The problem is thereby split into similar problems of smaller dimension.
 For the following considerations we can now assume $\mathcal{A}$ to be irreducible.
 
-\subsection*{Infimum Characterization by Norms}
-\begin{proposition}\citep{RotaStrang1960NoteJSR}
-    \label{prop:jsrInfimumOverNorms}
-    The JSR can be equivalently defined as the infimum over all submultiplicative norms:
-    \begin{equation}
-        \JSR(\mathcal{A}) = \inf_{\|\cdot\|} \max_{A \in \mathcal{A}} \|A\|.
-    \end{equation}
-\end{proposition}
-
-\begin{proof}
-    Define the family of norms by
-    \[
-    \|x\|_{\epsilon} := \max \left\{ \left\| \frac{A}{\lambda + \epsilon}x\right\|_2 : A \in \mathcal{A} \right\},
-    \]
-    where $\epsilon > 0$ and $\lambda := \JSR(\mathcal{A})$.
-    Using the induced matrix norm, we obtain
-    \[
-    \sup_{A \in \mathcal{A}} \|Ax\|_{\epsilon} \leq \lambda + \epsilon.
-    \]
-    Since $\epsilon > 0$ is arbitrary, the infimum equals $\JSR(\mathcal{A})$. If $\mathcal{A}$ is irreducible, the infimum is attained \citep{BergerWang1992BoundedSemigroupsMatrices}.
-    \qedhere
-\end{proof}
-
 \subsection*{Finiteness Property and Spectrum-Maximizing Products}
 \begin{definition}\citep{LagariasWang1995FinitenessConjecture}
     \label{def:finitenessProperty}
