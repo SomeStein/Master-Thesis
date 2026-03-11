@@ -59,3 +59,14 @@
 - Preserve existing mathematical notation macros and theorem environment structure in `masterthesis.tex`.
 - Keep terminology consistent across edits: JSR, invariant polytope algorithm, finite-tree algorithm, hybrid tree-polytope approach.
 - Keep edits minimal and thesis-focused unless explicitly asked for refactors.
+
+## Frequently Used Notation
+- `\mathcal{A} = \{A_1,\dots,A_n\}`: base matrix family, with `n = |\mathcal{A}|` and matrix dimension `d`.
+- `\tilde{\mathcal{A}}`: scaled matrix family after preprocessing.
+- `\mathcal{G} = \{G_1,\dots,G_m\}`: generator set, with `m = |\mathcal{G}|`.
+- `\mathcal{I} = \{1,\dots,n\}`, `I \in \mathcal{I}^k`, `A_I = A_{i_k}\cdots A_{i_1}`: positive-index products.
+- `\mathcal{J} = \{-m,\dots,-1,1,\dots,n\}`, `J \in \mathcal{J}^k`, `A_J`: extended index encoding for tree/generator products.
+- `\JSR(\mathcal{A})`: joint spectral radius operator.
+- `\|\cdot\|_{\mathrm{co}_{\mathrm{s}}(V)} = \|\cdot\|_V`: polytope norm notation.
+- `\mathcal{L}(T)`: leafage of a tree `T`.
+- `(\mathcal{A},\mathcal{G})`-tree and `T_{\min(\mathcal{A},\mathcal{G})}`: tree notation used in finite-tree/hybrid chapters.
