@@ -4,12 +4,14 @@
 
 The \textit{Joint Spectral Radius} (JSR) was first introduced by G.-C. Rota and G. Strang in 1960 \citep{RotaStrang1960NoteJSR}. They described the JSR as the maximal exponential growth rate of a product of matrices taken from a finite set. Since its inception, the JSR has become a cornerstone in various mathematical and engineering disciplines due to its ability to encapsulate the asymptotic behavior of matrix products. 
 
-The concept gained significant traction in the 1990s when researchers began exploring its theoretical properties and practical implications. Notable advancements include its application in wavelet theory, where it assists in the construction of refinable functions \citep{DaubechiesLagarias1992TwoScaleII}, as well as in control theory, where it is used to analyze the stability of switched linear systems \citep{Jungers2009JointSpectralRadius}, for which we provide a small example below. The computational challenges associated with determining the JSR have inspired the development of several algorithms, such as the invariant-polytope method \citep{GuglielmiProtasov2013ExactComputationJSR} and the finite-tree method \citep{MoellerReif2014TreeBasedJSR}.
+The concept gained significant traction in the 1990s when researchers began exploring its theoretical properties and practical implications. Notable advancements include its application in wavelet theory, where it assists in the construction of refinable functions \citep{DaubechiesLagarias1992TwoScaleII}, as well as in control theory, where it is used to analyze the stability of switched linear systems \citep{Jungers2009JointSpectralRadius}, for which we provide a small example below. The computational challenges associated with determining the JSR have inspired the development of several algorithms, such as the invariant-polytope algorithm \citep{GuglielmiProtasov2013ExactComputationJSR} and the finite-tree algorithm \citep{MoellerReif2014TreeBasedJSR}.
 
-Despite the progress, JSR computation remains challenging, particularly due to the exponential complexity of exploring all possible matrix products. This thesis contributes to this line of work by combining the invariant-polytope algorithm and the finite-tree algorithm into a hybrid approach that mitigates their respective limitations.
+Despite the progress, JSR computation remains challenging, particularly due to the exponential complexity of exploring all possible matrix products.
+
+This thesis has a two-part scope. Chapters~\ref{ch:invariantPolytope} and~\ref{ch:finiteTree} summarize established theory and algorithms from the literature and are included as background for the hybrid framework. The original contribution of this thesis is the detailed formulation of Algorithm~\ref{alg:hybridApproach} (invariant-tree algorithm) and its termination theory in Chapter~\ref{ch:hybridApproach}, developed on top of \citep{MejstrikReif2025HybridApproachJSR}. Implementation details for finite $1$-bounding of generated product sets are adopted from existing work and are not claimed as original here.
 
 \section*{Thesis Outline}
-This thesis is structured as follows: Chapter~\ref{ch:introduction} provides background on the JSR and its basic properties. Chapters~\ref{ch:invariantPolytope} and~\ref{ch:finiteTree} present the key ideas behind the algorithms used to construct the proposed hybrid approach, including their theoretical foundations and algorithmic implementations. Chapter~\ref{ch:hybridApproach} discusses possible combinations of the former approaches, proposes the so-called Tree-flavored invariant-polytope algorithm, and provides proofs of its termination properties, which form the main results of this thesis. Chapter~\ref{ch:numericalTesting} presents numerical results to analyze the efficiency and applicability of the hybrid algorithm. Chapter~\ref{ch:thesisConclusion} concludes with insights and future directions. Appendix~\ref{app:notation} collects a complete notation glossary for quick reference.
+This thesis is structured as follows: Chapter~\ref{ch:introduction} provides background on the JSR and its basic properties. Chapters~\ref{ch:invariantPolytope} and~\ref{ch:finiteTree} provide literature summaries of the invariant-polytope and finite-tree approaches, including the required theoretical foundations. Chapter~\ref{ch:hybridApproach} contains the thesis-specific contribution: a detailed invariant-tree algorithmic formulation and corresponding termination theory. In related literature, this construction is also called the \emph{tree-flavoured-invariant-polytope-algorithm} \citep{MejstrikReif2025HybridApproachJSR}. Chapter~\ref{ch:numericalTesting} presents numerical results to analyze the efficiency and applicability of the invariant-tree algorithm. Chapter~\ref{ch:thesisConclusion} concludes with insights and future directions. Appendix~\ref{app:notation} collects a complete notation glossary for quick reference.
 
 \section{Notation and Preliminaries}
 \label{sec:introPreliminaries}
@@ -111,7 +113,7 @@ The following results motivate the importance of bounding or approximating $\JSR
     \item The system~\eqref{eq:switched_system} is \emph{uniformly bounded} (i.e., $\sup_t \|x_t\| < \infty$ for all $x_0 \in \R^d$) if and only if $\JSR(\mathcal{A}) \leq 1$ and $\mathcal{A}$ is irreducible.
     \item It is \emph{uniformly asymptotically stable} if and only if $\JSR(\mathcal{A}) < 1$. 
 \end{itemize}
-Understanding the joint spectral radius is therefore critical for analyzing the asymptotic behavior of switched linear systems and motivates reliable computational methods \citep{Jungers2009JointSpectralRadius}. Beyond control theory, the JSR also appears in approximation theory, for example in regularity questions for two-scale and refinement equations \citep{DaubechiesLagarias1992TwoScaleII,Maesumi2000JSRHolderWavelets}. Related spectral-growth ideas are used in coding-theoretic capacity problems \citep{BlondelJungersProtasov2006CapacityCodes} and in discrete mathematics and combinatorics \citep{Protasov2000PartitionFunctionAsymptotic,JungersProtasovBlondel2008IntegerMatrixGrowth,JungersProtasovBlondel2009OverlapFreeWordsSpectra}. These links motivate efficient computational methods, including the hybrid algorithm studied in this thesis \citep{MejstrikReif2025HybridApproachJSR}.
+Understanding the joint spectral radius is therefore critical for analyzing the asymptotic behavior of switched linear systems and motivates reliable computational methods \citep{Jungers2009JointSpectralRadius}. Beyond control theory, the JSR also appears in approximation theory and subdivision theory, with foundational references including stationary subdivision and two-scale refinement equations \citep{CavarettaDahmenMicchelli1991StationarySubdivision,DaubechiesLagarias1992TwoScaleII,Maesumi2000JSRHolderWavelets}. Related spectral-growth ideas are used in coding-theoretic capacity problems, including codes that avoid specified differences \citep{MoisionOrlitskySiegel2001CodesAvoidDifferences,BlondelJungersProtasov2006CapacityCodes}, and in discrete mathematics and combinatorics \citep{Protasov2000PartitionFunctionAsymptotic,JungersProtasovBlondel2008IntegerMatrixGrowth,JungersProtasovBlondel2009OverlapFreeWordsSpectra}. These links motivate efficient computational methods, including the invariant-tree algorithm studied in this thesis \citep{MejstrikReif2025HybridApproachJSR}.
 
 \section{Fundamental Theoretical Results}
 \label{sec:introTheoreticalBackground}
@@ -223,13 +225,9 @@ For the left-hand side we obtain, for any $r\in\mathbb{N}$,
 \begin{equation}\label{eq:left_bound_three_member}
 \begin{aligned}
 \max_{P\in\mathcal{A}^k}\rho(P)^{1/k}
-&= \rho(P_{\max})^{1/k} \\
-&= \rho(P_{\max})^{r/(kr)} \\
-&= \rho(P_{\max}^r)^{1/(kr)} \\
-&\le \max_{P\in\mathcal{A}^{kr}}\rho(P)^{1/(kr)} \\
-&\le \limsup_{r\to\infty}\max_{P\in\mathcal{A}^{kr}}\rho(P)^{1/(kr)} \\
-&\le \limsup_{n\to\infty}\max_{P\in\mathcal{A}^n}\rho(P)^{1/n} \\
-&= \JSR(\mathcal{A}).
+&= \rho(P_{\max})^{1/k} = \rho(P_{\max})^{r/(kr)} \\
+&= \rho(P_{\max}^r)^{1/(kr)} \le \max_{P\in\mathcal{A}^{kr}}\rho(P)^{1/(kr)} \\
+&\le \limsup_{r\to\infty}\max_{P\in\mathcal{A}^{kr}}\rho(P)^{1/(kr)} \le \JSR(\mathcal{A}).
 \end{aligned}
 \end{equation}
 
@@ -278,11 +276,9 @@ Exponentiating \eqref{eq:fekete_step} gives
 \begin{equation}\label{eq:rhs_bound_three_member}
 \begin{aligned}
 \lim_{n\to\infty} M_n^{1/n}
-&= \exp\!\Big(\lim_{n\to\infty}\frac{a_n}{n}\Big) \\
-&\le \exp\!\Big(\frac{a_k}{k}\Big) \\
-&= \exp\!\Big(\frac{\log M_k}{k}\Big) \\
-&= M_k^{1/k}
-= \max_{P\in\mathcal{A}^k}\|P\|^{1/k}.
+&= \exp\!\Big(\lim_{n\to\infty}\frac{a_n}{n}\Big) \le \exp\!\Big(\frac{a_k}{k}\Big) \\
+&= \exp\!\Big(\frac{\log M_k}{k}\Big) = M_k^{1/k} \\
+&= M_k^{1/k} = \max_{P\in\mathcal{A}^k}\|P\|^{1/k}.
 \end{aligned}
 \end{equation}
 

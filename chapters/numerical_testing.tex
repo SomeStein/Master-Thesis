@@ -1,15 +1,17 @@
 
-\chapter{Numerical Experiments} 
+\chapter{Numerics}
 \label{ch:numericalTesting}
 
-\section{Runtime Analysis of Algorithm \ref{alg:hybridApproach} on Generated Matrix Families}
-\label{sec:numericsRuntimeHybrid}
+This chapter compares the invariant-polytope algorithm (Algorithm~\ref{alg:invariantPolytope}), the finite-tree algorithm (Algorithm~\ref{alg:finiteTree}), and the invariant-tree algorithm (Algorithm~\ref{alg:hybridApproach}) with respect to iterations, runtime, and solution quality.
 
-\section{Comparison with Algorithm \ref{alg:invariantPolytope}}
-\label{sec:numericsCompareHybridInvariant}
+\section{Solves on generated Matrix Sets}
+\label{sec:numericsGeneratedSets}
+In this section we compare all three algorithms on generated matrix families across increasing dimensions. The focus is quantitative scalability with respect to dimension and number of tested instances.
 
-\section{Comparison with Algorithm \ref{alg:finiteTree}}
-\label{sec:numericsCompareHybridFiniteTree}
+\section{Solved Problems with One s.m.p.}
+\label{sec:numericsSingleSmpSpeed}
+This section reports comparisons on benchmark families with a unique s.m.p., with iteration count (steps to termination) as the primary speed criterion.
 
-\section{Case Studies on Previously Open Problems}
-\label{sec:numericsOpenProblems}
+\section{Solved Problems with Multiple s.m.p.s}
+\label{sec:numericsMultiSmpQualitySpace}
+This section compares the effective solve space for multiple-s.m.p.\ instances, i.e., which classes of problems can be solved reliably and with what certificate quality by the new algorithm.

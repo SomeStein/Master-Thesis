@@ -1,121 +1,31 @@
 
-\chapter{Invariant Polytope Algorithm}
+\chapter{Invariant-Polytope Algorithm}
 \label{ch:invariantPolytope}
 
-In this chapter, we focus on the invariant-polytope algorithm.
-At its core, this algorithm seeks a polytope $\mathcal{P} \subset \R^d$ that is invariant under the action of the already scaled matrices in $\tilde{\mathcal{A}}$. The corresponding Minkowski functional of this polytope is then a so-called extremal norm for the family $\mathcal{A}$.
-As we will see, this is enough to prove that the chosen candidate is indeed an s.m.p., which is our goal.
+This chapter is a literature-based summary of the invariant-polytope approach and related termination theory. It is included as background for Chapter~\ref{ch:hybridApproach} and does not claim original algorithmic or theoretical contributions.
 
-\section{Extremal and Invariant Norms}
-\label{sec:invExtremalNorms}
+\section{Overview}
 
-\begin{definition}\citep{Barabanov1988LyapunovIndicatorDiscreteInclusions}
-    \label{def:barabanovNorm}
-    For a family of matrices $\mathcal{A}$ a norm $\lVert \cdot \rVert$ is called \emph{invariant} or \emph{Barabanov} if there exists a number $\lambda \geq 0$ such that
-    $$\max\limits_{A \in \mathcal{A}}\lVert A x \rVert = \lambda \lVert x \rVert, \quad \text{for all } x \in \mathbb{R}^d.$$
-\end{definition}
-The scalar in Definition~\ref{def:barabanovNorm} equals $\JSR(\mathcal{A})$.
+\subsection{Motivating Ideas}
+The invariant-polytope algorithm aims to certify an upper bound for the joint spectral radius by constructing a norm that is adapted to the matrix family.
 
-The next theorem is needed because it guarantees that invariant norms exist under irreducibility.
+\subsection{Problem Formulation}
+After preprocessing (Section~\ref{sec:introPreprocessing}), we have a scaled family $\tilde{\mathcal{A}}$ and a candidate product for the spectral maximizing product (s.m.p.). The remaining task is to certify $\JSR(\tilde{\mathcal{A}})\le 1$, which implies that the candidate scaling is correct.
 
-\begin{theorem}\citep{Barabanov1988LyapunovIndicatorDiscreteInclusions}
-    \label{thm:barabanovNormExistence}
-    Every irreducible family $\mathcal{A}$ possesses an invariant norm.
-\end{theorem}
+\subsection{Core Idea}
+The core idea is to construct a balanced polytope $\mathcal{P}\subset\R^d$ that is invariant under $\tilde{\mathcal{A}}$. Its Minkowski functional then yields an extremal norm for $\mathcal{A}$, and this is sufficient to prove that the chosen candidate is indeed an s.m.p.
 
-We are interested in norms with a weaker condition.
-
-\begin{definition}\citep{Protasov1996JSRInvariantSets}
-    \label{def:extremalNorm}
-    A norm $\lVert \cdot \rVert$ is called \emph{extremal} for a family of matrices $\mathcal{A}$ if
-    $$\max\limits_{A \in \mathcal{A}}\lVert A x \rVert \leq \JSR(\mathcal{A}) \lVert x \rVert \quad \text{for all } x \in \mathbb{R}^d.$$
-\end{definition}
-
-Every invariant norm is, of course, extremal, which guarantees the existence of such a norm.
-
-\begin{theorem}
-    \label{thm:extremalNormProductGrowth}
-    For every extremal norm $\lVert \cdot \rVert$ of a family of matrices $\mathcal{A}$
-    $$
-    \max \limits_{P \in \mathcal{A}^k} \lVert P \rVert = \JSR(\mathcal{A})^k
-    $$
-    holds for every $k \in \N$.
-\end{theorem}
-\begin{proof}
-    By submultiplicativity and extremality of the norm, we have
-    $$
-    \begin{aligned}
-        \max \limits_{P \in \mathcal{A}^k} \lVert P \rVert & = \max \limits_{d_k,\dots,d_1} \lVert A_{d_k}\cdots A_{d_1} \rVert \\
-        & \le \max \limits_{d_k,\dots,d_1} \lVert A_{d_k} \rVert \cdots \lVert A_{d_1} \rVert \\
-        & \le \JSR(\mathcal{A})^k 
-    \end{aligned}
-    $$
-    By the three-member inequality~\eqref{eq:three_member}, we know
-    $$
-    \begin{aligned}
-        & \JSR(\mathcal{A}) \leq \max_{P \in \mathcal{A}^k} \| P\|^{\frac{1}{k}} \\
-        & \JSR(\mathcal{A})^k \leq \max \limits_{P \in \mathcal{A}^k} \lVert P \rVert 
-    \end{aligned}
-    $$
-    for every $k \in \N$.
-
-\end{proof}
-
-\begin{remark}
-    \label{rem:extremalNormExactComputation}
-    In particular, when $k = 1$, we have $\max\limits_{A \in \mathcal{A}} \lVert A \rVert = \JSR(\mathcal{A})$. The existence of an extremal norm for $\mathcal{A}$ therefore enables the exact computation of the joint spectral radius.
-\end{remark}
-
-In the following, we build an extremal norm whose unit ball is a balanced polytope, as introduced in \citep{Protasov1996JSRInvariantSets} and \citep{GuglielmiZennaro2008ExtremalPolytopeNorms}.
-
-\begin{definition}
-    \label{def:balancedPolytope}
-    A polytope $\mathcal{P}$ is called \emph{balanced} if it spans the whole space and is equal to the symmetrized convex hull of a finite set of vertices.
-    $$\mathcal{P} = \text{co}_{\text{s}}(V) := \text{co}(V, -V) = \{x \in \R^d : x = \sum_{i=1}^M \alpha_i v_i \text{ and } \sum_{i=1}^M |\alpha_i| \le 1\}$$
-    If a polytope satisfies $\mathcal{A}\mathcal{P} \subseteq \mathcal{P}$ for some family $\mathcal{A}$, it is called \emph{invariant under $\mathcal{A}$}.
-\end{definition}
-
-
-\begin{definition}\citep{MagarilIlyaevTikhomirov2001ConvexAnalysis}
-    \label{def:minkowskiFunctional}
-    Let $C \subseteq \R^d$ be a nonempty, convex set such that $0 \in \operatorname{int}(C)$.
-    The \emph{Minkowski functional} (or \emph{gauge function}) associated to $C$ is the mapping $p_C : \R^d \to [0,\infty)$ defined by:
-    \[
-    p_C(x) = \inf\left\{ \lambda > 0 \ \middle| \ x \in \lambda C \right\} \quad \text{for all } x \in \R^d.
-    \]
-
-\end{definition}
-
-\begin{remark}
-    \label{rem:balancedPolytopeInducedNorm}
-    In general, the Minkowski functional is only a seminorm on $\R^d$. If $\mathcal{P}$ is a balanced polytope, then the associated Minkowski functional defines a norm on $\mathbb{R}^d$. Moreover, every induced matrix norm on $\mathbb{R}^{d \times d}$ is submultiplicative. In both cases, we denote the norm by $\lVert \cdot \rVert _{\mathcal{P}}$.
-\end{remark}
-
-\begin{theorem}\citep{GuglielmiProtasov2013ExactComputationJSR}
-    \label{thm:invariantPolytopeImpliesJsrUpperBound}
-    If a balanced polytope $\mathcal{P}$ is invariant under $\tilde{\mathcal{A}}$ from Section~\ref{sec:introPreprocessing}, the corresponding Minkowski functional is an extremal norm for the family $\mathcal{A}$ and $ \JSR(\mathcal{A}) \le \hat{\rho}$.
-\end{theorem}
-
-\begin{proof}
-    $$
-    \begin{aligned}
-    \tilde{\mathcal{A}}\mathcal{P} \subseteq  \mathcal{P} & \implies \mathcal{A}\mathcal{P} \subseteq \hat{\rho}\mathcal{P} \\
-    & \implies \lVert A \rVert _\mathcal{P} \le \hat{\rho} \quad \text{for all } A \in \mathcal{A} \\
-    & \implies \max \limits_{A \in \mathcal{A}} \lVert A \rVert _\mathcal{P} \le \hat{\rho} \\
-    \end{aligned}
-    $$
-\end{proof}
-By the previous theorem, we only need to find a balanced polytope that is invariant under the action of $\tilde{\mathcal{A}}$. Then we have proved that the chosen candidate from the preprocessing is indeed an s.m.p.
-
-\section{Algorithmic Structure}
+\section{Algorithmic Formulation}
 \label{sec:invAlgorithmStructure}
-After preprocessing has been carried out, we end up with a candidate $\tilde{\Pi} = \tilde{A}_{d_k} \cdots \tilde{A}_{d_1}$ for our finiteness-property hypothesis. We want to establish $\JSR(\tilde{\mathcal{A}}) = 1$ by finding an invariant balanced polytope $\mathcal{P} = \text{co}_{\text{s}}(V)$. We define $V := \{ v_1, \cdots, v_k \}$, where $v_1$ is the leading eigenvector of $\tilde{\Pi}$ (assumed real and unique) and $v_i := \tilde{A}_{d_{i-1}} \cdots \tilde{A}_{d_1}v_1$ are the leading eigenvectors of the cyclic permutations of $\tilde{\Pi}$.
-Now we add new vertices to $V$ iteratively by multiplying with matrices from $\tilde{\mathcal{A}}$, i.e.
-$$ V \xleftarrow{\cup} \tilde{\mathcal{A}}V :\iff V \leftarrow V \, \cup \, \tilde{\mathcal{A}}V. $$
-All vertices that fall into the symmetrized convex hull of $V$ can be disregarded, since they do not contribute to a change of the polytope $\mathcal{P}$ and therefore reduce computational effort. In practice, it is very important to drop as many vertices as possible, since $V$ grows exponentially. This is done by solving a standard linear programming problem to determine whether $\lVert Av \rVert _{\text{co}_{\text{s}}(V)} \geq 1$.
-If the algorithm does not produce new vertices that lie outside the current polytope for every $\tilde{A} \in \tilde{\mathcal{A}}$, then it is invariant by definition, and the finiteness property has been proved for the chosen candidate.
 
+\subsection{Algorithm Description}
+Starting from an initial finite set of vertices
+\[
+V_0=\{v_1,\dots,v_M\},
+\]
+the algorithm iteratively enlarges $V$ by testing images $Av$ with $A\in\tilde{\mathcal{A}}$ and current vertices $v$. If $\|Av\|_{\mathrm{co}_{\mathrm{s}}(V)}\ge 1$, the point $Av$ is appended. If one full iteration yields no new vertices, the procedure stops and returns $\mathrm{co}_{\mathrm{s}}(V)$.
 
+\subsection{Pseudocode}
 \begin{algorithm}[ht]
 \caption{Invariant-polytope algorithm}
 \label{alg:invariantPolytope}
@@ -137,25 +47,184 @@ If the algorithm does not produce new vertices that lie outside the current poly
 \EndFor
 \EndWhile \\
 \Return $\text{co}_{\text{s}}(V)$ \\
-\end{algorithmic} 
+\end{algorithmic}
 \end{algorithm}
 
-\section{Stopping Criterion and Candidate Rejection}
+\subsection{Visualization}
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[>=latex]
+  \node[draw, rounded corners, align=center] (s0) at (0,0)
+    {$V_r$ and current polytope\\$\mathcal{P}_r=\mathrm{co}_{\mathrm{s}}(V_r)$};
+  \node[draw, rounded corners, align=center] (s1) at (5.2,0)
+    {Compute images\\$\tilde{A}v,\ \tilde{A}\in\tilde{\mathcal{A}},\ v\in V_r$};
+  \node[draw, rounded corners, align=center] (s2) at (10.6,0)
+    {Test\\$\|\tilde{A}v\|_{\mathcal{P}_r}\ge 1$};
+  \node[draw, rounded corners, align=center] (s3) at (10.6,-2.2)
+    {Add violating images\\$V_{r+1}=V_r\cup\{\tilde{A}v:\|\tilde{A}v\|_{\mathcal{P}_r}\ge 1\}$};
+  \node[draw, rounded corners, align=center] (s4) at (5.2,-2.2)
+    {No new vertices};
+  \node[draw, rounded corners, align=center] (s5) at (0,-2.2)
+    {Terminate and return\\$\mathrm{co}_{\mathrm{s}}(V_r)$};
+
+  \draw[->] (s0) -- (s1);
+  \draw[->] (s1) -- (s2);
+  \draw[->] (s2) -- node[right] {yes} (s3);
+  \draw[->] (s2) -- node[above] {no} (s4);
+  \draw[->] (s4) -- (s5);
+  \draw[->] (s3) to[out=210,in=330] node[below] {next iteration} (s0);
+\end{tikzpicture}
+\caption{Schematic iteration of the invariant-polytope algorithm. Termination occurs when no new violating images are found.}
+\label{fig:invPolytopeWorkflow}
+\end{figure}
+
+\section{Termination Theory}
+\label{sec:invExtremalNorms}
+
+\subsection{Proof Strategy}
+The proof path is: (i) introduce invariant and extremal norms, (ii) connect balanced invariant polytopes to extremal norms, and (iii) deduce a valid upper bound for $\JSR(\mathcal{A})$. This provides a finite certificate when the algorithm terminates.
+
+\subsection{Auxiliary Results}
+\begin{definition}\citep{Barabanov1988LyapunovIndicatorDiscreteInclusions}
+    \label{def:barabanovNorm}
+    For a family of matrices $\mathcal{A}$ a norm $\lVert \cdot \rVert$ is called \emph{invariant} or \emph{Barabanov} if there exists a number $\lambda \geq 0$ such that
+    $$\max\limits_{A \in \mathcal{A}}\lVert A x \rVert = \lambda \lVert x \rVert, \quad \text{for all } x \in \mathbb{R}^d.$$
+\end{definition}
+The scalar in Definition~\ref{def:barabanovNorm} equals $\JSR(\mathcal{A})$.
+
+\begin{theorem}\citep{Barabanov1988LyapunovIndicatorDiscreteInclusions}
+    \label{thm:barabanovNormExistence}
+    Every irreducible family $\mathcal{A}$ possesses an invariant norm.
+\end{theorem}
+
+\begin{example}
+    \label{ex:barabanovExtremalNorm}
+    Consider the family
+    \[
+    \mathcal{A}=\{A_1,A_2\},\qquad
+    A_1=\begin{bmatrix}
+    0 & -1 \\
+    1 & 0
+    \end{bmatrix},\quad
+    A_2=\begin{bmatrix}
+    1 & 0 \\
+    0 & -1
+    \end{bmatrix}.
+    \]
+    Both matrices are orthogonal, so the Euclidean norm satisfies
+    \[
+    \lVert A_1x \rVert_2=\lVert x \rVert_2,\qquad
+    \lVert A_2x \rVert_2=\lVert x \rVert_2
+    \]
+    for all $x\in\R^2$. Therefore
+    \[
+    \max_{A\in\mathcal{A}}\lVert Ax\rVert_2=\lVert x\rVert_2
+    \]
+    for all $x\in\R^2$. Hence $\lVert\cdot\rVert_2$ is a Barabanov norm with $\lambda=1$, and in particular it is extremal for $\mathcal{A}$ with $\JSR(\mathcal{A})=1$.
+\end{example}
+
+\begin{definition}\citep{Protasov1996JSRInvariantSets}
+    \label{def:extremalNorm}
+    A norm $\lVert \cdot \rVert$ is called \emph{extremal} for a family of matrices $\mathcal{A}$ if
+    $$\max\limits_{A \in \mathcal{A}}\lVert A x \rVert \leq \JSR(\mathcal{A}) \lVert x \rVert \quad \text{for all } x \in \mathbb{R}^d.$$
+\end{definition}
+
+\begin{theorem}
+    \label{thm:extremalNormProductGrowth}
+    For every extremal norm $\lVert \cdot \rVert$ of a family of matrices $\mathcal{A}$
+    $$
+    \max \limits_{P \in \mathcal{A}^k} \lVert P \rVert = \JSR(\mathcal{A})^k
+    $$
+    holds for every $k \in \N$.
+\end{theorem}
+\begin{proof}
+    By submultiplicativity and extremality of the norm, we have
+    $$
+    \begin{aligned}
+        \max \limits_{P \in \mathcal{A}^k} \lVert P \rVert & = \max \limits_{d_k,\dots,d_1} \lVert A_{d_k}\cdots A_{d_1} \rVert \\
+        & \le \max \limits_{d_k,\dots,d_1} \lVert A_{d_k} \rVert \cdots \lVert A_{d_1} \rVert \\
+        & \le \JSR(\mathcal{A})^k
+    \end{aligned}
+    $$
+    By the three-member inequality~\eqref{eq:three_member}, we know
+    $$
+    \begin{aligned}
+        & \JSR(\mathcal{A}) \leq \max_{P \in \mathcal{A}^k} \| P\|^{\frac{1}{k}} \\
+        & \JSR(\mathcal{A})^k \leq \max \limits_{P \in \mathcal{A}^k} \lVert P \rVert
+    \end{aligned}
+    $$
+    for every $k \in \N$.
+\end{proof}
+
+\begin{remark}
+    \label{rem:extremalNormExactComputation}
+    In particular, when $k = 1$, we have $\max\limits_{A \in \mathcal{A}} \lVert A \rVert = \JSR(\mathcal{A})$. The existence of an extremal norm for $\mathcal{A}$ therefore enables the exact computation of the joint spectral radius.
+\end{remark}
+
+\begin{definition}
+    \label{def:balancedPolytope}
+    A polytope $\mathcal{P}$ is called \emph{balanced} if it spans the whole space and is equal to the symmetrized convex hull of a finite set of vertices.
+    $$\mathcal{P} = \text{co}_{\text{s}}(V) := \text{co}(V, -V) = \{x \in \R^d : x = \sum_{i=1}^M \alpha_i v_i \text{ and } \sum_{i=1}^M |\alpha_i| \le 1\}$$
+    If a polytope satisfies $\mathcal{A}\mathcal{P} \subseteq \mathcal{P}$ for some family $\mathcal{A}$, it is called \emph{invariant under $\mathcal{A}$}.
+\end{definition}
+
+\begin{definition}\citep{MagarilIlyaevTikhomirov2001ConvexAnalysis}
+    \label{def:minkowskiFunctional}
+    Let $C \subseteq \R^d$ be a nonempty, convex set such that $0 \in \operatorname{int}(C)$.
+    The \emph{Minkowski functional} (or \emph{gauge function}) associated to $C$ is the mapping $p_C : \R^d \to [0,\infty)$ defined by:
+    \[
+    p_C(x) = \inf\left\{ \lambda > 0 \ \middle| \ x \in \lambda C \right\} \quad \text{for all } x \in \R^d.
+    \]
+\end{definition}
+
+\begin{remark}
+    \label{rem:balancedPolytopeInducedNorm}
+    In general, the Minkowski functional is only a seminorm on $\R^d$. If $\mathcal{P}$ is a balanced polytope, then the associated Minkowski functional defines a norm on $\mathbb{R}^d$. Moreover, every induced matrix norm on $\mathbb{R}^{d \times d}$ is submultiplicative. In both cases, we denote the norm by $\lVert \cdot \rVert _{\mathcal{P}}$.
+\end{remark}
+
+\subsection{Main Result}
+\begin{theorem}\citep{GuglielmiProtasov2013ExactComputationJSR}
+    \label{thm:invariantPolytopeImpliesJsrUpperBound}
+    If a balanced polytope $\mathcal{P}$ is invariant under $\tilde{\mathcal{A}}$ from Section~\ref{sec:introPreprocessing}, the corresponding Minkowski functional is an extremal norm for the family $\mathcal{A}$ and $ \JSR(\mathcal{A}) \le \hat{\rho}$.
+\end{theorem}
+
+\begin{proof}
+    $$
+    \begin{aligned}
+    \tilde{\mathcal{A}}\mathcal{P} \subseteq  \mathcal{P} & \implies \mathcal{A}\mathcal{P} \subseteq \hat{\rho}\mathcal{P} \\
+    & \implies \lVert A \rVert _\mathcal{P} \le \hat{\rho} \quad \text{for all } A \in \mathcal{A} \\
+    & \implies \max \limits_{A \in \mathcal{A}} \lVert A \rVert _\mathcal{P} \le \hat{\rho}.
+    \end{aligned}
+    $$
+\end{proof}
+
+\subsection{Termination Conditions}
+Theorem~\ref{thm:invariantPolytopeImpliesJsrUpperBound} gives the central sufficient condition: if the algorithm produces a balanced polytope invariant under $\tilde{\mathcal{A}}$, then the corresponding upper bound is certified.
+
+For finite termination of the implemented vertex-expansion scheme, a necessary algorithmic condition is that only finitely many violating images are generated. If this fails, the vertex set keeps growing and the algorithm does not terminate.
+
+\section{Implementation Details}
+
+\subsection{Stopping Criterion and Candidate Rejection}
 \label{sec:invStoppingCriterion}
 The runtime of Algorithm~\ref{alg:invariantPolytope} can be high in practice, so it is important to detect incorrect candidates early and control the growth of the vertex set $V$. A common practical safeguard is to set an upper bound on the number of vertices. For rejecting an incorrect s.m.p.\ candidate, \citep{GuglielmiProtasov2013ExactComputationJSR} proposed the following method.
+
 In the case where the candidate $\tilde{\Pi}$ has a unique simple leading eigenvalue and there exists only one s.m.p., define $v_1^{*}$ as the leading eigenvector of $\tilde{\Pi}^{*}$ (the conjugate operator of $\tilde{\Pi}$), normalized by $(v_1, v_1^{*}) = 1$, and define $v_i^{*} := \tilde{A_{d_i}^{*}} \cdots \tilde{A_{d_k}^{*}} v_1^{*}$, which are the leading eigenvectors of the conjugates of the cyclic permutations of $\Pi \in \mathcal{A}^k$.
+
 If $\lVert Av \rVert _{\text{co}_{\text{s}}(V)} > 1$ and there exists a $j$ such that $| ( v_j^{*}, Av) | > 1$, then the chosen candidate is not an s.m.p.\ and must be rejected.
 
-\section{Termination Conditions}
-\label{sec:invTerminationConditions}
-There are rare cases where the finiteness property does not hold, or where no invariant polytopes exist. In those cases, the algorithm will not find the value of the $\JSR$.
-
-\section{Rebalancing and Additional Initial Vertices}
+\subsection{Rebalancing and Additional Initial Vertices}
 \label{sec:invRebalancing}
 Three years after publishing the fundamental algorithm with the stopping criterion, the authors released a new paper on rebalancing multiple s.m.p.s, as well as starting with extra vertices so that the polytope is better conditioned \citep{GuglielmiProtasov2016InvariantPolytopes}. In that setting, termination with multiple s.m.p.s can be achieved, but it is substantially more delicate than in the unique-s.m.p.\ case.
 
-\section{Complex Variants}
+\section{Remarks}
+
+\subsection{Complex Variants}
 \label{sec:invEigenvectorCases}
 If the leading eigenvector associated with a candidate product is complex, then the real balanced-polytope norm is no longer sufficient and must be replaced by a \emph{complex-balanced polytope norm}. This changes the convex-hull membership tests in the linear-programming step, while the high-level structure of the algorithm remains the same.
 
 In the present thesis, we restrict attention to the real case. For details on complex variants, we refer to \citep{GuglielmiWirthZennaro2005ComplexPolytopeExtremality,GuglielmiZennaro2007BalancedComplexPolytopes,GuglielmiProtasov2013ExactComputationJSR}.
+
+\begin{remark}
+    There are rare cases where the finiteness property does not hold, or where no invariant polytopes exist. In those cases, the invariant-polytope algorithm will not find the value of $\JSR(\mathcal{A})$.
+\end{remark}
