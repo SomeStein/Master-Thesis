@@ -198,16 +198,19 @@ Here the first inequality works since after $k$ steps the prefix $P'_{i}$ is gua
 \subsection{Main Termination Result}
 
 \begin{proof}
-  Due to the auxiliary lemmata, Theorem~\ref{thm:hybridTermination} is now straightforward.
-  Lemma~\ref{lem:hybridArbitraryProductBound} implies that for every $P \in \mathcal{A}^k$ and $v \in V$, $\lVert Pv \rVert _{\text{co}_{\text{s}}(V)} \le p(k)$.
-  In particular, this implies
+  Let $I \in \mathcal{I}^k$ be a multi-index of length $k$. 
+  We want to find a polynomial $p$ such that $\lVert A_{I} \rVert \le p(k)$.
+  We make the assumption all products $P' \in \mathcal{A}^{k'}$ with length $k'$ less than $k$ are already bounded by $p$ i.e. $$ \lVert P' \rVert \le p(k') $$ in their lengths $k'$. 
+  Now by Dicomp-Lemma we get: 
   $$
-    \lVert P \rVert _{\text{co}_{\text{s}}(V)} \le p(k) \quad \text{for all } P \in \mathcal{A}^k.
+  \begin{aligned}
+    \lVert A_{I} v \rVert & =  \lVert A_{P_{I,v}} A_{L_{I,v}} v \rVert  =  \lVert A_{P_{I,v}} (\lambda_{1}v_{1} + ... + \lambda_{l}v_{l}) \rVert \\
+    & = \lambda_{1} \lVert A_{P_{I,v}}v_{1} \rVert + ... + \lambda_{1} \lVert A_{P_{I,v}}v_{1} \rVert & \\
+    & \le p(k) \\ %all products can be either within testtree then we have p(k) by decomp theorem or its a real decomp and therefore less than or equal p(k-1)
+    % now arbitrary v with V-norm 1 is good situated linear decomp of v_is 
+    % now main norm is operator norm less than max of norms before < p(k)
+  \end{aligned}
   $$
-  Taking the definition of $\JSR$ gives
-  $$
-    \JSR(\mathcal{A}) = \lim_{k \to \infty} \max_{P \in \mathcal{A}^k} \lVert P \rVert^\frac{1}{k} \le \lim_{k \to \infty} p(k)^\frac{1}{k} = 1.
-  $$ 
 \end{proof}
 
 \begin{corollary}
