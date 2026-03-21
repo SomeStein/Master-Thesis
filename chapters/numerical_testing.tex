@@ -1,17 +1,154 @@
 
-\chapter{Numerics}
+\chapter{Numerical Testing}
 \label{ch:numericalTesting}
 
-This chapter compares the invariant-polytope algorithm (Algorithm~\ref{alg:invariantPolytope}), the finite-tree algorithm (Algorithm~\ref{alg:finiteTree}), and the invariant-tree algorithm (Algorithm~\ref{alg:hybridApproach}) with respect to iterations, runtime, and solution quality.
+This chapter compares the invariant-polytope algorithm (Algorithm~\ref{alg:invariantPolytope}), the finite-tree algorithm (Algorithm~\ref{alg:finiteTree}), and the invariant-tree algorithm (Algorithm~\ref{alg:hybridApproach}) with respect to iteration counts, runtime, and certificate quality.
 
-\section{Solves on generated Matrix Sets}
+\section{Experimental Setup}
+\label{sec:numericsExperimentalSetup}
+This chapter is intended to document the computational evidence for the thesis. In its final form, it should make clear which matrix families were tested, how the algorithms were implemented, and which quantitative criteria were used for the comparison.
+
+All experiments should be reported with the same preprocessing pipeline from Section~\ref{sec:introPreprocessing}. In particular, the candidate-selection strategy, the scaling convention, the stopping tolerances, and the maximal iteration counter should be kept fixed unless a section explicitly studies their effect.
+
+The numerical comparison should at least record the following quantities:
+\begin{itemize}
+    \item whether the algorithm terminated with an exact certificate,
+    \item the number of outer iterations until termination or stopping,
+    \item the wall-clock runtime,
+    \item the size of the produced certificate object, such as the number of vertices or tested leaves,
+    \item and, in the non-terminating case, the interval $[\underline{\rho},\overline{\rho}]$ returned for the JSR.
+\end{itemize}
+
+\begin{table}[ht]
+\centering
+\caption{Experimental setup. Replace the placeholder entries by the actual implementation details used for the reported experiments.}
+\label{tab:numericsSetup}
+\begin{tabular}{ll}
+\toprule
+Item & Value to insert \\
+\midrule
+Programming language / environment & -- \\
+Software version & -- \\
+Hardware / CPU & -- \\
+Stopping tolerance & -- \\
+Maximal iteration counter $r_{\max}$ & -- \\
+Candidate-selection strategy & -- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[ht]
+\centering
+\caption{Benchmark families used in the numerical tests. Replace the placeholders by the actual families and sample sizes.}
+\label{tab:numericsBenchmarkSummary}
+\begin{tabular}{llll}
+\toprule
+Family class & Dimension(s) & Number of instances & Section \\
+\midrule
+Generated random families & -- & -- & Section~\ref{sec:numericsGeneratedSets} \\
+Families with unique s.m.p. & -- & -- & Section~\ref{sec:numericsSingleSmpSpeed} \\
+Families with multiple s.m.p.s & -- & -- & Section~\ref{sec:numericsMultiSmpQualitySpace} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Generated Matrix Families}
 \label{sec:numericsGeneratedSets}
-In this section we compare all three algorithms on generated matrix families across increasing dimensions. The focus is quantitative scalability with respect to dimension and number of tested instances.
+This section should compare the three algorithms on generated matrix families across increasing dimensions. The main purpose is to document how the computational cost changes with dimension and to what extent the invariant-tree algorithm preserves solvability when the baseline methods begin to fail.
 
-\section{Solved Problems with One s.m.p.}
+The discussion in the final version should answer at least the following questions. How does the termination rate depend on the matrix dimension? How quickly do runtime and certificate size grow? At what dimensions do the three algorithms begin to separate clearly in performance?
+
+\begin{table}[ht]
+\centering
+\caption{Generated matrix families. Replace the placeholder entries by aggregated numerical results such as median runtime, median iteration count, and termination rate.}
+\label{tab:numericsGenerated}
+\begin{tabular}{lccccc}
+\toprule
+Dimension & Instances & Algorithm & Termination rate & Median iterations & Median runtime \\
+\midrule
+-- & -- & Invariant polytope & -- & -- & -- \\
+-- & -- & Finite tree & -- & -- & -- \\
+-- & -- & Invariant tree & -- & -- & -- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[ht]
+\centering
+\fbox{\parbox{0.82\textwidth}{\centering
+Insert a plot for the generated-family experiment here.\\
+Suggested options: runtime versus dimension, termination rate versus dimension, or certificate size versus dimension.
+}}
+\caption{Placeholder for the generated-family comparison plot.}
+\label{fig:numericsGenerated}
+\end{figure}
+
+After inserting the data, this section should end with a short interpretation of the dominant trend. In particular, note whether the invariant-tree algorithm mainly improves termination, runtime, or both, and explain where the computational bottleneck appears to move.
+
+\section{Instances with a Unique s.m.p.}
 \label{sec:numericsSingleSmpSpeed}
-This section reports comparisons on benchmark families with a unique s.m.p., with iteration count (steps to termination) as the primary speed criterion.
+This section should report comparisons on benchmark families with a unique s.m.p. In this regime the invariant-polytope algorithm is already expected to perform well, so the main question is whether the invariant-tree algorithm remains competitive when the problem is favorable to the classical method.
 
-\section{Solved Problems with Multiple s.m.p.s}
+The final discussion should compare the algorithms not only by runtime, but also by iteration count and certificate size. If the invariant-tree algorithm is slower on these easy instances, this section should say so explicitly and quantify the gap.
+
+\begin{table}[ht]
+\centering
+\caption{Benchmark instances with a unique s.m.p. Replace the placeholders by the measured quantities for each benchmark family.}
+\label{tab:numericsUniqueSmp}
+\begin{tabular}{lcccccc}
+\toprule
+Instance & Dimension & Algorithm & Terminated & Iterations & Runtime & Certificate size \\
+\midrule
+-- & -- & Invariant polytope & -- & -- & -- & -- \\
+-- & -- & Finite tree & -- & -- & -- & -- \\
+-- & -- & Invariant tree & -- & -- & -- & -- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[ht]
+\centering
+\fbox{\parbox{0.82\textwidth}{\centering
+Insert a figure for the unique-s.m.p.\ benchmark comparison here.\\
+Suggested options: grouped runtime bars, iteration counts, or a scatter plot comparing the invariant-tree and invariant-polytope methods.
+}}
+\caption{Placeholder for the unique-s.m.p.\ benchmark comparison.}
+\label{fig:numericsUniqueSmp}
+\end{figure}
+
+When this section is completed, it should close with a concise statement explaining whether the hybrid method merely matches the classical algorithm on these instances or whether it also brings a practical advantage.
+
+\section{Instances with Multiple s.m.p.s}
 \label{sec:numericsMultiSmpQualitySpace}
-This section compares the effective solve space for multiple-s.m.p.\ instances, i.e., which classes of problems can be solved reliably and with what certificate quality by the new algorithm.
+This section should compare the effective solve space for multiple-s.m.p.\ instances. This is the part of the numerical chapter where the invariant-tree algorithm is expected to show its main advantage, so the final write-up should make the difference in solvability especially clear.
+
+Besides reporting termination and runtime, this section should state what kind of certificate was obtained when exact termination failed. In particular, it should report how narrow the resulting interval $[\underline{\rho},\overline{\rho}]$ was and whether the invariant-tree method still produced a useful bound where the other methods stalled.
+
+\begin{table}[ht]
+\centering
+\caption{Benchmark instances with multiple s.m.p.s. Replace the placeholders by the measured output of the three algorithms.}
+\label{tab:numericsMultipleSmp}
+\begin{tabular}{lcccccc}
+\toprule
+Instance & Dimension & Algorithm & Terminated & Runtime & Lower bound & Upper bound \\
+\midrule
+-- & -- & Invariant polytope & -- & -- & -- & -- \\
+-- & -- & Finite tree & -- & -- & -- & -- \\
+-- & -- & Invariant tree & -- & -- & -- & -- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[ht]
+\centering
+\fbox{\parbox{0.82\textwidth}{\centering
+Insert a figure for the multiple-s.m.p.\ comparison here.\\
+Suggested options: solvability map, interval-width comparison, or runtime bars on the difficult benchmark set.
+}}
+\caption{Placeholder for the multiple-s.m.p.\ benchmark comparison.}
+\label{fig:numericsMultipleSmp}
+\end{figure}
+
+The final paragraph of this section should identify the main qualitative conclusion from the benchmark set. For example, it should state whether the invariant-tree algorithm enlarges the class of solvable examples, whether it mainly improves certificate quality, or whether its benefit is concentrated in a narrower subclass of problems.
+
+At the end of the chapter, add a short transitional paragraph summarizing the numerical evidence in a way that can be reused in Chapter~\ref{ch:thesisConclusion}.

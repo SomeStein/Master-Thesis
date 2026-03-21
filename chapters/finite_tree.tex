@@ -1,31 +1,25 @@
-
 \chapter{Finite-Tree Algorithm}
 \label{ch:finiteTree}
 
-This chapter is a literature-based summary of the finite-tree approach from \citep{MoellerReif2014TreeBasedJSR} and related references. Its role is to provide the theoretical and algorithmic background needed for the hybrid method in Chapter~\ref{ch:hybridApproach}.
+This chapter summarizes the finite-tree approach from \citep{MoellerReif2014TreeBasedJSR}. Its role is to provide the first tree-based termination argument in the thesis and to bridge the invariant-polytope method from Chapter~\ref{ch:invariantPolytope} to the hybrid method in Chapter~\ref{ch:hybridApproach}.
 
 \section{Overview}
 
 \subsection{Motivating Ideas}
-The finite-tree algorithm bounds arbitrary products $P\in\mathcal{A}^k$ by decomposing them into factors that are $1$-bounded with respect to a chosen norm.
+The finite-tree algorithm bounds arbitrary products $P \in \mathcal{A}^k$ by decomposing them into factors that are $1$-bounded with respect to a chosen norm and one residual factor that grows at most polynomially.
 
 \subsection{Problem Formulation}
-The objective is to construct a finite certificate that implies $\JSR(\mathcal{A})\le 1$. Concretely, one seeks a structured subtree such that all relevant leaf products are bounded by $1$ and all remaining factors admit polynomial control in their length.
+After preprocessing from Section~\ref{sec:introPreprocessing}, we obtain a rescaled family $\tilde{\mathcal{A}}$. From the chosen candidate product and the three-member inequality \eqref{eq:three_member}, we already know $\JSR(\tilde{\mathcal{A}}) \ge 1$. Hence it remains to prove $\JSR(\tilde{\mathcal{A}}) \le 1$.
+To simplify notation, we write $\mathcal{A}$ for this rescaled family throughout the remainder of the chapter.
 
 \subsection{Core Idea and Notation}
-\label{sec:finiteNotationDefinitions}
-\begin{definition}
-    \label{def:treeGraph}
-    A \emph{tree} is a connected, acyclic graph \( T \) with a distinguished node \( t_0\) called the \emph{root}. The tree structure induces a natural hierarchy: for any node $t_i$, there exists a unique path from \( t_0 \) to \( t_i \). The tree can then be described in terms of the following concepts:
-    \begin{itemize}
-        \item \textbf{Parent}: For any node \( t \in T \), the node preceding \( t \) on the path from the root $t_0$ is called its \emph{parent}.
-        \item \textbf{Children}: The nodes adjacent to a given node \( t \) that are further from the root $t_0$ are called its \emph{children}.
-        \item \textbf{Leaf}: A node with no children is called a \emph{leaf}.
-        \item \textbf{Internal vertex}: A node with at least one child is called an \emph{internal} or \emph{non-leaf} node.
-    \end{itemize}
-\end{definition}
+The finite-tree argument is the first generalization of the invariant-polytope strategy from Chapter~\ref{ch:invariantPolytope}. Instead of requiring one-step invariance of a balanced polytope, it organizes products in a finite tree and proves that every long product can be decomposed into leaf factors bounded by $1$ and one remaining factor with only polynomial growth.
 
-We define $T_{\mathcal{A}}$ as the tree consisting of all products in the set $\bigcup \limits_ {k \in \mathbb{N}_0}\mathcal{A}^k$ where every multi-index represents a node. For the empty index ($k = 0$) we set $A_{[]} = I_d$, the identity matrix in $\R^{d\times d}$, and call this node the root.
+We begin with the rooted product tree $T_{\mathcal{A}}$ whose nodes are all positive multi-indices. For the empty index, we set
+\[
+A_{[]} = I_d,
+\]
+and this node is the root.
 
 \begin{figure}[ht]
 \centering
@@ -67,100 +61,108 @@ We define $T_{\mathcal{A}}$ as the tree consisting of all products in the set $\
 \label{fig:finiteMatrixProductTree}
 \end{figure}
 
-In general, a direct search in $T_{\mathcal{A}}$ is not computationally feasible. Following \citep{MoellerReif2014TreeBasedJSR}, one introduces generators and set-valued nodes.
-
-We fix a set $\mathcal{G} = \{ G_1, \cdots, G_m \}$ with $G_i \in \mathcal{A}^{k_i}$ and $\rho(G_i)^{\frac{1}{k_i}} \le 1$.
-All products from this set will be called \emph{generators}.
-We also define $A_l := G_{-l}$ for $l \in \{-m, \dots, -1\}$.
+In general, a direct search in $T_{\mathcal{A}}$ is not feasible. Following \citep{MoellerReif2014TreeBasedJSR}, one therefore introduces generators and set-valued nodes.
+We fix a generator set
+\[
+\mathcal{G} = \{G_1,\ldots,G_m\},
+\]
+where each generator satisfies
+\[
+G_r \in \mathcal{A}^{k_r}
+\quad \text{and} \quad
+\rho(G_r)^{1/k_r} \le 1.
+\]
 
 \begin{definition}\citep{MoellerReif2014TreeBasedJSR}
     \label{def:extendedMultiIndexSet}
-    The set \( \mathcal{J}^k := \{-m, \dots, -1, 1, \dots, n\}^k \) denotes the collection of all multi-indices of length \( k \) with entries in $\{-m, \dots, -1, 1, \dots, n\}$.
-    For a multi-index \( J = [j_1, \dots, j_k] \in \mathcal{J}^k \), the corresponding matrix product set is defined by:
-    $$
-    A_J := \{ A_{j_k}^{e_k} \cdots A_{j_1}^{e_1} \mid  e_i = 1  \text{ if } j_i > 0 \text{ or } e_i \in \mathbb{N}_0 \text{ otherwise}\}.
-    $$
-\end{definition}
-
-\begin{definition}
-    \label{def:multiIndexExtension}
-    Let $J = [j_1, \cdots, j_k]$ be a multi-index and let $j_{k+1} \in \mathcal{J}$. We define the extension
+    Set
     \[
-    [J, j_{k+1}] := [j_1, \cdots, j_k, j_{k+1}].
+    \mathcal{J} := \{-m,\ldots,-1,1,\ldots,n\}
     \]
-    Nested concatenations are always flattened a priori.
-\end{definition}
-
-\begin{definition}
-    \label{def:childType}
-    Let $t \in T$ be a node with the multi-index $J$.
-    A child node $\tilde{t}$ with the multi-index $[J, j_{k+1}]$ is called:
-    \begin{itemize}
-        \item \emph{positive} if $j_{k+1}$ is positive.
-        \item \emph{generator} if $j_{k+1}$ is negative.
-    \end{itemize}
+    and define
+    \[
+    A_{-r} := G_r
+    \quad \text{for } r = 1,\ldots,m.
+    \]
+    For a multi-index $J = [j_1,\ldots,j_\ell] \in \mathcal{J}^{\ell}$, the associated set of matrix products is
+    \[
+    A_J :=
+    \left\{
+      A_{j_{\ell}}^{e_{\ell}} \cdots A_{j_1}^{e_1}
+      :
+      \begin{array}{l}
+      e_s = 1 \text{ if } j_s > 0,\\
+      e_s \in \mathbb{N}_0 \text{ if } j_s < 0
+      \end{array}
+    \right\}.
+    \]
+    Thus positive entries represent single matrices from $\mathcal{A}$, while negative entries represent arbitrary powers of generators.
 \end{definition}
 
 \begin{definition}\citep{MoellerReif2014TreeBasedJSR}
     \label{def:agTree}
-    \begin{samepage}
-    A so-called $\AG\text{-tree } T$ has the following structure:
-\begin{itemize}
-    \item The root node contains the identity matrix: \( t_0 = \{I_d\} \).
-    \item For every node \( t \in T \setminus \{t_0\} \), there is exactly one parent node in \(T\).
-    \item Each node \( t \in T \) is either:
+    A finite rooted tree $T$ is called an \emph{$\AG$-tree} if its nodes are multi-indices from $\bigcup_{\ell \in \mathbb{N}_0} \mathcal{J}^{\ell}$, the root is the empty index $[]$, and every node is one of the following:
     \begin{itemize}
         \item a leaf,
-        \item a parent of exactly \( n \) positive children,
+        \item a parent of exactly $n$ positive children,
         \item or a parent with at least one generator child.
     \end{itemize}
-\end{itemize}
-\end{samepage}
 \end{definition}
 
 \begin{definition}\citep{MoellerReif2014TreeBasedJSR}
     \label{def:coveredNode}
-    A node in the tree is called \emph{covered} if it is a subset of one of its ancestors in the tree. Otherwise, it is called \emph{uncovered}.
-    The set of uncovered leaves is denoted as
-\[
-    \mathcal{L}(T) := \{ t \in T : t \text{ is an uncovered leaf} \}
-\]
-and called \emph{leafage} of the tree $T$.
+    A node of an $\AG$-tree is called \emph{covered} if its associated product set is contained in the product set of one of its ancestors. Otherwise, it is called \emph{uncovered}. The set of uncovered leaves is denoted by
+    \[
+    \mathcal{L}(T) := \{K \in T : K \text{ is an uncovered leaf}\}
+    \]
+    and is called the \emph{leafage} of $T$.
 \end{definition}
 
 \begin{definition}\citep{MoellerReif2014TreeBasedJSR}
 \label{def:oneBoundedTree}
-An $\AG\text{-tree}$ $T$ is called \emph{1-bounded} with respect to a matrix norm \( \| \cdot \| \) if
+An $\AG$-tree $T$ is called \emph{$1$-bounded} with respect to a matrix norm $\lVert \cdot \rVert$ if
 \[
-    \sup_{L \in \mathcal{L}(T)} \| L \| \leq 1.
+\sup\{\lVert P \rVert : L \in \mathcal{L}(T),\ P \in A_L\} \le 1.
 \]
-If \( \sup_{L \in \mathcal{L}(T)} \| L \| < 1 \), then the tree is called \emph{strictly 1-bounded}.
+If
+\[
+\sup\{\lVert P \rVert : L \in \mathcal{L}(T),\ P \in A_L\} < 1,
+\]
+then $T$ is called \emph{strictly $1$-bounded}.
 \end{definition}
 
 \section{Algorithmic Formulation}
 \label{sec:finiteAlgorithmStructure}
 
 \subsection{Algorithm Description}
-The finite-tree algorithm performs a non-exhaustive search in the space of $\AG$-trees. At each active node, it checks whether the corresponding set of products is already $1$-bounded. If not, children are generated according to the child-selection rule, and the process is repeated until no active node violates the bound.
+The finite-tree algorithm performs a non-exhaustive search in the space of $\AG$-trees. It starts from the positive children of the root.
+We denote by $Q_i$ the set of active nodes that still have to be tested in iteration $i$.
+For each active node $J \in Q_i$, the algorithm checks whether the associated product set $A_J$ is already $1$-bounded.
+If not, the node is expanded according to a child-selection rule, and the new children are placed into the next active set $Q_{i+1}$.
+If $Q_i = \emptyset$, then the current tree is a finite certificate candidate.
 
 \subsection{Pseudocode}
 \begin{algorithm}[ht]
     \caption{Finite-tree algorithm}
     \label{alg:finiteTree}
     \begin{algorithmic}
-        \State \Input{$\mathcal{A} = \{A_1, \ldots, A_n\}$ and $\mathcal{G} = \{ G_1, \cdots, G_m \}$}
-        \State \Output{If the algorithm terminates, the tree condition holds}
-        \State $Q \leftarrow \{[1], \cdots, [n]\}$
-        \While{$Q \ne \emptyset$}
-            \State $Q_{\text{new}} \leftarrow \emptyset$
-            \For{$J \in Q$}
-                \If{$\sup \{ \lVert P \rVert : P \in A_J \} > 1$}
-                    \State $\mathcal{C} \leftarrow \textproc{selectChildren}(J, \mathcal{A}, \mathcal{G})$
-                    \State $Q_{\text{new}} \xleftarrow{\cup} \{[J,j]: j \in \mathcal{C}\}$
+        \State \Input{$\mathcal{A}$ (rescaled family of matrices), $\mathcal{G}$ (set of generators)}
+        \State $T_0 \gets \{[], [1], \ldots, [n]\}$
+        \State $Q_0 \gets \{[1], \ldots, [n]\}$
+        \State $i \gets 0$
+        \While{$Q_i \ne \emptyset$}
+            \State $T_{i+1} \gets T_i$
+            \State $Q_{i+1} \gets \emptyset$
+            \For{$J \in Q_i$}
+                \If{$\sup\{\lVert P \rVert : P \in A_J\} > 1$}
+                    \State $\mathcal{C} \gets \textproc{selectChildren}(J,\mathcal{A},\mathcal{G})$
+                    \State $T_{i+1} \xleftarrow{\cup} \{[J,j] : j \in \mathcal{C}\}$
+                    \State $Q_{i+1} \xleftarrow{\cup} \{[J,j] : j \in \mathcal{C}\}$
                 \EndIf
             \EndFor
-            \State $Q \leftarrow Q_{\text{new}}$
-        \EndWhile \\
+            \State $i \gets i + 1$
+        \EndWhile
+        \State \Return $T_i$
     \end{algorithmic}
 \end{algorithm}
 
@@ -168,12 +170,12 @@ The finite-tree algorithm performs a non-exhaustive search in the space of $\AG$
 \begin{figure}[ht]
 \centering
 \begin{tikzpicture}[>=latex]
-  \node[draw, rounded corners, align=center] (s0) at (0,0) {Initialize queue\\$Q=\{[1],\dots,[n]\}$};
-  \node[draw, rounded corners, align=center] (s1) at (4.8,0) {Pick $J\in Q$\\and test $\sup\{\|P\|:P\in A_J\}\le 1$};
+  \node[draw, rounded corners, align=center] (s0) at (0,0) {Current tree $T_i$\\and active nodes $Q_i$};
+  \node[draw, rounded corners, align=center] (s1) at (4.8,0) {Pick $J \in Q_i$\\and test $\sup\{\|P\|:P \in A_J\}\le 1$};
   \node[draw, rounded corners, align=center] (s2) at (10.2,0) {Violation?};
-  \node[draw, rounded corners, align=center] (s3) at (10.2,-2.1) {Expand via\\$\textproc{selectChildren}$};
-  \node[draw, rounded corners, align=center] (s4) at (4.8,-2.1) {Update queue\\$Q\leftarrow Q_{\text{new}}$};
-  \node[draw, rounded corners, align=center] (s5) at (0,-2.1) {Terminate if\\$Q=\emptyset$};
+  \node[draw, rounded corners, align=center] (s3) at (10.2,-2.1) {Expand $J$ via\\$\textproc{selectChildren}$};
+  \node[draw, rounded corners, align=center] (s4) at (4.8,-2.1) {Form next active set\\$Q_{i+1}$};
+  \node[draw, rounded corners, align=center] (s5) at (0,-2.1) {Terminate if\\$Q_i=\emptyset$};
 
   \draw[->] (s0) -- (s1);
   \draw[->] (s1) -- (s2);
@@ -181,98 +183,174 @@ The finite-tree algorithm performs a non-exhaustive search in the space of $\AG$
   \draw[->] (s2) -- node[above] {no} (s4);
   \draw[->] (s3) -- (s4);
   \draw[->] (s4) -- (s5);
-  \draw[->] (s5) to[out=210,in=330] node[below] {next loop if nonempty} (s0);
+  \draw[->] (s5) to[out=210,in=330] node[below] {next iteration if nonempty} (s0);
 \end{tikzpicture}
-\caption{Workflow of the finite-tree algorithm. Termination occurs when no violating node remains in the active queue.}
+\caption{Workflow of the finite-tree algorithm. Termination occurs when no active node violates the $1$-bound.}
 \label{fig:finiteTreeWorkflow}
 \end{figure}
 
 \section{Termination Theory}
 
 \subsection{Proof Strategy}
-The proof strategy has two steps. First, one proves a polynomial bound for products encoded by nodes of a fixed $\AG$-tree. Second, one combines this with prefix-leaf decomposition to bound arbitrary products and pass to the $k$-th root limit in the definition of $\JSR$.
+The finite-tree argument is the tree-based analogue of the invariant-polytope argument from Chapter~\ref{ch:invariantPolytope}. Instead of proving one-step invariance of a set, it bounds arbitrary products by repeated prefix-leaf decomposition. The proof has two steps. First, one proves a polynomial bound for products encoded by nodes of a fixed finite $\AG$-tree. Second, one decomposes an arbitrary product into leaf factors bounded by $1$ and one residual node factor, then passes to the $k$-th root limit in the definition of $\JSR$.
 
 \subsection{Auxiliary Results}
 \begin{lemma}
     \label{lem:finitePolynomialBound}
-    For every $\AG\text{-tree } T$ there exists a strictly positive, monotone polynomial $p$ such that for every node $t \in T$ and every product $P \in \mathcal{A}^k$ encoded by $t$, $\lVert P \rVert \le p(k)$ holds.
+    For every finite $\AG$-tree $T$ there exists a monotone polynomial $p$ such that for every node $K \in T$ and every product $P \in \mathcal{A}^k$ encoded by $K$, one has
+    \[
+    \lVert P \rVert \le p(k).
+    \]
 \end{lemma}
 
 \begin{proof}
-    Take an arbitrary node $t \in T$ with multi-index $J = [j_1, \cdots, j_l]$.
-    Now every $j_i$ encodes either a matrix from $\mathcal{A}$ or arbitrary powers of a generator from $\mathcal{G}$.
-    Since all those matrices have spectral radius less than or equal to $1$, their Jordan normal forms grow at most polynomially and thus, by norm equivalence in finite-dimensional vector spaces, there exists a strictly positive, monotone polynomial $p_i$ with
-    $$
-    \lVert A_{j_i}^{e} \rVert \le p_i(e) \quad \text{for all } e \in \mathbb{N}_0.
-    $$
+    Let $K = [j_1,\ldots,j_{\ell}]$ be a fixed node of $T$.
+    For each position $r = 1,\ldots,\ell$, define a monotone polynomial $q_r$ as follows.
+    If $j_r > 0$, then the corresponding factor is always the single matrix $A_{j_r}$, so we set
+    \[
+    q_r(t) := \lVert A_{j_r} \rVert
+    \quad \text{for all } t \in \mathbb{N}_0.
+    \]
+    If $j_r < 0$, then $A_{j_r} = G_{-j_r}$ is a generator with spectral radius at most $1$.
+    Hence the powers of $A_{j_r}$ grow at most polynomially by the Jordan-normal-form argument, so there exists a monotone polynomial $q_r$ such that
+    \[
+    \lVert A_{j_r}^{e} \rVert \le q_r(e)
+    \quad \text{for all } e \in \mathbb{N}_0.
+    \]
 
-    We define:
-    $$
-    \begin{aligned}
-    p_t & := p_{l} \cdots p_{1} \\
-    p & := \sum \limits_{t \in T} p_t
-    \end{aligned}
-    $$
-    The sum over all of $T$ is finite since $T$ has only finitely many nodes.
-    Take now an arbitrary product $P = A_{j_l}^{e_{l}}\cdots A_{j_1}^{e_1} \in \mathcal{A}^k$ that is encoded by $t$.
+    Set
+    \[
+    p_K := q_{\ell} \cdots q_1
+    \]
+    and
+    \[
+    p := \sum_{K \in T} p_K.
+    \]
+    Since $T$ is finite, the function $p$ is a monotone polynomial.
 
-    Now we have:
-    $$
-    \begin{aligned}
-    \lVert P \rVert & = \lVert A_{j_l}^{e_{l}} \cdots A_{j_1}^{e_{1}} \rVert \\
-    & \leq \lVert A_{j_l}^{e_{l}} \rVert \cdots \lVert A_{j_1}^{e_{1}} \rVert \\
-    & \leq p_{l}(e_l) \cdots p_{1}(e_1) \\
-    & \leq p_{l}(k) \cdots p_{1}(k) \\
-    & = p_t(k) \leq p(k).
-    \end{aligned}
-    $$
-    Since the node $t$ and the product $P$ were chosen arbitrary, this concludes the proof.
+    Now let
+    \[
+    P = A_{j_{\ell}}^{e_{\ell}} \cdots A_{j_1}^{e_1} \in \mathcal{A}^k
+    \]
+    be encoded by the node $K$.
+    By submultiplicativity,
+    \[
+    \lVert P \rVert
+    \le \lVert A_{j_{\ell}}^{e_{\ell}} \rVert \cdots \lVert A_{j_1}^{e_1} \rVert
+    \le q_{\ell}(e_{\ell}) \cdots q_1(e_1).
+    \]
+    Every exponent satisfies $e_r \le k$, because the encoded product has total length $k$.
+    Using the monotonicity of the polynomials $q_r$, we obtain
+    \[
+    \lVert P \rVert
+    \le q_{\ell}(k) \cdots q_1(k)
+    = p_K(k)
+    \le p(k).
+    \]
+    Since the node $K$ and the product $P$ were arbitrary, the lemma follows.
+\end{proof}
+
+\begin{lemma}\citep[cf. Lemma~4.1 and the proof of Theorem~3.3]{MoellerReif2014TreeBasedJSR}
+    \label{lem:agTreePLDecomposition}
+    Let $T$ be a finite $\AG$-tree and let $I \in \mathcal{I}^k$.
+    Then there exist unique multi-indices $L$ and $P$, each either positive or equal to $[]$, such that
+    \[
+    I = [L,P]
+    \quad \text{and hence} \quad
+    A_I = A_P A_L.
+    \]
+    Moreover, either $P = []$ and $A_I$ is encoded by a node of $T$, or $A_L$ is encoded by a leaf in $\mathcal{L}(T)$ and $|P| < k$.
+\end{lemma}
+
+\begin{proof}
+    Let
+    \[
+    \mathcal{I}_{\ast}(T)
+    :=
+    \left\{
+      J \in \bigcup_{r \in \mathbb{N}_0} \mathcal{I}^r
+      :
+      A_J \in \bigcup_{K \in T} A_K
+    \right\}
+    \]
+    denote the set of positive multi-indices encoded by nodes of $T$.
+    Choose the longest prefix $L$ of $I$ that belongs to $\mathcal{I}_{\ast}(T)$, and let $P$ be the complementary suffix, so that $I = [L,P]$.
+    The maximality of the prefix makes this choice unique.
+
+    If $P = []$, then the whole product $A_I$ is encoded by a node of $T$, and the first case holds.
+    Assume therefore that $P \ne []$.
+    Let $K$ be maximal among the nodes of $T$ whose encoded product set contains $A_L$.
+    By maximality of the prefix $L$, the node $K$ cannot have a positive child continuing the word $I$.
+    It also cannot have a generator child, because every generator child contains the power $0$ and would therefore still encode $A_L$ at a deeper node.
+    Finally, the argument in \citep[proof of Lemma~4.1]{MoellerReif2014TreeBasedJSR} excludes the possibility that $K$ is covered.
+    Hence $K$ is an uncovered leaf, that is, $K \in \mathcal{L}(T)$.
+    Therefore $A_L$ is encoded by a leaf of $T$.
+    Since $P \ne []$, one also has $|P| < k$.
 \end{proof}
 
 \subsection{Main Result}
-\begin{theorem}\citep{MoellerReif2014TreeBasedJSR}
+\begin{theorem}\citep[Theorem~3.3]{MoellerReif2014TreeBasedJSR}
 \label{thm:finiteTreeTermination}
-    If a 1-bounded $\AG\text{-tree}$ is found for a given matrix set $\mathcal{A}$ and generator set $\mathcal{G}$, then $\JSR(\mathcal{A}) = 1$.
+    If the rescaled family $\mathcal{A}$ admits a finite $1$-bounded $\AG$-tree, then
+    \[
+    \JSR(\mathcal{A}) \le 1.
+    \]
 \end{theorem}
 
 \begin{proof}
-    We take an arbitrary positive multi-index $I = [i_1, \cdots, i_k]$.
-    Our found $\AG\text{-tree } T$ allows for a unique decomposition of this multi-index into $I_k, \cdots, I_1$ where
-    $$
-    A_I = A_{I_k}A_{I_{k-1}}\cdots A_{I_1}.
-    $$
-    Each sub-multi-index $I_j \quad j = 1, \cdots,k-1$ encodes either a leaf of $T$ or is the empty set and $I_k$ encodes any node of $T$. Now due to Lemma~\ref{lem:finitePolynomialBound} there exists a polynomial $p$ such that
+    Take an arbitrary positive multi-index $I \in \mathcal{I}^k$.
+    Repeatedly apply Lemma~\ref{lem:agTreePLDecomposition} to the current remainder until the remaining factor is encoded by a node of $T$.
+    This yields multi-indices $I_1,\ldots,I_r$ such that
     \[
-        \lVert A_{I}  \rVert =  \lVert A_{I_k}A_{I_{k-1}}\cdots A_{I_1}\rVert \le  \lVert A_{I_k} \rVert \cdot \lVert A_{I_{k-1}}\rVert \cdots \lVert A_{I_1} \rVert \le \lVert A_{I_k} \rVert\le p(k).
+    A_I = A_{I_r} \cdots A_{I_1},
     \]
-    The last inequality holds since all $I_j \quad j = 1, \cdots,k-1$ are either the empty multi-index or leaves such that their products $A_{I_j}$ are bounded by 1.
-    Furthermore $A_{I_k}$ can be bounded by the polynomial $p$ and the length of the product, which is less than $k$.
-    Now we have
-      $$\JSR(\mathcal{A}) = \lim_{k \to \infty} \max_{P \in \mathcal{A}^k} \lVert P \rVert ^{\frac{1}{k}} \leq \lim_{k \to \infty} p(k) ^{\frac{1}{k}}  = 1$$
-    since the chosen multi-index was arbitrary.
+    where each factor $A_{I_j}$ with $j = 1,\ldots,r-1$ is encoded by a leaf in $\mathcal{L}(T)$ and the last factor $A_{I_r}$ is encoded by a node of $T$.
+
+    By Definition~\ref{def:oneBoundedTree}, the leaf factors satisfy
+    \[
+    \lVert A_{I_j} \rVert \le 1
+    \quad \text{for } j = 1,\ldots,r-1.
+    \]
+    By Lemma~\ref{lem:finitePolynomialBound}, there exists a monotone polynomial $p$ such that
+    \[
+    \lVert A_{I_r} \rVert \le p(k).
+    \]
+    Therefore,
+    \[
+    \lVert A_I \rVert
+    = \lVert A_{I_r} \cdots A_{I_1} \rVert
+    \le \lVert A_{I_r} \rVert \cdots \lVert A_{I_1} \rVert
+    \le p(k).
+    \]
+
+    Since the multi-index $I$ was arbitrary,
+    \[
+    \JSR(\mathcal{A})
+    = \lim_{k \to \infty} \max_{P \in \mathcal{A}^k} \lVert P \rVert^{1/k}
+    \le \lim_{k \to \infty} p(k)^{1/k}
+    = 1.
+    \]
 \end{proof}
 
-\subsection{Termination Conditions}
-Theorem~\ref{thm:finiteTreeTermination} gives a sufficient condition: finding a $1$-bounded $\AG$-tree implies $\JSR(\mathcal{A})=1$.
+\begin{remark}
+    Combined with the preprocessing step from Section~\ref{sec:introPreprocessing}, Theorem~\ref{thm:finiteTreeTermination} certifies that the chosen candidate scaling is correct. In this sense, the finite-tree method plays the same role for tree-based certificates that Theorem~\ref{thm:invariantPolytopeTermination} plays for invariant polytopes.
+\end{remark}
 
-For finite termination of the implemented search procedure, a necessary algorithmic condition is that the child-selection process reaches a finite $1$-bounded tree. In practice, this depends on the choice of generators and branching heuristics.
+\subsection{Termination Conditions}
+Theorem~\ref{thm:finiteTreeTermination} gives the central sufficient condition: a finite $1$-bounded $\AG$-tree implies the desired upper bound for the rescaled family.
+For actual finite termination of the search procedure, the child-selection rule must lead to such a tree after finitely many expansions.
 
 \section{Implementation Details}
 
 \subsection{Child-Selection Policy}
-\begin{remark}\citep{MoellerReif2014TreeBasedJSR}
-\label{rem:moller}
-The procedure \textproc{selectChildren} determines whether all positive children (from $1$ to $n$) or a subset of generator children (from $-1$ to $-m$) is chosen, according to the theory established there.
-\end{remark}
+The function $\textproc{selectChildren}$ decides whether a violating node is expanded by all positive children or by a suitable collection of generator children. This choice is part of the practical search strategy and follows the rules discussed in \citep{MoellerReif2014TreeBasedJSR}.
 
 \section{Remarks}
 
-\begin{remark}\citep{MoellerReif2014TreeBasedJSR}
-    \label{rem:finiteTreeDecomposition}
-    The decomposition used in the proof of Theorem~\ref{thm:finiteTreeTermination} exists and is unique due to the structure of an $\AG\text{-tree}$.
+\begin{remark}\citep[Theorem~3.5]{MoellerReif2014TreeBasedJSR}
+    If the rescaled family $\mathcal{A}$ is irreducible and has a spectral gap at $1$ in the sense of Definition~\ref{def:spectralGap}, then, with a suitable choice of norm, a finite tree of the type required in Theorem~\ref{thm:finiteTreeTermination} exists. Thus the finite-tree method is guaranteed to succeed in that setting.
 \end{remark}
 
 \begin{remark}\citep{MoellerReif2014TreeBasedJSR}
-    \label{rem:finiteGeneratorNecessity}
-    In the cited work, the authors show that the use of generators is essential for ensuring termination in cases where the original invariant-polytope algorithm fails to terminate. Deciding when to use generators instead of all positive children is still part of active research and is handled by heuristics. In particular, termination with multiple s.m.p.\ candidates is substantially more delicate.
+    Generators are essential for the strength of the method. They make it possible to treat infinite families of products through finite tree nodes and can substantially reduce the depth of the searched tree. This is one of the key differences between the finite-tree and invariant-polytope approaches.
 \end{remark}

@@ -1,23 +1,42 @@
 \chapter{Conclusions and Outlook}
 \label{ch:thesisConclusion}
 
-\section{Summary of Invariant-Tree numerics}
+This final chapter collects the main conclusions of the thesis. It separates numerical observations, resolved problem classes, remaining limitations, and directions for future research.
+
+\section{Summary of Invariant-Tree Numerics}
 \label{sec:conclusionNewApproach}
+This section should distill the numerical evidence from Chapter~\ref{ch:numericalTesting} into a small number of clear statements. In the final version, it should summarize how the invariant-tree algorithm compares with the invariant-polytope and finite-tree algorithms in terms of termination behavior, runtime, and certificate quality.
+
+The most useful structure is to state the main observation first and then support it with one short paragraph on each of the following points: easy instances with a unique s.m.p., difficult instances with several competing products, and the overall runtime trade-off introduced by the hybrid method.
 
 \section{Resolved Problem Classes}
 \label{sec:conclusionSolvedProblems}
+This section should identify the classes of matrix families for which the thesis now provides a satisfactory algorithmic picture. In particular, it should state where the invariant-polytope algorithm already gives a complete answer, where the finite-tree argument is sufficient, and where the invariant-tree algorithm extends the range of exact certificates.
+
+When you fill this section, it is helpful to phrase the result class by class. For example, one paragraph can cover families with a unique simple s.m.p., a second can cover classes with a useful spectral gap, and a third can discuss instances where vertex-wise trees succeed although a single invariant polytope is difficult to construct.
 
 \section{Remaining Open Problem Classes}
 \label{sec:conclusionUnsolvedProblems}
+This section should state the limits of the present approach just as clearly as its successes. In particular, it should mention which benchmark families remain difficult, whether the bottleneck lies in candidate selection, tree construction, generator-branch verification, or numerical conditioning, and where the present termination theory still falls short of a full characterization.
+
+The final version should also separate theoretical limitations from implementation limitations. If a problem class is believed to be tractable in principle but is not yet covered by the current implementation, that distinction should be stated explicitly.
 
 \section{Directions for Future Research}
 \label{sec:conclusionFurtherResearch}
+This section should turn the open issues above into concrete research directions. The most convincing structure is to move from the most immediate implementation problems to the broader mathematical questions suggested by the thesis.
 
 \subsection{Optimization of Tree Choice and Vertex Selection}
 \label{subsec:conclusionTreeGenerationAndVertexChoice}
+This subsection should discuss how the current heuristic tree selection could be improved. In particular, it should address whether one can construct better test trees than the minimal trees used in this thesis, how vertex ordering influences runtime, and whether local tree choices can be coordinated more globally.
+
+It is also a natural place to mention the open problem raised in Chapter~\ref{ch:hybridApproach}: how to build a single global tree from the family of vertex-wise trees, or how to decide efficiently when such a global tree exists.
 
 \subsection{Extension to the Complex Setting}
 \label{subsec:conclusionComplexCase}
+This subsection should explain why the real-valued restriction is mathematically convenient but algorithmically limiting. The final version should indicate what would have to change in the invariant-polytope, finite-tree, and invariant-tree parts of the framework in order to treat complex leading eigenvectors and complex-balanced polytopes.
 
-\subsection{Optimization for Nonnegative Matrix-Sets}
+\subsection{Optimization for Nonnegative Matrix Families}
 \label{subsec:conclusionNonnegativeCase}
+This subsection should discuss the special structure of nonnegative matrix families. If the numerical tests contain such examples, this is the place to connect them to possible simplifications of the tree search, polytope membership tests, and generator verification. It should also state whether the invariant-tree approach seems especially promising in that setting.
+
+The chapter should end with a short final paragraph that returns to the thesis goal from Chapter~\ref{ch:introduction}: the invariant-tree algorithm is intended as a bridge between invariant-polytope certificates and tree-based product decompositions. The final sentence should state clearly what this thesis has achieved on that path and what remains to be done.
