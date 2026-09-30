@@ -1,0 +1,7 @@
+case_id,category,dimension,num_matrices,repeat,mode,elapsed_s,jsr_lower,jsr_upper,errorcode,status,iterations,vertices,tree_closed_points,error_identifier
+mejstrikpumm251,gallery,2,2,1,off,81.490878708333327,2.2370144239581564,2.2370144239581564,-10,certified,68,68,0,
+mejstrikpumm251,gallery,2,2,1,strict,40.75917475,2.2370144239581564,2.2370144239581564,-10,certified,43,34,9,
+mejstrikpumm251,gallery,2,2,2,strict,31.033395291666668,2.2370144239581564,2.2370144239581564,-10,certified,43,34,9,
+mejstrikpumm251,gallery,2,2,2,off,29.661217833333332,2.2370144239581564,2.2370144239581564,-10,certified,69,68,0,
+mejstrikpumm251,gallery,2,2,3,off,28.042502333333335,2.2370144239581564,2.2370144239581564,-10,certified,69,68,0,
+mejstrikpumm251,gallery,2,2,3,strict,31.641761124999999,2.2370144239581564,2.2370144239581564,-10,certified,43,34,9,

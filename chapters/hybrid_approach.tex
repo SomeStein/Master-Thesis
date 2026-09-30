@@ -2,7 +2,7 @@
 \chapter{Invariant-Tree Algorithm}
 \label{ch:hybridApproach}
 
-This chapter contains the thesis-specific contribution: a detailed formulation of the invariant-tree algorithm and a corresponding termination analysis, based on the hybrid framework of \citep{MejstrikReif2025HybridApproachJSR}. In the recent literature, the same construction is also referred to as the \emph{tree-flavoured-invariant-polytope-algorithm}. Implementation details for finite $1$-bounding of generated product sets are taken from the cited work and are not claimed as original contributions here.
+This chapter gives a detailed account of the tree-flavoured invariant-polytope algorithm of \citet{MejstrikReif2025HybridApproachJSR}, called the \emph{invariant-tree algorithm} here. It states the vertex-wise termination certificate explicitly and connects that certificate to the toolbox implementation used in Chapter~\ref{ch:numericalTesting}.
 
 \section{Overview}
 \subsection{Combination Strategies}
@@ -42,10 +42,8 @@ then $T$ is called \emph{strictly $1$-$v$-bounded}.
 The algorithm starts, as in the invariant-polytope method, from a set $V_0$ of starting vertices.
 Each vertex set $V_r$ defines a vector polytope norm $\lVert \cdot \rVert _{V_r}$.
 At iteration $r$, for every vertex $v \in V_r$, we build a test $\AG$-tree $T_v$.
-If some $L$ in the leafage of $T_v$ satisfies $\lVert Lv \rVert _{V_r} \ge 1$, then $Lv$ is added as a new vertex candidate.
+If an image $Lv$ lies outside the current polytope, it is added as a new vertex candidate.
 If all test-tree leafages in one iteration are $1$-$v$-bounded with respect to the current polytope norm, the algorithm terminates.
-
-\vspace{1cm}
 
 \begin{algorithm}
   \caption{Invariant-tree algorithm}
@@ -57,8 +55,8 @@ If all test-tree leafages in one iteration are $1$-$v$-bounded with respect to t
           \State $V_{\text{rem}} \gets V_{\text{new}}$
           \State $V_{\text{new}} \gets \emptyset$
           \For {$v \in V_{\text{rem}}$}
-              \State Construct minimal $\AG$-tree $\mathbf{T}$ as discussed in Section~\ref{sec:hybridImplementation}
-              \State $\mathcal{W} \gets \{Lv : L \in \mathcal{L}(\mathbf{T}) \text{ and } \lVert Lv \rVert _{\text{co}_{\text{s}}(V)} \geq 1\}$
+              \State Choose a valid $\AG$-tree $\mathbf{T}$ as discussed in Section~\ref{sec:hybridImplementation}
+              \State $\mathcal{W} \gets \{Lv : L \in \mathcal{L}(\mathbf{T}) \text{ and } \lVert Lv \rVert _{\text{co}_{\text{s}}(V)} > 1\}$
               \If {$\mathcal{W} \ne \emptyset$}
                   \State $V \xleftarrow{\cup} \mathcal{W}$
                   \State $V_{\text{new}} \xleftarrow{\cup} \mathcal{W}$
@@ -68,21 +66,23 @@ If all test-tree leafages in one iteration are $1$-$v$-bounded with respect to t
   \end{algorithmic}
 \end{algorithm}
 
-\vspace{1cm}
 \section{Termination Theory}
 \label{sec:hybridTerminationResults}
 
-\begin{theorem}
+\citet[Theorem 2.7]{MejstrikReif2025HybridApproachJSR} prove the upper bound when one $V$-closed tree works for every vertex. Their Algorithm 3.1 allows a tree to be chosen separately at each vertex. The following theorem makes this vertex-wise implication explicit. Its proof is an independently written extension of the common-tree argument, using the cited prefix--leaf decomposition.
+
+\begin{theorem}[Vertex-wise tree certificate]
   \label{thm:hybridTermination}
-  If Algorithm~\ref{alg:hybridApproach} terminates, then $\JSR(\mathcal{A}) \leq 1$.
+  Suppose that Algorithm~\ref{alg:hybridApproach} terminates with a finite set $V$ spanning $\R^d$. Assume that each selected $\AG$-tree is valid, its generators have spectral radius at most $1$, and it is $1$-$v$-bounded for its associated vertex $v\in V$ in the final polytope norm. Then $\JSR(\mathcal{A})\le 1$.
 \end{theorem}
+
+This is a correctness theorem for a finite stopping certificate. It does not guarantee that a particular heuristic for selecting trees will find such a certificate in finitely many iterations.
 
 \subsection{Proof Strategy}
 \label{subsec:hybridProofOutline}
-Products are bounded by norms built during intermediate iterations, and submultiplicativity allows us to pass to the final norm. Therefore, we work with $\lVert \cdot \rVert _V$ for the final vertex set $V = \cup_{i=1}^{K} V_i$, where $K$ is the final iteration.
-The proof generalizes the finite-tree argument by repeatedly expanding linear combinations and controlling their coefficients via $1$-$v$-boundedness.
+We work in the norm of the final vertex set $V$. With one common tree, closure at every vertex bounds each leaf set in operator norm, as in the cited theorem. Different trees need not give that common operator-norm bound. Instead, an arbitrary product either lies in a node of the tree selected for its starting vertex or has a nonempty leaf suffix. In the latter case, leaf closure replaces the suffix image by a convex combination of vertices and leaves a shorter product. Induction then gives one polynomial bound for all products.
 
-\begin{figure}
+\begin{figure}[H]
   \centering
   \begin{tikzpicture}[
     edge from parent/.style={draw, -latex, dashed, thick},
@@ -108,7 +108,7 @@ The proof generalizes the finite-tree argument by repeatedly expanding linear co
 
   % Right side
   \node (v5) at (4,-0.5) {$v_5$}
-    child {node {$\{ Av_7\}$}}
+    child {node {$\{ Av_5\}$}}
     child {
       child {
         child {node {$\{AG^nBv_5\}$}} 
@@ -149,85 +149,63 @@ The proof generalizes the finite-tree argument by repeatedly expanding linear co
   \node[above] at ($(v6)!0.6!(v6-2)$) {$B$};
   
   \end{tikzpicture}
-  \caption{Cyclic tree structure generated by the algorithm. Here $\mathcal{A}$ consists of two matrices $A$ and $B$ and the chosen candidate is $\Pi = ABA$. Dashed arrows indicate $\AG$-trees used for bounds. Solid arrows indicate vertices added to $V$ in one iteration. Leaf labels with powers $G^n$ represent matrix-vector products that remain $1$-$v$-bounded for all $n \in \mathbb{N}_0$.}
+  \caption{Schematic cyclic vertices and test-tree branches for $\mathcal{A}=\{A,B\}$ and candidate $\Pi=ABA$. Solid arrows connect stored vertices; dashed arrows expand test branches. A label involving $G^n$ represents all nonnegative generator powers, each of which must satisfy the leaf bound.}
   \label{fig:hybridCyclicTree}
 \end{figure}
 
 \subsection{Auxiliary Termination Results}
 
+The next lemma is the vertex-wise form of the tree bound. Its proof follows the prefix--leaf decomposition of \citet{MoellerReif2014TreeBasedJSR} and the hybrid closure condition of \citet{MejstrikReif2025HybridApproachJSR}.
+
 \begin{lemma}
   \label{lem:hybridArbitraryProductBound}
-  If Algorithm~\ref{alg:hybridApproach} terminates, there exists a monotone polynomial $p$ such that for every product $P \in \mathcal{A}^k$ and $v \in V$, $\lVert Pv \rVert _{\text{co}_{\text{s}}(V)} \le p(k)$ holds.
+  Under the hypotheses of Theorem~\ref{thm:hybridTermination}, there is a monotone polynomial $p$ such that
+  \[
+    \lVert A_Iv\rVert_V\le p(k)
+    \quad\text{for every }v\in V,\ I\in\mathcal I^k,\ k\in\N_0.
+  \]
 \end{lemma}
 
 \begin{proof}
-If the algorithm terminates, then the set of vertices $V = \{ v_1, \cdots, v_m \}$ is finite and for each $v \in V$ there exists an $\AG\text{-tree } T_v$ that is $1$-$v$-bounded with respect to $\lVert \cdot \rVert _{\text{co}_{\text{s}}(V)}$. In particular, for every $L \in \mathcal{L}(T_v)$ one has $\lVert Lv \rVert _{\text{co}_{\text{s}}(V)} \leq 1$, which means there exists $\lambda_1, \cdots, \lambda_m$ such that $Lv = \sum \lambda_j v_j$ with $ \sum |\lambda_j| \leq 1 $. According to Lemma~\ref{lem:finitePolynomialBound}, there exists a polynomial $p_v$ such that for every product $P \in \mathcal{A}^k$ encoded by $T_v$, $\lVert Pv \rVert _{\text{co}_{\text{s}}(V)} \leq p_v(k)$.
-Take an arbitrary product $P \in \mathcal{A}^k$ and $v \in V$.
-Define: 
-$$
-\begin{aligned}
-  p & := \sum \limits_{v \in V} p_v \\
-  P' L & := P \text{ with } L  \in  \mathcal{L}(T_v) \text{ if } P \notin T_v \text{ and } L  := I \text{ else}\\
-  P'_{i_1 \dots i_r} L_{i_1 \dots i_r} & := P'_{i_1 \dots i_{r-1}} \text{ with } L_{i_1 \dots i_r} \in  \mathcal{L}(T_{v_{i_{r}}}) \text{ if } P'_{i_1 \dots i_{r-1}} \notin T_{v_{i_{r}}}\\
-  \text{ and } L_{i_1 \dots i_r} & := I \text{ else.} \\
-  \text{Where } i_j \in \mathcal{I} & := \{1, \cdots, m \}\\
-\end{aligned}
-$$
-These decompositions exist and are unique because of the special structure of $\AG\text{-trees}$; details can be found in \citep{MoellerReif2014TreeBasedJSR}.
-\newline
-Now we have:
-$$
-\begin{aligned}
-  \|Pv\|_{co_s(V)} & = \|P'Lv\|_{co_s(V)} \\ 
-  & = \|P' \sum \limits_{i_1 \in \mathcal{I}} \lambda_{i_1} v_{i_1} \|_{co_s(V)} \\ 
-  & = \sum \limits_{i_1 \in \mathcal{I}} |\lambda_{i_1}| \|P'v_{i_1} \|_{co_s(V)}\\
-  & = \sum \limits_{i_1 \in \mathcal{I}} |\lambda_{i_1}| \|P'_{i_1}L_{i_1}v_{i_1} \|_{co_s(V)} \\ 
-  & = \sum \limits_{i \in \mathcal{I}^2} |\lambda_{i_1}| |\lambda_{i_2}| \|P'_{i}v_{i_2} \|_{co_s(V)}\\
-  & \cdots \\
-  & = \sum \limits_{i \in \mathcal{I}^{k}} |\lambda_{i_1}| \cdot ... \cdot |\lambda_{i_k}| \|P'_{i}v_{i_{k}} \|_{co_s(V)}\\
-  & \leq \sum \limits_{i \in \mathcal{I}^{k}} |\lambda_{i_1}| \cdot ... \cdot |\lambda_{i_k}| \text{ } p_{v_{i_k}}(k) \\
-  & \leq p(k)\sum \limits_{i \in \mathcal{I}^{k}} |\lambda_{i_1}| \cdot ... \cdot |\lambda_{i_k}| \\
-  & =  p(k)\sum \limits_{i_1 \in \mathcal{I}} |\lambda_{i_1}| \sum \limits_{i_2 \in \mathcal{I}} |\lambda_{i_2}| \text{ } ... \sum \limits_{i_k \in \mathcal{I}} |\lambda_{i_k}| \\
-  & \leq p(k) \cdot 1 \cdot ... \cdot 1\\
-  & \leq p(k)
-\end{aligned}
-$$
-Here the first inequality works since after $k$ steps the prefix $P'_{i}$ is guaranteed to be in the tree $T_{v_{i_k}}$, and thus the norm is bounded by $p_{v_{i_k}}(k)$, which is less than $p(k)$ by definition. The second-to-last inequality follows because the sums of absolute coefficients in the corresponding linear combinations are bounded by $1$ due to $1$-$v$-boundedness of the $\AG\text{-trees}$.
+For each vertex $v$, Lemma~\ref{lem:finitePolynomialBound} bounds all products encoded by nodes of $T_v$ by a monotone polynomial. There are finitely many vertices and trees. Hence we can choose one monotone polynomial $p$, with $p(0)\ge1$, that bounds the operator norms of all products encoded by any of their nodes.
+
+We prove the assertion by induction on the product length $k$. At length zero it follows from $\lVert v\rVert_V\le1$. Let $I$ have length $k>0$ and assume the assertion for shorter lengths. If $A_I$ is encoded by a node of $T_v$, the choice of $p$ gives $\lVert A_Iv\rVert_V\le p(k)$.
+
+Otherwise the prefix--leaf decomposition for the valid tree $T_v$ writes $A_I=A_JP$ for some matrix $P$ in an uncovered leaf set $L$, where $|J|<k$. Since $T_v$ is $1$-$v$-bounded, $Pv$ belongs to $\mathrm{co}_{\mathrm{s}}(V)$. Thus there are coefficients $c_w$ such that
+\[
+  Pv=\sum_{w\in V}c_ww,\qquad
+  \sum_{w\in V}|c_w|\le1.
+\]
+The induction hypothesis and monotonicity of $p$ now give
+\[
+  \lVert A_Iv\rVert_V
+  \le\sum_{w\in V}|c_w|\,\lVert A_Jw\rVert_V
+  \le p(|J|)\sum_{w\in V}|c_w|
+  \le p(k).
+\]
+This proves the claim for every vertex and every product of length $k$.
 \end{proof}
 
 \subsection{Main Termination Result}
 
-\begin{proof}
-  Let $I \in \mathcal{I}^k$ be a multi-index of length $k$. 
-  We want to find a polynomial $p$ such that $\lVert A_{I} \rVert \le p(k)$.
-  We make the assumption all products $P' \in \mathcal{A}^{k'}$ with length $k'$ less than $k$ are already bounded by $p$ i.e. $$ \lVert P' \rVert \le p(k') $$ in their lengths $k'$. 
-  Now by Dicomp-Lemma we get: 
-  $$
-  \begin{aligned}
-    \lVert A_{I} v \rVert & =  \lVert A_{P_{I,v}} A_{L_{I,v}} v \rVert  =  \lVert A_{P_{I,v}} (\lambda_{1}v_{1} + ... + \lambda_{l}v_{l}) \rVert \\
-    & = \lambda_{1} \lVert A_{P_{I,v}}v_{1} \rVert + ... + \lambda_{1} \lVert A_{P_{I,v}}v_{1} \rVert & \\
-    & \le p(k) \\ %all products can be either within testtree then we have p(k) by decomp theorem or its a real decomp and therefore less than or equal p(k-1)
-    % now arbitrary v with V-norm 1 is good situated linear decomp of v_is 
-    % now main norm is operator norm less than max of norms before < p(k)
-  \end{aligned}
-  $$
+\begin{proof}[Proof of Theorem~\ref{thm:hybridTermination}]
+Because $V$ spans $\R^d$, $\mathrm{co}_{\mathrm{s}}(V)$ is the unit ball of a norm. Any vector $x$ in that unit ball admits a representation $x=\sum_{v\in V}c_vv$ with $\sum_{v\in V}|c_v|\le1$. Lemma~\ref{lem:hybridArbitraryProductBound} therefore implies
+\[
+  \lVert A_Ix\rVert_V
+  \le\sum_{v\in V}|c_v|\,\lVert A_Iv\rVert_V
+  \le p(k)
+  \quad\text{for every }I\in\mathcal I^k.
+\]
+Thus every product of length $k$ has induced operator norm at most $p(k)$. Taking $k$-th roots yields
+\[
+  \JSR(\mathcal A)
+  \le\lim_{k\to\infty}p(k)^{1/k}=1.
+\]
+If the scaled family contains a candidate product with averaged spectral radius $1$, the reverse inequality follows from the three-member inequality, and the candidate is spectrum maximizing.
 \end{proof}
 
 \begin{corollary}
-  If the chosen trees are always $T_v = \mathcal{A}$, then Algorithm~\ref{alg:hybridApproach} reduces to the invariant-polytope algorithm~\ref{alg:invariantPolytope}. Hence, the invariant-tree algorithm generalizes the invariant-polytope algorithm.
-\end{corollary}
-
-\begin{corollary}
-  Assume Algorithm~\ref{alg:hybridApproach} terminates and all test trees $T_v$ are chosen without generator children. Then the polynomial bound in Lemma~\ref{lem:hybridArbitraryProductBound} can be chosen constant, i.e. there exists $C>0$ such that
-  \[
-  \lVert P \rVert_{\mathrm{co}_{\mathrm{s}}(V)} \le C
-  \quad \text{for all } P \in \mathcal{A}^k,\ k\in\N.
-  \]
-  Consequently, for the rescaled family $\widehat{\mathcal{A}}:=C^{-1}\mathcal{A}$, one has
-  \[
-  \widehat{\mathcal{A}}\,\mathrm{co}_{\mathrm{s}}(V)\subseteq \mathrm{co}_{\mathrm{s}}(V),
-  \]
-  so polytope invariance is recovered after scaling.
+  If each chosen tree consists of the root and the $n$ one-letter positive leaves, then Algorithm~\ref{alg:hybridApproach} reduces to the invariant-polytope algorithm~\ref{alg:invariantPolytope}. Hence, the invariant-tree algorithm generalizes the invariant-polytope algorithm.
 \end{corollary}
 
 \begin{corollary}
@@ -306,15 +284,15 @@ Here the first inequality works since after $k$ steps the prefix $P'_{i}$ is gua
     \draw (264,202.4) node [anchor=north west][inner sep=0.75pt]    {$A$};
     
     \end{tikzpicture}
-    \caption{Minimal tree structure $T_{(G, \mathcal{A})}$ for the candidate $G = ABA$ and $\mathcal{A} = \{A,B\}$. The arrows marked with circles are uncovered-leafs, the arrow marked with a square is a covered-leaf}
+    \caption{Minimal tree $T_{\mathcal G}$ for $G=ABA$ and $\mathcal A=\{A,B\}$. Circles mark uncovered leaves; the square marks the covered node.}
     \label{fig:hybridMinimalTree}
 \end{figure}
 
 In principle, the invariant-tree algorithm allows a different test tree for each vertex $v \in V$. More precisely, both the test tree and the corresponding bounding tree can be chosen independently for each vertex, as long as they satisfy the $\AG\text{-tree}$ conditions from Definition~\ref{def:agTree}.
 
-In our implementation, we use minimal trees only. This means that for each vertex we choose a tree that keeps the generator branch and the first covered-node effect, while minimizing the size of leafage to be tested. This reduces the number of norm checks $\lVert Lv \rVert _{\text{co}_{\text{s}}(V)}$ in each iteration and is the default tree-selection policy.
+The implementation constructs a minimal tree by default, but it also accepts manually supplied leaf words. For the main numerical example, two generator trees are supplied and a vertex may close under either one. Their admissibility is checked from the tree structure in Section~\ref{sec:numericsPrimaryTree}; the toolbox does not validate user-supplied words automatically. A larger tree may require more leaf-norm checks, but can establish closure when the minimal tree cannot.
 
-Because generator branches encode families such as $\{G^r : r \in \N\}$, a naive implementation would require infinitely many tests. Following Section~3.3 of \citep{MejstrikReif2025HybridApproachJSR}, we split the generator dynamics into a leading-eigenspace part and a stable remainder, estimate the remainder by pseudo-spectral-radius bounds, and then reduce each infinite branch check to finitely many verifiable conditions for the current vertex.
+Generator branches encode families such as $\{G^r:r\in\N_0\}$. The tested toolbox revision requires diagonalizable generator matrices with periodic leading eigenvalues. It splits each image into a periodic leading part and a decaying remainder, bounds the latter using norm equivalence and the stable eigenvalues, and tests the finitely many initial powers left by that bound. This is a restricted implementation of the general verification strategy in \citet[Section 3.3]{MejstrikReif2025HybridApproachJSR}; it does not use a pseudo-spectral-radius estimate in the active path.
 
 The practical implementation also uses a maximal iteration counter $r_{\max}$. If no certificate is found before reaching $r_{\max}$, the algorithm stops and returns an approximation interval for $\JSR(\mathcal{A})$ via the three-member inequality:
 \[
@@ -322,95 +300,6 @@ The practical implementation also uses a maximal iteration counter $r_{\max}$. I
 \]
 In practice, these bounds can already be accurate even when full termination is not achieved.
 
-From a computational perspective, runtime is dominated by norm/membership checks over leafage elements and by tree construction. Memory is dominated by the current vertex set $V$ and temporary tree data. Restricting to minimal trees keeps leafage small, so both runtime and memory growth are significantly lower than with larger test trees.
-
 Finally, candidate handling from the pure invariant-polytope algorithm is still used in the invariant-tree setting. In particular, candidate rejection and candidate updates can be applied before or during invariant-tree iterations to improve robustness.
 
-\section{Remarks}
-\label{sec:hybridRemarks}
-
-\subsection{Polytope Invariance}
-\label{subsec:hybridPolytopeInvariance}
-After Algorithm~\ref{alg:hybridApproach} terminates, the polytope $\text{co}_{\text{s}}(V)$ is, in general, not invariant under the full family $\mathcal{A}$. This is expected, since the invariant-tree algorithm enforces polynomial product bounds rather than one-step invariance under each matrix in $\mathcal{A}$.
-
-The termination certificate is first vertex-wise. For every $v \in V$, the algorithm provides a test tree $T_v$ such that each leaf matrix in $\mathcal{L}(T_v)$ maps $v$ back into the polytope. Equivalently, with
-\[
-\Gamma_V := \{(v,L) : v \in V,\ L \in \mathcal{L}(T_v)\},
-\]
-one has
-\[
-(v,L) \in \Gamma_V
-\quad \Longrightarrow \quad
-Lv \in \text{co}_{\text{s}}(V).
-\]
-
-A stronger, uniform statement is obtained if one can construct a single $\AG$-tree $T_\star$ that bounds all vertices simultaneously, i.e.
-\[
-\lVert Lv \rVert_{\text{co}_{\text{s}}(V)} \le 1
-\quad \text{for all } v \in V \text{ and } L \in \mathcal{L}(T_\star).
-\]
-Then $T_\star$ induces leafage invariance on the whole polytope:
-\[
-x \in \text{co}_{\text{s}}(V),\ L \in \mathcal{L}(T_\star)
-\quad \Longrightarrow \quad
-Lx \in \text{co}_{\text{s}}(V).
-\]
-Indeed, writing $x=\sum_{i=1}^M \alpha_i v_i$ with $\sum_{i=1}^M |\alpha_i|\le 1$ and $v_i \in V$, one gets
-\[
-Lx=\sum_{i=1}^M \alpha_i Lv_i,
-\]
-and each term $Lv_i$ belongs to $\text{co}_{\text{s}}(V)$ by assumption. By convexity and symmetry of $\text{co}_{\text{s}}(V)$, this implies $Lx \in \text{co}_{\text{s}}(V)$.
-
-The existence and efficient construction of such a global tree $T_\star$ from the family $(T_v)_{v\in V}$ is a separate algorithmic problem and remains part of future work.
-
-This invariance interpretation, together with the intended play on words relative to the invariant-polytope algorithm, motivates the name \emph{invariant-tree algorithm}.
-
-\subsection{Memory and Time Complexity}
-\label{subsec:hybridComplexity}
-
-We summarize the computational complexity in terms of the final vertex set
-\[
-V=\{v_1,\dots,v_M\},\qquad M:=|V|.
-\]
-By Algorithm~\ref{alg:hybridApproach}, each vertex is processed once after it is added to $V$. For a processed vertex $v$, write
-\[
-\ell_v := |\mathcal{L}(T_v)|
-\]
-for the size of the tested leafage, and denote by $C_{\mathrm{tree}}(v)$ the cost of constructing $T_v$.
-
-For each leaf matrix $L\in\mathcal{L}(T_v)$, one needs to evaluate $\|Lv\|_{\mathrm{co}_{\mathrm{s}}(V)}$, which consists of
-\[
-C_{\mathrm{mv}}(d)\ \text{(matrix-vector product)}\quad +\quad C_{\mathrm{norm}}(d,|V|)\ \text{(polytope-norm / membership test)}.
-\]
-Hence the total runtime is bounded by
-\[
-T_{\mathrm{total}}
-\;\lesssim\;
-\sum_{v\in V}\Big(C_{\mathrm{tree}}(v)+\ell_v\big(C_{\mathrm{mv}}(d)+C_{\mathrm{norm}}(d,|V|)\big)\Big).
-\]
-With uniform bounds $C_{\mathrm{tree}}(v)\le C_{\mathrm{tree}}^{\max}$ and $\ell_v\le \ell_{\max}$, this yields
-\[
-T_{\mathrm{total}}
-=
-\mathcal{O}\!\left(
-M\Big(C_{\mathrm{tree}}^{\max}+\ell_{\max}\big(C_{\mathrm{mv}}(d)+C_{\mathrm{norm}}(d,M)\big)\Big)
-\right).
-\]
-
-Generator branches introduce an additional preprocessing/verification cost (Section~3.3 in \citep{MejstrikReif2025HybridApproachJSR}), where infinite families are reduced to finitely many checks via spectral estimates and pseudo-spectral-radius bounds. This overhead is typically amortized across vertices when the same generators are reused.
-
-The peak memory footprint has the structure
-\[
-S_{\mathrm{total}}
-\;\lesssim\;
-\underbrace{\mathcal{O}(nd^2)}_{\text{input matrices}}
-\;+\;
-\underbrace{\mathcal{O}(Md)}_{\text{vertex set}}
-\;+\;
-\underbrace{\mathcal{O}(S_{\mathrm{tree}}^{\max})}_{\text{active tree data}}
-\;+\;
-\underbrace{\mathcal{O}(S_{\mathrm{norm}}(d,M))}_{\text{norm/membership solver state}},
-\]
-where $S_{\mathrm{tree}}^{\max}$ denotes the maximal storage needed for one active test tree.
-
-Practically, minimal trees reduce $\ell_v$ and $S_{\mathrm{tree}}^{\max}$ substantially; if all test trees coincide, tree construction and PL-decomposition data can be reused globally (Corollary above), reducing both runtime and memory constants. Nevertheless, no global polynomial-time bound in $(n,d)$ is expected in full generality, consistent with known hardness results for JSR computation \citep{TsitsiklisBlondel1997HardToComputeJSR,BlondelTsitsiklis2000NPHardMaxAlgebra}.
+The output polytope need not be invariant under every matrix in $\mathcal A$: the certificate bounds leaf products at individual vertices. A strict check evaluates periodic limits, a bound for the stable part, and enough initial powers to cover the remaining range. Its cost depends on the generator spectrum, leaf words, and polytope-norm solves. Chapter~\ref{ch:numericalTesting} measures this cost for the tested families; the termination proof does not give a polynomial worst-case complexity bound.

@@ -1,0 +1,8 @@
+Machine used for the archived runs
+Model: MacBook Pro (MacBookPro17,1)
+Processor: Apple M1, 8 cores (4 performance, 4 efficiency)
+Memory: 8 GB
+Operating system: macOS 14.5
+Architecture reported by MATLAB: MACA64
+MATLAB: R2026a Update 1 (26.1.0.3234472)
+Solver: Gurobi (MATLAB MEX at external/gurobi1302/macos_universal2/matlab/gurobi.mexmaca64)

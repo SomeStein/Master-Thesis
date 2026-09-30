@@ -1,0 +1,11 @@
+diff --git a/ttoolboxes/ipa/private/ipa_hybrid_make_leaf_words.m b/ttoolboxes/ipa/private/ipa_hybrid_make_leaf_words.m
+index 6426c74..4c8e7bf 100644
+--- a/ttoolboxes/ipa/private/ipa_hybrid_make_leaf_words.m
++++ b/ttoolboxes/ipa/private/ipa_hybrid_make_leaf_words.m
+@@ -29,1 +29,6 @@
++function vec = tocolumn(vec)
++    assert(isvector(vec), 'ipa:hybrid:leaf', 'Leaf words must be vectors.');
++    vec = vec(:);
++end
++
+ function dummy; end  %#ok<DEFNU>  % Generates an error, if the 'end' of a function is missing.

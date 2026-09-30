@@ -1,23 +1,12 @@
 \chapter{Conclusions and Outlook}
 \label{ch:thesisConclusion}
 
-\section{Summary of Invariant-Tree numerics}
-\label{sec:conclusionNewApproach}
+The thesis connected two finite upper-bound certificates for the joint spectral radius. Ordinary IPA closes an invariant polytope under every normalized matrix. The invariant-tree method of \citet{MejstrikReif2025HybridApproachJSR} instead tests finite product trees on the polytope's vertices. Chapter~\ref{ch:hybridApproach} reconstructed the cited common-tree certificate and made its vertex-wise form explicit: valid generator trees and bounded leaf images at a finite spanning vertex set imply a polynomial bound for every product, hence $\JSR\le1$. The vertex-wise induction is the theoretical extension established here; a candidate with averaged spectral radius one supplies the matching lower bound.
 
-\section{Resolved Problem Classes}
-\label{sec:conclusionSolvedProblems}
+The $4\times4$ Mejstrik--Pumm pair shows the practical effect of the tree condition. The candidate matrix has leading eigenvalues $3$ and $-3$, outside the simple-leading-eigenvalue hypothesis of the standard strict IPA termination characterization. With the two supplied trees, strict hybrid returned the scalar JSR value $3$ in two iterations and closed twelve tree points in each of three runs. Ordinary IPA reached the limit of $80$ iterations in every matched run, returning a narrow interval rather than a scalar result. This is evidence for the value of the custom tree in this implementation under the stated settings. It does not prove that ordinary IPA cannot terminate under different initialization or without limits.
 
-\section{Remaining Open Problem Classes}
-\label{sec:conclusionUnsolvedProblems}
+The fixed cohort shows where that gain extends and where it does not. Strict hybrid returned scalar values for MP252 and MP253 while ordinary IPA met the watchdog or iteration limit, respectively. Both modes met the watchdog on MP254. For MP255, MP256, and the controlled families, both modes returned scalar values; strict hybrid sometimes used fewer vertices but did not consistently take less time. The raw CSV preserves every repeat, including missing bounds after watchdog stops. The finite-tree algorithm remains a theoretical ingredient, with no separate implemented numerical baseline in this comparison.
 
-\section{Directions for Future Research}
-\label{sec:conclusionFurtherResearch}
+For the published $2\times2$ pair, the assumptions of the cited strict IPA characterization can be checked exactly, and the two leading eigenvalues rule out closure in that idealized sense. Both toolbox modes nevertheless returned scalar exits. This distinction matters: the theorem concerns strict mathematical closure, while the table records the implementation's floating-point stopping decision.
 
-\subsection{Optimization of Tree Choice and Vertex Selection}
-\label{subsec:conclusionTreeGenerationAndVertexChoice}
-
-\subsection{Extension to the Complex Setting}
-\label{subsec:conclusionComplexCase}
-
-\subsection{Optimization for Nonnegative Matrix-Sets}
-\label{subsec:conclusionNonnegativeCase}
+Several boundaries remain. The toolbox evaluates closure with floating-point optimization, so an independently rigorous computer-assisted certificate would require validated arithmetic for the final inequalities. The termination theorem is conditional on valid finite trees and suitable generators; selecting those trees automatically, especially when several products compete for maximal growth, remains a search problem. Future work can automate admissibility checks for user-supplied leaf words, validate the numerical upper bounds, and study tree selection on larger matrix families. These are direct next steps for turning the reconstructed proof and observed contrast into a separate paper.

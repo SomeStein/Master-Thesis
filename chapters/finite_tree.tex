@@ -75,7 +75,7 @@ We also define $A_l := G_{-l}$ for $l \in \{-m, \dots, -1\}$.
 
 \begin{definition}\citep{MoellerReif2014TreeBasedJSR}
     \label{def:extendedMultiIndexSet}
-    The set \( \mathcal{J}^k := \{-m, \dots, -1, 1, \dots, n\}^k \) denotes the collection of all multi-indices of length \( k \) with entries in $\{-m, \dots, -1, 1, \dots, n\}$.
+    Set $\mathcal J:=\{-m,\dots,-1,1,\dots,n\}$. Then $\mathcal J^k$ denotes the collection of all extended multi-indices of length $k$.
     For a multi-index \( J = [j_1, \dots, j_k] \in \mathcal{J}^k \), the corresponding matrix product set is defined by:
     $$
     A_J := \{ A_{j_k}^{e_k} \cdots A_{j_1}^{e_1} \mid  e_i = 1  \text{ if } j_i > 0 \text{ or } e_i \in \mathbb{N}_0 \text{ otherwise}\}.
@@ -104,7 +104,7 @@ We also define $A_l := G_{-l}$ for $l \in \{-m, \dots, -1\}$.
 \begin{definition}\citep{MoellerReif2014TreeBasedJSR}
     \label{def:agTree}
     \begin{samepage}
-    A so-called $\AG\text{-tree } T$ has the following structure:
+    A finite $\AG\text{-tree } T$ has the following structure:
 \begin{itemize}
     \item The root node contains the identity matrix: \( t_0 = \{I_d\} \).
     \item For every node \( t \in T \setminus \{t_0\} \), there is exactly one parent node in \(T\).
@@ -114,6 +114,7 @@ We also define $A_l := G_{-l}$ for $l \in \{-m, \dots, -1\}$.
         \item a parent of exactly \( n \) positive children,
         \item or a parent with at least one generator child.
     \end{itemize}
+    \item A generator child is never a leaf.
 \end{itemize}
 \end{samepage}
 \end{definition}
@@ -127,6 +128,8 @@ We also define $A_l := G_{-l}$ for $l \in \{-m, \dots, -1\}$.
 \]
 and called \emph{leafage} of the tree $T$.
 \end{definition}
+
+For a set-valued node $L$, we write $\lVert L\rVert:=\sup_{P\in L}\lVert P\rVert$ and $\lVert Lv\rVert:=\sup_{P\in L}\lVert Pv\rVert$. Thus a leaf condition concerns every matrix represented by that node, including every generator power.
 
 \begin{definition}\citep{MoellerReif2014TreeBasedJSR}
 \label{def:oneBoundedTree}
@@ -163,6 +166,8 @@ The finite-tree algorithm performs a non-exhaustive search in the space of $\AG$
         \EndWhile \\
     \end{algorithmic}
 \end{algorithm}
+
+This pseudocode is a schematic search rule. A concrete implementation must ensure that the selected children form a valid finite $\AG$-tree and must bound each set-valued node, including all represented generator powers. The numerical chapter does not use this procedure as a separate baseline.
 
 \subsection{Visualization}
 \begin{figure}[ht]
@@ -201,7 +206,7 @@ The proof strategy has two steps. First, one proves a polynomial bound for produ
 \begin{proof}
     Take an arbitrary node $t \in T$ with multi-index $J = [j_1, \cdots, j_l]$.
     Now every $j_i$ encodes either a matrix from $\mathcal{A}$ or arbitrary powers of a generator from $\mathcal{G}$.
-    Since all those matrices have spectral radius less than or equal to $1$, their Jordan normal forms grow at most polynomially and thus, by norm equivalence in finite-dimensional vector spaces, there exists a strictly positive, monotone polynomial $p_i$ with
+    The positive indices occur only to the first power and are bounded by constants. Each generator has spectral radius at most $1$, so its powers grow at most polynomially by Jordan normal form. Consequently, for every position there exists a strictly positive, monotone polynomial $p_i$ with
     $$
     \lVert A_{j_i}^{e} \rVert \le p_i(e) \quad \text{for all } e \in \mathbb{N}_0.
     $$
@@ -232,28 +237,27 @@ The proof strategy has two steps. First, one proves a polynomial bound for produ
 \subsection{Main Result}
 \begin{theorem}\citep{MoellerReif2014TreeBasedJSR}
 \label{thm:finiteTreeTermination}
-    If a 1-bounded $\AG\text{-tree}$ is found for a given matrix set $\mathcal{A}$ and generator set $\mathcal{G}$, then $\JSR(\mathcal{A}) = 1$.
+    If a $1$-bounded $\AG\text{-tree}$ is found for a given matrix set $\mathcal{A}$ and generator set $\mathcal{G}$, then $\JSR(\mathcal{A}) \le 1$. If a candidate product has averaged spectral radius $1$, equality follows.
 \end{theorem}
 
 \begin{proof}
     We take an arbitrary positive multi-index $I = [i_1, \cdots, i_k]$.
-    Our found $\AG\text{-tree } T$ allows for a unique decomposition of this multi-index into $I_k, \cdots, I_1$ where
+    The $\AG\text{-tree } T$ gives a prefix--leaf decomposition of this multi-index into $I_r, \cdots, I_1$ where
     $$
-    A_I = A_{I_k}A_{I_{k-1}}\cdots A_{I_1}.
+    A_I = A_{I_r}A_{I_{r-1}}\cdots A_{I_1}.
     $$
-    Each sub-multi-index $I_j \quad j = 1, \cdots,k-1$ encodes either a leaf of $T$ or is the empty set and $I_k$ encodes any node of $T$. Now due to Lemma~\ref{lem:finitePolynomialBound} there exists a polynomial $p$ such that
+    Each $I_j$ for $j<r$ encodes an uncovered leaf of $T$, while the residual $I_r$ is encoded by a node of $T$. By Lemma~\ref{lem:finitePolynomialBound} there exists a polynomial $p$ such that
     \[
-        \lVert A_{I}  \rVert =  \lVert A_{I_k}A_{I_{k-1}}\cdots A_{I_1}\rVert \le  \lVert A_{I_k} \rVert \cdot \lVert A_{I_{k-1}}\rVert \cdots \lVert A_{I_1} \rVert \le \lVert A_{I_k} \rVert\le p(k).
+        \lVert A_{I}  \rVert =  \lVert A_{I_r}A_{I_{r-1}}\cdots A_{I_1}\rVert \le  \lVert A_{I_r} \rVert \prod_{j=1}^{r-1}\lVert A_{I_j}\rVert \le \lVert A_{I_r} \rVert\le p(k).
     \]
-    The last inequality holds since all $I_j \quad j = 1, \cdots,k-1$ are either the empty multi-index or leaves such that their products $A_{I_j}$ are bounded by 1.
-    Furthermore $A_{I_k}$ can be bounded by the polynomial $p$ and the length of the product, which is less than $k$.
+    The leaf factors have norm at most $1$. The residual node product has length at most $k$, so monotonicity gives the final bound.
     Now we have
       $$\JSR(\mathcal{A}) = \lim_{k \to \infty} \max_{P \in \mathcal{A}^k} \lVert P \rVert ^{\frac{1}{k}} \leq \lim_{k \to \infty} p(k) ^{\frac{1}{k}}  = 1$$
     since the chosen multi-index was arbitrary.
 \end{proof}
 
 \subsection{Termination Conditions}
-Theorem~\ref{thm:finiteTreeTermination} gives a sufficient condition: finding a $1$-bounded $\AG$-tree implies $\JSR(\mathcal{A})=1$.
+Theorem~\ref{thm:finiteTreeTermination} gives a sufficient upper-bound certificate. The normalized candidate supplies the matching lower bound when its averaged spectral radius is $1$.
 
 For finite termination of the implemented search procedure, a necessary algorithmic condition is that the child-selection process reaches a finite $1$-bounded tree. In practice, this depends on the choice of generators and branching heuristics.
 
@@ -269,7 +273,7 @@ The procedure \textproc{selectChildren} determines whether all positive children
 
 \begin{remark}\citep{MoellerReif2014TreeBasedJSR}
     \label{rem:finiteTreeDecomposition}
-    The decomposition used in the proof of Theorem~\ref{thm:finiteTreeTermination} exists and is unique due to the structure of an $\AG\text{-tree}$.
+    The tree structure ensures that a prefix--leaf decomposition exists. The proof only needs existence; it does not depend on a unique decomposition when different generator powers encode the same product.
 \end{remark}
 
 \begin{remark}\citep{MoellerReif2014TreeBasedJSR}

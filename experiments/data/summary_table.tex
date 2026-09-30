@@ -1,0 +1,44 @@
+\begin{table}[H]
+\centering\small
+\begin{tabular}{@{}lcrrcrrr@{}}
+\toprule
+Set & Off & Iter./vert. & Time (s) & Strict & Iter./vert. & Time (s) & Tree points \\
+\midrule
+MP251 & C & 68/68 & 74.32 & C & 43/34 & 80.13 & 9 \\
+MP252 & X & --/-- & $\geq180$ & C & 2/6 & 4.828 & 3 \\
+MP253 & I & 80/8 & 26.55 & C & 3/8 & 5.515 & 6 \\
+MP254 & X & --/-- & $\geq180$ & X & --/-- & $\geq180$ & -- \\
+MP255 & C & 4/24 & 38.53 & C & 3/14 & 36.74 & 9 \\
+MP256 & C & 2/6 & 91.15 & C & 2/6 & 101.6 & 0 \\
+MP257 & I & 80/80 & 43.6 & C & 2/8 & 6.858 & 12 \\
+MR2 & C & 26/4 & 56.23 & C & 1/4 & 31.75 & 3 \\
+C3 & C & 2/16 & 2.315 & C & 1/8 & 2.821 & 9 \\
+C7a & C & 1/38 & 2.207 & C & 1/34 & 3.045 & 3 \\
+C7b & C & 1/42 & 2.406 & C & 1/34 & 3.774 & 6 \\
+\bottomrule
+\end{tabular}
+\caption{Matched IPA runs on the fixed cohort. Times, counts, and closed tree points are medians of three repeats. A combined outcome code records variation across repeats.}
+\label{tab:ipaComparison}
+\end{table}
+\begin{table}[H]
+\centering\small
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+Set & Off lower & Off upper & Strict lower & Strict upper \\
+\midrule
+MP251 & 2.23701442396 & 2.23701442396 & 2.23701442396 & 2.23701442396 \\
+MP252 & -- & -- & 3.60555127546 & 3.60555127546 \\
+MP253 & 4 & 4.00000002099 & 4 & 4 \\
+MP254 & -- & -- & -- & -- \\
+MP255 & 4.472135955 & 4.472135955 & 4.472135955 & 4.472135955 \\
+MP256 & 1 & 1 & 1 & 1 \\
+MP257 & 3 & 3.000000015 & 3 & 3 \\
+MR2 & 1 & 1 & 1 & 1 \\
+C3 & 1 & 1 & 1 & 1 \\
+C7a & 1 & 1 & 1 & 1 \\
+C7b & 1 & 1 & 1 & 1 \\
+\bottomrule
+\end{tabular}
+\caption{Median returned JSR lower and upper bounds. Missing values indicate that no bounds were returned. Scalar entries with outcome $C$ in Table~\ref{tab:ipaComparison} are the toolbox's numerical certificates.}
+\label{tab:ipaBounds}
+\end{table}

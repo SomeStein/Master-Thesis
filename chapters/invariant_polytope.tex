@@ -23,7 +23,7 @@ Starting from an initial finite set of vertices
 \[
 V_0=\{v_1,\dots,v_M\},
 \]
-the algorithm iteratively enlarges $V$ by testing images $Av$ with $A\in\tilde{\mathcal{A}}$ and current vertices $v$. If $\|Av\|_{\mathrm{co}_{\mathrm{s}}(V)}\ge 1$, the point $Av$ is appended. If one full iteration yields no new vertices, the procedure stops and returns $\mathrm{co}_{\mathrm{s}}(V)$.
+the algorithm iteratively enlarges $V$ by testing images $\tilde Av$ with $\tilde A\in\tilde{\mathcal{A}}$ and current vertices $v$. A point strictly outside $\mathrm{co}_{\mathrm{s}}(V)$ is appended. If one full iteration yields no new vertices, the procedure stops and returns $\mathrm{co}_{\mathrm{s}}(V)$.
 
 \subsection{Pseudocode}
 \begin{algorithm}[ht]
@@ -38,10 +38,10 @@ the algorithm iteratively enlarges $V$ by testing images $Av$ with $A\in\tilde{\
 \State $V_{\text{new}} \gets \emptyset$
 \For {$v \in V_{\text{rem}}$}
 
-\For {$A \in \mathcal{A}$}
-\If {$\lVert Av \rVert _{\text{co}_{\text{s}}(V)} \geq 1$}
-\State $V \xleftarrow{\cup} Av$
-\State $V_{\text{new}} \xleftarrow{\cup} Av$
+\For {$\tilde A \in \tilde{\mathcal{A}}$}
+\If {$\lVert \tilde Av \rVert _{\text{co}_{\text{s}}(V)} > 1$}
+\State $V \xleftarrow{\cup} \tilde Av$
+\State $V_{\text{new}} \xleftarrow{\cup} \tilde Av$
 \EndIf
 \EndFor
 \EndFor
@@ -53,15 +53,15 @@ the algorithm iteratively enlarges $V$ by testing images $Av$ with $A\in\tilde{\
 \subsection{Visualization}
 \begin{figure}[ht]
 \centering
-\begin{tikzpicture}[>=latex]
+\begin{tikzpicture}[>=latex,scale=.98,transform shape]
   \node[draw, rounded corners, align=center] (s0) at (0,0)
     {$V_r$ and current polytope\\$\mathcal{P}_r=\mathrm{co}_{\mathrm{s}}(V_r)$};
   \node[draw, rounded corners, align=center] (s1) at (5.2,0)
     {Compute images\\$\tilde{A}v,\ \tilde{A}\in\tilde{\mathcal{A}},\ v\in V_r$};
   \node[draw, rounded corners, align=center] (s2) at (10.6,0)
-    {Test\\$\|\tilde{A}v\|_{\mathcal{P}_r}\ge 1$};
+    {Test\\$\|\tilde{A}v\|_{\mathcal{P}_r}>1$};
   \node[draw, rounded corners, align=center] (s3) at (10.6,-2.2)
-    {Add violating images\\$V_{r+1}=V_r\cup\{\tilde{A}v:\|\tilde{A}v\|_{\mathcal{P}_r}\ge 1\}$};
+    {Add violating images\\$V_{r+1}=V_r\cup\{\tilde{A}v:\|\tilde{A}v\|_{\mathcal{P}_r}>1\}$};
   \node[draw, rounded corners, align=center] (s4) at (5.2,-2.2)
     {No new vertices};
   \node[draw, rounded corners, align=center] (s5) at (0,-2.2)
@@ -164,7 +164,7 @@ The scalar in Definition~\ref{def:barabanovNorm} equals $\JSR(\mathcal{A})$.
 \begin{definition}
     \label{def:balancedPolytope}
     A polytope $\mathcal{P}$ is called \emph{balanced} if it spans the whole space and is equal to the symmetrized convex hull of a finite set of vertices.
-    $$\mathcal{P} = \text{co}_{\text{s}}(V) := \text{co}(V, -V) = \{x \in \R^d : x = \sum_{i=1}^M \alpha_i v_i \text{ and } \sum_{i=1}^M |\alpha_i| \le 1\}$$
+    $$\mathcal{P} = \mathrm{co}_{\mathrm{s}}(V) := \mathrm{co}(V\cup -V) = \{x \in \R^d : x = \sum_{i=1}^M \alpha_i v_i \text{ and } \sum_{i=1}^M |\alpha_i| \le 1\}$$
     If a polytope satisfies $\mathcal{A}\mathcal{P} \subseteq \mathcal{P}$ for some family $\mathcal{A}$, it is called \emph{invariant under $\mathcal{A}$}.
 \end{definition}
 
@@ -179,49 +179,37 @@ The scalar in Definition~\ref{def:barabanovNorm} equals $\JSR(\mathcal{A})$.
 
 \begin{remark}
     \label{rem:balancedPolytopeInducedNorm}
-    In general, the Minkowski functional is only a seminorm on $\R^d$. If $\mathcal{P}$ is a balanced polytope, then the associated Minkowski functional defines a norm on $\mathbb{R}^d$. Moreover, every induced matrix norm on $\mathbb{R}^{d \times d}$ is submultiplicative. In both cases, we denote the norm by $\lVert \cdot \rVert _{\mathcal{P}}$.
+    A general convex gauge need not be symmetric. For the bounded, spanning, symmetric polytope $\mathcal P$, its Minkowski functional is a vector norm. The induced matrix norm is submultiplicative; both are denoted by $\lVert\cdot\rVert_{\mathcal P}$ when the argument makes their roles clear.
 \end{remark}
 
 \subsection{Main Result}
 \begin{theorem}\citep{GuglielmiProtasov2013ExactComputationJSR}
     \label{thm:invariantPolytopeImpliesJsrUpperBound}
-    If a balanced polytope $\mathcal{P}$ is invariant under $\tilde{\mathcal{A}}$ from Section~\ref{sec:introPreprocessing}, the corresponding Minkowski functional is an extremal norm for the family $\mathcal{A}$ and $ \JSR(\mathcal{A}) \le \hat{\rho}$.
+    Let $\hat\rho=\rho(P)^{1/k}>0$ be the averaged spectral radius of a candidate $P\in\mathcal A^k$, and set $\tilde{\mathcal A}=\hat\rho^{-1}\mathcal A$. If a balanced polytope $\mathcal P$ is invariant under $\tilde{\mathcal A}$, then $\JSR(\mathcal A)=\hat\rho$ and its Minkowski functional is an extremal norm for $\mathcal A$.
 \end{theorem}
 
 \begin{proof}
-    $$
-    \begin{aligned}
-    \tilde{\mathcal{A}}\mathcal{P} \subseteq  \mathcal{P} & \implies \mathcal{A}\mathcal{P} \subseteq \hat{\rho}\mathcal{P} \\
-    & \implies \lVert A \rVert _\mathcal{P} \le \hat{\rho} \quad \text{for all } A \in \mathcal{A} \\
-    & \implies \max \limits_{A \in \mathcal{A}} \lVert A \rVert _\mathcal{P} \le \hat{\rho}.
-    \end{aligned}
-    $$
+    Invariance gives $\lVert A\rVert_{\mathcal P}\le\hat\rho$ for each $A\in\mathcal A$, hence $\JSR(\mathcal A)\le\hat\rho$. The candidate product gives $\hat\rho\le\JSR(\mathcal A)$ by \eqref{eq:three_member}. Equality follows, and the norm is extremal by Definition~\ref{def:extremalNorm}.
 \end{proof}
 
 \subsection{Termination Conditions}
-Theorem~\ref{thm:invariantPolytopeImpliesJsrUpperBound} gives the central sufficient condition: if the algorithm produces a balanced polytope invariant under $\tilde{\mathcal{A}}$, then the corresponding upper bound is certified.
-
-For finite termination of the implemented vertex-expansion scheme, a necessary algorithmic condition is that only finitely many violating images are generated. If this fails, the vertex set keeps growing and the algorithm does not terminate.
+Theorem~\ref{thm:invariantPolytopeImpliesJsrUpperBound} gives the certificate: an invariant balanced polytope establishes the upper bound. Finite termination is a different question. For a normalized irreducible family with one spectrum-maximizing product, the strict-closure characterization in \citet[Theorem 2.5]{MejstrikReif2025HybridApproachJSR} requires a spectral gap, uniqueness of that product up to cyclic permutations and powers, and a simple leading eigenvalue. The example in Section~\ref{sec:numericsPrimaryTree} tests the consequence of losing this simple-leading-eigenvalue condition. Reaching an implementation limit alone does not prove mathematical nontermination.
 
 \section{Implementation Details}
 
 \subsection{Stopping Criterion and Candidate Rejection}
 \label{sec:invStoppingCriterion}
-The runtime of Algorithm~\ref{alg:invariantPolytope} can be high in practice, so it is important to detect incorrect candidates early and control the growth of the vertex set $V$. A common practical safeguard is to set an upper bound on the number of vertices. For rejecting an incorrect s.m.p.\ candidate, \citep{GuglielmiProtasov2013ExactComputationJSR} proposed the following method.
-
-In the case where the candidate $\tilde{\Pi}$ has a unique simple leading eigenvalue and there exists only one s.m.p., define $v_1^{*}$ as the leading eigenvector of $\tilde{\Pi}^{*}$ (the conjugate operator of $\tilde{\Pi}$), normalized by $(v_1, v_1^{*}) = 1$, and define $v_i^{*} := \tilde{A_{d_i}^{*}} \cdots \tilde{A_{d_k}^{*}} v_1^{*}$, which are the leading eigenvectors of the conjugates of the cyclic permutations of $\Pi \in \mathcal{A}^k$.
-
-If $\lVert Av \rVert _{\text{co}_{\text{s}}(V)} > 1$ and there exists a $j$ such that $| ( v_j^{*}, Av) | > 1$, then the chosen candidate is not an s.m.p.\ and must be rejected.
+The runtime of Algorithm~\ref{alg:invariantPolytope} can be high, so implementations limit the vertex count and try to reject incorrect spectrum-maximizing candidates early. Under the simple-leading-eigenvalue assumptions, \citet{GuglielmiProtasov2013ExactComputationJSR} use dual eigenvectors of the cyclic candidate products to obtain a rejection test. This safeguard concerns the search for a candidate; it is separate from the invariant-polytope certificate in Theorem~\ref{thm:invariantPolytopeImpliesJsrUpperBound}.
 
 \subsection{Rebalancing and Additional Initial Vertices}
 \label{sec:invRebalancing}
-Three years after publishing the fundamental algorithm with the stopping criterion, the authors released a new paper on rebalancing multiple s.m.p.s, as well as starting with extra vertices so that the polytope is better conditioned \citep{GuglielmiProtasov2016InvariantPolytopes}. In that setting, termination with multiple s.m.p.s can be achieved, but it is substantially more delicate than in the unique-s.m.p.\ case.
+Rebalancing several candidate products and adding initial vertices can improve the conditioning of the polytope search \citep{GuglielmiProtasov2016InvariantPolytopes}. Termination with multiple s.m.p.s is more delicate than in the unique-candidate case.
 
 \section{Remarks}
 
 \subsection{Complex Variants}
 \label{sec:invEigenvectorCases}
-If the leading eigenvector associated with a candidate product is complex, then the real balanced-polytope norm is no longer sufficient and must be replaced by a \emph{complex-balanced polytope norm}. This changes the convex-hull membership tests in the linear-programming step, while the high-level structure of the algorithm remains the same.
+When a candidate product has a nonreal leading eigenvector, the standard initialization from a real leading eigenvector is unavailable. A \emph{complex-balanced polytope norm} is one established alternative; it changes the convex-hull membership tests while preserving the broad algorithmic structure.
 
 In the present thesis, we restrict attention to the real case. For details on complex variants, we refer to \citep{GuglielmiWirthZennaro2005ComplexPolytopeExtremality,GuglielmiZennaro2007BalancedComplexPolytopes,GuglielmiProtasov2013ExactComputationJSR}.
 

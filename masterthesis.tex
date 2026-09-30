@@ -1,12 +1,12 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Master Thesis 
-% Title: Termination results for hybrid approach of Joint Spectral Radius computation
+% Title: Termination and numerical results for a hybrid joint spectral radius algorithm
 % Author: Aaron Pumm
-% Date: 2025
+% Date: 2026
 % License: MIT License
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\documentclass[oneside,12pt,pagesize,twoside,DIV=12,headsepline=0.4pt,parskip=half]{scrbook}
+\documentclass[12pt,pagesize,twoside,DIV=12,headsepline=0.4pt,parskip=half]{scrbook}
 \usepackage{scrhack}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -16,6 +16,7 @@
 %\usepackage[default,semibold,light]{sourcesanspro} % Source Sans Pro font
 \usepackage{lmodern}
 \usepackage[T1]{fontenc}
+\usepackage[ngerman,english]{babel}
 
 % Citation and References
 \usepackage[round]{natbib}                       % For (Author, Year) style
@@ -32,6 +33,7 @@
 \DeclareMathOperator*{\argmax}{arg\,max}
 \newcommand{\Input}{\textbf{Input: }}
 \newcommand{\Output}{\textbf{Output: }}
+\newcommand{\authorcheck}[1]{\textcolor{red}{\textbf{[AUTHOR CHECK: #1]}}}
 
 % Graphics and Figures
 \usepackage{graphicx}                            % For including graphics
@@ -43,6 +45,7 @@
 
 % Tables
 \usepackage{booktabs}                            % For professional tables
+\usepackage{xcolor}
 
 % Layout and Formatting
 \usepackage{setspace}                            % Line spacing
@@ -109,7 +112,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Personal Data 
 
-\renewcommand{\title}{Termination results for hybrid approach of Joint Spectral Radius computation}
+\renewcommand{\title}{Termination and Numerical Results for a Hybrid Joint Spectral Radius Algorithm}
 \renewcommand{\author}{Aaron Pumm, B.Sc.}
 \newcommand{\matrikelnummer}{11921970}
 \newcommand{\studienkennzahl}{UA 066 821}
@@ -144,7 +147,6 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Bibliography
-\nocite{*}
 \bibliography{literature} 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
