@@ -13,9 +13,9 @@
 - Output directory: `build/`.
 - Tool/recipe name: `latexmk`.
 - Configured command and arguments:
-  - `latexmk -synctex=1 -interaction=nonstopmode -file-line-error -pdf -outdir=%OUTDIR% %DOC%`
+  - `latexmk -cd -synctex=1 -interaction=nonstopmode -file-line-error -pdf -outdir=%OUTDIR% %DOC%`
 - Equivalent direct CLI command from repository root:
-  - `latexmk -synctex=1 -interaction=nonstopmode -file-line-error -pdf -outdir=build masterthesis.tex`
+  - `latexmk -cd -synctex=1 -interaction=nonstopmode -file-line-error -pdf -outdir=build masterthesis.tex`
 - LaTeX Workshop clean mode:
   - `latex-workshop.latex.clean.subfolder.enabled = true`
   - `latex-workshop.latex.autoClean.run = onFailed`
