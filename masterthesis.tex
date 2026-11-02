@@ -1,5 +1,5 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Master Thesis 
+% Master Thesis
 % Title: Termination and numerical results for a hybrid joint spectral radius algorithm
 % Author: Aaron Pumm
 % Date: 2026
@@ -13,7 +13,6 @@
 % Packages organized by category
 
 % Fonts and Encoding
-%\usepackage[default,semibold,light]{sourcesanspro} % Source Sans Pro font
 \usepackage{lmodern}
 \usepackage[T1]{fontenc}
 \usepackage[ngerman,english]{babel}
@@ -29,16 +28,14 @@
 \usepackage{algpseudocode}
 \floatname{algorithm}{Algorithm}
 \DeclareMathOperator{\JSR}{JSR}
-\DeclareMathOperator{\cc}{child\_choice}
 \DeclareMathOperator*{\argmax}{arg\,max}
 \newcommand{\Input}{\textbf{Input: }}
 \newcommand{\Output}{\textbf{Output: }}
-\newcommand{\authorcheck}[1]{\textcolor{red}{\textbf{[AUTHOR CHECK: #1]}}}
 
 % Graphics and Figures
 \usepackage{graphicx}                            % For including graphics
 \usepackage{currfile}                            % Resolve chapter-local generated tables
-\graphicspath{{renders/}}                        % Output PDF in the 'renders' folder
+\graphicspath{{images/}}
 \usepackage{tikz}                                % TikZ for diagrams
 \usetikzlibrary{calc,trees}
 \usepackage{caption}
@@ -49,11 +46,11 @@
 \usepackage{xcolor}
 
 % Layout and Formatting
-\usepackage{setspace}                            % Line spacing
 \usepackage[colorlinks=true, linkcolor=black, citecolor=black, urlcolor=gray]{hyperref}
 \usepackage{scrlayer-scrpage}                    % Custom headers and footers
 \let\cleardoublepage\clearpage
 \pagestyle{scrheadings}
+\raggedbottom
 \automark[chapter]{chapter}
 \ohead[]{\headmark}
 \cfoot[]{}
@@ -77,15 +74,15 @@
 \newtheorem{corollary}[theorem]{Corollary}
 \newtheorem{proposition}[theorem]{Proposition}
 
-\newtheoremstyle{normaltext} % Name of the new style
-  {}                        % Space above
-  {}                        % Space below
-  {}                        % Body font (empty means default - upright)
-  {}                        % Indent amount
-  {\bfseries}               % Theorem head font (bold)
-  {.}                       % Punctuation after theorem head
-  { }                       % Space after theorem head
-  {}                        % Theorem head spec
+\newtheoremstyle{normaltext}
+    {}             % Space above
+    {}             % Space below
+    {}             % Upright body font
+    {}             % Indentation
+    {\bfseries}    % Heading font
+    {.}            % Heading punctuation
+    { }            % Space after heading
+    {}             % Heading specification
 
 \theoremstyle{normaltext}
 \newtheorem{definition}[theorem]{Definition}
@@ -101,7 +98,6 @@
 \newcommand{\C}{\mathbb{C}}
 \newcommand{\F}{\mathbb{F}}
 \newcommand{\AG}{(\mathcal{A},\mathcal{G})}
-\providecommand{\with}{\mathrel{\colon}}
 
 % Remove ending keywords in algorithms
 \algtext*{EndIf}
@@ -111,7 +107,7 @@
 \algtext*{EndProcedure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Personal Data 
+% Personal Data
 
 \renewcommand{\title}{Termination and Numerical Results for a Hybrid Joint Spectral Radius Algorithm}
 \renewcommand{\author}{Aaron Pumm, B.Sc.}
@@ -148,7 +144,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Bibliography
-\bibliography{literature} 
+\bibliography{literature}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % End Document

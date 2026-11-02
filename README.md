@@ -1,6 +1,6 @@
 # Master Thesis
 
-Termination results for a hybrid approach to Joint Spectral Radius (JSR) computation.
+Termination and Numerical Results for a Hybrid Joint Spectral Radius Algorithm.
 
 ## Overview
 
@@ -46,6 +46,17 @@ The final PDF is written to:
 - Bibliography backend: BibTeX
 - Database file: `literature.bib`
 - Style in `masterthesis.tex`: `apalike`
+
+## Source Conventions
+
+Write one prose sentence per source line and separate paragraphs with a blank line.
+Indent environments by four spaces, use `$...$` for inline mathematics, and use AMS environments or `\[ ... \]` for displays.
+Keep matrix rows and tree branches on separate, indented lines.
+The generated comparison tables in `experiments/data/summary_table.tex` follow their generator's layout.
+
+Certificate trees are finite and have internal roots.
+Generators retain their defining words and have spectral radius at most one.
+Node depth and expanded product length are distinct.
 
 ## Cleaning Build Artifacts
 

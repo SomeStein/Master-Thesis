@@ -2,82 +2,161 @@
 \chapter{Numerical Experiments}
 \label{ch:numericalTesting}
 
-This chapter compares ordinary invariant-polytope algorithm (IPA) with its strict hybrid extension in the same MATLAB toolbox. The finite-tree algorithm supplies the theoretical background in Chapter~\ref{ch:finiteTree}, but it is not an implemented comparator in these experiments. The first example displays a tree certificate; the remaining matrix families show how often the extra tree checks change the result or runtime.
+The experiments compare ordinary invariant-polytope algorithm (IPA) with its strict hybrid extension in the same MATLAB toolbox.
+The finite-tree algorithm supplies the theoretical background in Chapter~\ref{ch:finiteTree}, but it is not an implemented comparator in these experiments.
+We first examine the tree certificate for the Mejstrik--Pumm pair and then compare the modes across the full cohort.
 
 \section{Experimental protocol}
 \label{sec:numericsProtocol}
-The source of the runs is \texttt{ttoolboxes} commit \texttt{c67fe5e}, with the single helper patch archived beside the script in \texttt{experiments/}. The original commit calls \texttt{tocolumn} from its custom leaf-word parser, although that helper is local to another file. The patch makes that existing operation available in the parser. MATLAB R2026a Update 1 ran on a MacBook Pro with Apple M1 and 8\,GB of memory, using Gurobi. The script, raw rows, exact options, and software manifest are retained in \texttt{experiments/data/}.
+The source of the runs is \texttt{ttoolboxes} commit \texttt{c67fe5e}, with the single helper patch archived beside the script in \texttt{experiments/}.
+The original commit calls \texttt{tocolumn} from its custom leaf-word parser, although that helper is local to another file.
+The patch makes that existing operation available in the parser.
+MATLAB R2026a Update 1 ran on a MacBook Pro with Apple M1 and 8\,GB of memory, using Gurobi.
+The script, raw rows, exact options, and software manifest are retained in \texttt{experiments/data/}.
 
-Both modes receive the same matrix family, candidate-selection settings, solver, iteration limit of $80$, time setting of $120$ seconds, and the toolbox option \texttt{numcore=0}. The only change is \texttt{hybrid=off} versus \texttt{hybrid=strict}; the strict run for the main example additionally receives its two valid test trees. Each mode is run three times per family, with their order alternated between repetitions. A separate process watchdog records an external timeout at $180$ seconds, because the toolbox's time check occurs only between internal operations. Tables~\ref{tab:ipaComparison} and~\ref{tab:ipaBounds} report medians of returned values and preserve all outcomes in the raw CSV. A scalar result with the toolbox's exact-result exit code is called a \emph{numerical certificate}. A limit result reports what happened within the budget and does not establish mathematical nontermination. Returned-call timings include candidate search and preprocessing. An $X$ row records the censored process time, including MATLAB startup, and is not a completed IPA runtime.
+Both modes receive the same matrix family, candidate-selection settings, solver, iteration limit of $80$, time setting of $120$ seconds, and the toolbox option \texttt{numcore=0}.
+The modes differ in the setting \texttt{hybrid=off} versus \texttt{hybrid=strict}.
+For the main example, the strict run also receives the two test trees described below.
+Each mode is run three times per family, with their order alternated between repetitions.
+A separate process watchdog records an external timeout at $180$ seconds, because the toolbox's time check occurs only between internal operations.
+Tables~\ref{tab:ipaComparison} and~\ref{tab:ipaBounds} report medians of returned values and preserve all outcomes in the raw CSV.
+A scalar result with the toolbox's exact-result exit code is called a \emph{numerical certificate}.
+A limit result reports what happened within the budget and does not establish mathematical nontermination.
+Returned-call timings include candidate search and preprocessing.
+An $X$ row records the censored process time, including MATLAB startup, and is not a completed IPA runtime.
 
-The fixed cohort consists of seven named Mejstrik--Pumm gallery families, the published $2\times2$ pair of \citet[Example 2.9]{MejstrikReif2025HybridApproachJSR}, and three deterministic controlled families from the toolbox discovery construction. They were selected before examining the results of this run. The controlled cases use seeds $2$, $2001$, and $2033$ and dimensions $3$, $7$, and $7$, respectively. Their generator candidates, initial vectors, and scaling are fixed by the archived script. All outcomes, including incomplete ones, appear in the raw CSV.
+The fixed cohort consists of seven named Mejstrik--Pumm gallery families, the published $2\times2$ pair of \citet[Example 2.9]{MejstrikReif2025HybridApproachJSR}, and three deterministic controlled families from the toolbox discovery construction.
+They were selected before examining the results of this run.
+The controlled cases use seeds $2$, $2001$, and $2033$ and dimensions $3$, $7$, and $7$, respectively.
+Their generator candidates, initial vectors, and scaling are fixed by the archived script.
+All outcomes, including incomplete ones, appear in the raw CSV.
 
 \section{The Mejstrik--Pumm matrix pair}
 \label{sec:numericsPrimaryTree}
 The supervisor supplied the following pair, listed as \texttt{mejstrikpumm257} in the toolbox gallery:
 \[
- A=\begin{bmatrix}
- -1&-2&0&-2\\0&-2&-1&-1\\2&-1&2&1\\0&1&0&1
- \end{bmatrix},\qquad
- B=\begin{bmatrix}
- -2&-2&2&-2\\0&-1&0&1\\2&0&1&-2\\0&2&-1&0
- \end{bmatrix}.
+    A=\begin{bmatrix}
+        -1&-2&0&-2 \\
+        0&-2&-1&-1 \\
+        2&-1&2&1 \\
+        0&1&0&1
+    \end{bmatrix},\qquad
+    B=\begin{bmatrix}
+        -2&-2&2&-2 \\
+        0&-1&0&1 \\
+        2&0&1&-2 \\
+        0&2&-1&0
+    \end{bmatrix}.
 \]
-The characteristic polynomial of $B$ is $t(t+2)(t^2-9)$, so $B$ has two leading eigenvalues, $3$ and $-3$. The candidate $B$ gives the lower bound $\JSR(\{A,B\})\ge3$. To establish equality, the algorithms work with $\widetilde A=A/3$ and $\widetilde B=B/3$. The two leading eigenvalues of $B$ violate the simple-leading-eigenvalue condition in the standard strict IPA termination characterization \citep[Theorem 2.5]{MejstrikReif2025HybridApproachJSR}. This condition motivates a tree test; by itself it does not prove the outcome of a bounded program run.
+The characteristic polynomial of $B$ is $t(t+2)(t^2-9)$, so $B$ has two leading eigenvalues, $3$ and $-3$.
+The candidate $B$ gives the lower bound $\JSR(\{A,B\})\geq3$.
+To establish equality, the algorithms work with $\widetilde{A}=A/3$ and $\widetilde{B}=B/3$.
+The two leading eigenvalues of $B$ violate the simple-leading-eigenvalue condition in the standard strict IPA termination characterization \citep[Theorem 2.5]{MejstrikReif2025HybridApproachJSR}.
+The tree tests are motivated by these two leading eigenvalues.
 
-The strict run receives two generators, $G_1=\widetilde B$ and $G_2=\widetilde B^2$. The eigenvalues of $G_1$ are $1,-1,-2/3,0$; those of $G_2$ are $1,1,4/9,0$. Thus $G_1$ retains the sign alternation of its leading eigenspaces, while $G_2$ fixes them. In the signed word convention of Chapter~\ref{ch:finiteTree}, the negative first index denotes an arbitrary nonnegative power of a generator. The first tree is minimal and has uncovered leaf $[-1;1]$. The second uses the five uncovered words
+The strict run receives two generators, $G_1=\widetilde{B}$ and $G_2=\widetilde{B}^2$.
+The eigenvalues of $G_1$ are $1,-1,-2/3,0$, and those of $G_2$ are $1,1,4/9,0$.
+Thus $G_1$ retains the sign alternation of its leading eigenspaces, while $G_2$ fixes them.
+In the signed word convention of Chapter~\ref{ch:finiteTree}, the negative first index denotes an arbitrary nonnegative power of a generator.
+The first tree is minimal and has uncovered leaf $[-1,1]$.
+The second uses the five uncovered words
 \[
- [-2;1;1;1],\quad[-2;1;1;2],\quad[-2;1;2;1],\quad[-2;1;2;2],\quad[-2;2;1].
+    [-2,1,1,1],\quad[-2,1,1,2],\quad[-2,1,2,1],\quad[-2,1,2,2],\quad[-2,2,1].
 \]
-Figure~\ref{fig:mp257Trees} shows both test trees. At each internal node, all positive children are represented. The $2$ branch in the first tree and the $2;2$ branch in the second return to their respective generator node, so they are covered. Thus the supplied words define valid finite $\AG$-trees. The stored certificate was checked against all six displayed leaf words; its eight vertices span $\R^4$, and its twelve marked tree points have the toolbox's closed status. The check is reproducible with \texttt{verify\_primary\_certificate.m} in \texttt{experiments/}.
+Figure~\ref{fig:mp257Trees} shows the positive subtrees below the generator nodes.
+The identity roots and their generator edges are omitted.
+Every internal node below a generator node has all positive children.
+The $2$ branch in the first tree completes the generator word $[2]$, while the $2,2$ branch in the second completes $[2,2]$.
+Each completed copy is absorbed into the generator exponent, so the corresponding leaf is covered by its generator node.
+Thus the supplied words define valid finite $\AG$-trees with internal roots.
+The stored certificate was checked against all six displayed leaf words.
+Its eight vertices span $\R^4$, and its twelve marked tree points have the toolbox's closed status.
+The check is reproducible with \texttt{verify\_primary\_certificate.m} in \texttt{experiments/}.
 
 \begin{figure}[H]
-\centering
-\begin{minipage}{.31\textwidth}\centering
-\begin{forest}
-for tree={grow'=0,child anchor=west,parent anchor=east,l sep=9pt,s sep=5pt,font=\scriptsize,edge={->,>=latex}}
-[{$G_1^n$}
-  [{$[-1;1]$},edge label={node[midway,above]{$1$}}]
-  [{$2$ covered},edge label={node[midway,below]{$2$}}]
-]
-\end{forest}\\[2pt]Minimal $G_1$ tree
-\end{minipage}\hfill
-\begin{minipage}{.65\textwidth}\centering
-\begin{forest}
-for tree={grow'=0,child anchor=west,parent anchor=east,l sep=9pt,s sep=4pt,font=\scriptsize,edge={->,>=latex}}
-[{$G_2^n$}
-  [{$1$}
-    [{$11$}
-      [{$[-2;1;1;1]$}]
-      [{$[-2;1;1;2]$}]
-    ]
-    [{$12$}
-      [{$[-2;1;2;1]$}]
-      [{$[-2;1;2;2]$}]
-    ]
-  ]
-  [{$2$}
-    [{$[-2;2;1]$}]
-    [{$22$ covered}]
-  ]
-]
-\end{forest}\\[2pt]Custom $G_2$ tree
-\end{minipage}
-\caption{The two supplied test trees for the $4\times4$ pair. A positive edge label appends that matrix index to the word. The five signed leaves of the second tree and the leaf of the first are exactly the paths tested by the strict hybrid run.}
-\label{fig:mp257Trees}
+    \centering
+    \begin{minipage}{.31\textwidth}
+        \centering
+        \begin{forest}
+            for tree={grow'=0, child anchor=west, parent anchor=east,
+                l sep=9pt, s sep=5pt, font=\scriptsize, edge={->, >=latex}}
+            [{$G_1^r$}
+                [{$[-1,1]$}, edge label={node[midway,above]{$1$}}]
+                [{$2$ covered}, edge label={node[midway,below]{$2$}}]
+            ]
+        \end{forest}\par\vspace{2pt}
+        Minimal $G_1$ tree
+    \end{minipage}\hfill
+    \begin{minipage}{.65\textwidth}
+        \centering
+        \begin{forest}
+            for tree={grow'=0, child anchor=west, parent anchor=east,
+                l sep=9pt, s sep=4pt, font=\scriptsize, edge={->, >=latex}}
+            [{$G_2^r$}
+                [{$1$}
+                    [{$11$}
+                        [{$[-2,1,1,1]$}]
+                        [{$[-2,1,1,2]$}]
+                    ]
+                    [{$12$}
+                        [{$[-2,1,2,1]$}]
+                        [{$[-2,1,2,2]$}]
+                    ]
+                ]
+                [{$2$}
+                    [{$[-2,2,1]$}]
+                    [{$22$ covered}]
+                ]
+            ]
+        \end{forest}\par\vspace{2pt}
+        Custom $G_2$ tree
+    \end{minipage}
+    \caption{The two supplied test trees for the $4\times4$ pair.
+    A positive edge appends that matrix index to the word, and $r\in\N_0$.
+    The six signed leaves are exactly the paths tested by the strict hybrid run.}
+    \label{fig:mp257Trees}
 \end{figure}
 
-In each of the three full-budget repeats, strict hybrid returned the scalar value $3$ after two iterations, with eight stored vertices and twelve closed tree points. Its median call time was $6.86$ seconds. Ordinary IPA reached the $80$-iteration limit in every repeat, with $80$ vertices and the interval $[3,3.0000000150]$; its median call time was $43.60$ seconds. Thus ordinary IPA \emph{did not terminate within the limit} in these runs, while the strict mode closed the tested trees. Because the custom leaf-word parser does not check tree admissibility, the structural verification above is essential. The reported numerical closure is the toolbox's result; this thesis does not claim an independent interval-arithmetic verification of every floating-point norm bound.
+In all three runs at the stated limits, strict hybrid returned the scalar value $3$ after two iterations, with eight stored vertices and twelve closed tree points.
+Its median call time was $6.86$ seconds.
+Ordinary IPA reached the $80$-iteration limit in every repeat, with $80$ vertices and the interval $[3,3.0000000150]$.
+Its median call time was $43.60$ seconds.
+Thus ordinary IPA \emph{did not terminate within the limit} in these runs, while the strict mode closed the tested trees.
+Because the custom leaf-word parser does not check tree admissibility, the structural verification above is essential.
 
-% AUTHOR CHECK: Ask whether interval arithmetic is required for a rigorous floating-point upper bound.
-\authorcheck{Ask the supervisor whether interval arithmetic is required before calling the floating-point upper bound rigorous.}
+The exact tree structure verifies the combinatorial assumptions of Theorem~\ref{thm:hybridTermination}.
+The leaf inequalities were checked in floating-point arithmetic.
+A rigorous computer-assisted upper bound would require validated numerical bounds for these inequalities.
 
 \section{Comparison across the fixed cohort}
 \label{sec:numericsCohort}
-The status codes in Table~\ref{tab:ipaComparison} are $C$ for a numerical certificate, $I$ for the iteration limit, $T$ for a toolbox time limit, $L$ for a vertex or tree-depth limit, $X$ for the external watchdog, $S$ for another stopped run, and $E$ for a process failure or exception. An iteration/vertex entry gives the median iteration count followed by the median number of stored vertices. The final column is the median number of closed tree points in strict mode. Table~\ref{tab:ipaBounds} gives the median lower and upper JSR values returned by each mode; medians of bounds and counts omit missing values when a run has no return. Labels MP251--MP257 denote the gallery pairs, MR2 the published $2\times2$ pair, and C3/C7a/C7b the controlled cases. The raw rows show every repeat and are needed to assess timing variability and mixed outcomes.
+The status codes in Table~\ref{tab:ipaComparison} are $C$ for a numerical certificate, $I$ for the iteration limit, $T$ for a toolbox time limit, $L$ for a vertex or tree-depth limit, $X$ for the external watchdog, $S$ for another stopped run, and $E$ for a process failure or exception.
+An iteration/vertex entry gives the median iteration count followed by the median number of stored vertices.
+The final column is the median number of closed tree points in strict mode.
+Table~\ref{tab:ipaBounds} gives the median lower and upper JSR values returned by each mode.
+Missing values are omitted when computing medians of bounds and counts.
+Labels MP251--MP257 denote the gallery pairs, MR2 the published $2\times2$ pair, and C3/C7a/C7b the controlled cases.
+The raw rows show every repeat and are needed to assess timing variability and mixed outcomes.
 
 \input{\currfiledir../experiments/data/summary_table.tex}
 
-The gallery cases show several distinct outcomes. MP251 returned a scalar value in both modes; strict hybrid reduced the median iteration count from $68$ to $43$ and the vertices from $68$ to $34$, while its median call time rose from $74.32$ to $80.13$ seconds. On MP252, ordinary IPA hit the external watchdog in every repeat without returning bounds, whereas strict hybrid returned a scalar result after two iterations. On MP253, ordinary IPA reached the iteration limit with a narrow interval; strict hybrid returned a scalar result after three iterations. MP254 hit the external watchdog in both modes, so this protocol gives no comparative certificate for that family. MP255 and MP256 returned scalar values in both modes. Strict hybrid used fewer vertices on MP255, but its median call time on MP256 exceeded ordinary IPA's. The controlled families also returned scalar values in both modes: strict hybrid stored fewer vertices, while ordinary IPA had the shorter median call time. These are outcomes for this fixed setting, not a claim that one mode is uniformly faster or more reliable.
+MP251 returned a scalar value in both modes.
+Strict hybrid reduced the median iteration count from $68$ to $43$ and the vertices from $68$ to $34$, while its median call time rose from $74.32$ to $80.13$ seconds.
+On MP252, ordinary IPA hit the external watchdog in every repeat without returning bounds, whereas strict hybrid returned a scalar result after two iterations.
+On MP253, ordinary IPA reached the iteration limit with a narrow interval.
+Strict hybrid returned a scalar result after three iterations.
+MP254 hit the external watchdog in both modes, so this protocol gives no comparative certificate for that family.
+MP255 and MP256 returned scalar values in both modes.
+Strict hybrid used fewer vertices on MP255, but its median call time on MP256 exceeded ordinary IPA's.
+The controlled families also returned scalar values in both modes: strict hybrid stored fewer vertices, while ordinary IPA had the shorter median call time.
+Neither mode was consistently faster across this cohort.
 
-The MR2 pair separates the paper's ideal strict-closure criterion from a toolbox scalar exit. Its first matrix has leading eigenvalues $1$ and $-1$. The family is irreducible: its only candidate common invariant lines would be the coordinate axes, and the second matrix exchanges them. With $v_1=(1,0)^\top$ and $v_2=(0,1/2)^\top$, its matrices satisfy $A_1v_1=v_1$, $A_1v_2=-v_2$, $A_2v_1=v_2$, and $A_2v_2=v_1/2$. Thus the diamond $\mathrm{co}_{\mathrm{s}}\{v_1,v_2\}$ is invariant and $\JSR=1$. The assumptions of \citet[Theorem 2.5]{MejstrikReif2025HybridApproachJSR} hold, and its simple-leading-eigenvalue condition rules out strict one-generator IPA closure. The ordinary toolbox mode nevertheless returned a scalar exit in all three bounded numerical runs. This exit does not establish the paper's ideal strict closure condition; the strict hybrid mode returned the same value after one iteration.
+The MR2 pair separates the paper's ideal strict-closure criterion from a toolbox scalar exit.
+Its first matrix has leading eigenvalues $1$ and $-1$.
+The family is irreducible: its only candidate common invariant lines would be the coordinate axes, and the second matrix exchanges them.
+With $v_1=(1,0)^\top$ and $v_2=(0,1/2)^\top$, its matrices satisfy $A_1v_1=v_1$, $A_1v_2=-v_2$, $A_2v_1=v_2$, and $A_2v_2=v_1/2$.
+Thus the diamond $\mathrm{co}_{\mathrm{s}}\{v_1,v_2\}$ is invariant and $\JSR=1$.
+The assumptions of \citet[Theorem 2.5]{MejstrikReif2025HybridApproachJSR} hold, and its simple-leading-eigenvalue condition rules out strict one-generator IPA closure.
+The ordinary toolbox mode nevertheless returned a scalar exit in all three bounded numerical runs.
+A scalar exit alone does not establish strict closure.
+Strict hybrid returned the same value after one iteration.

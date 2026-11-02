@@ -1,218 +1,241 @@
-
+% !TeX root = ../masterthesis.tex
 \chapter{Invariant-Polytope Algorithm}
 \label{ch:invariantPolytope}
 
-This chapter is a literature-based summary of the invariant-polytope approach and related termination theory. It is included as background for Chapter~\ref{ch:hybridApproach} and does not claim original algorithmic or theoretical contributions.
+The invariant-polytope algorithm of \citet{GuglielmiProtasov2013ExactComputationJSR} seeks a polytope whose norm certifies the candidate JSR value.
+Chapters~\ref{ch:finiteTree} and~\ref{ch:hybridApproach} replace invariance under each matrix by conditions on tree leaves.
 
 \section{Overview}
 
-\subsection{Motivating Ideas}
-The invariant-polytope algorithm aims to certify an upper bound for the joint spectral radius by constructing a norm that is adapted to the matrix family.
-
-\subsection{Problem Formulation}
-After preprocessing (Section~\ref{sec:introPreprocessing}), we have a scaled family $\tilde{\mathcal{A}}$ and a candidate product for the spectral maximizing product (s.m.p.). The remaining task is to certify $\JSR(\tilde{\mathcal{A}})\le 1$, which implies that the candidate scaling is correct.
-
-\subsection{Core Idea}
-The core idea is to construct a balanced polytope $\mathcal{P}\subset\R^d$ that is invariant under $\tilde{\mathcal{A}}$. Its Minkowski functional then yields an extremal norm for $\mathcal{A}$, and this is sufficient to prove that the chosen candidate is indeed an s.m.p.
+After the preprocessing in Section~\ref{sec:introPreprocessing}, a candidate product supplies the lower bound $\JSR(\tilde{\mathcal{A}})\geq1$.
+The algorithm seeks a balanced polytope $\mathcal{P}$ invariant under every matrix in $\tilde{\mathcal{A}}$.
+Its Minkowski functional then gives a norm in which every normalized matrix has operator norm at most $1$.
+This proves the matching upper bound.
+The resulting norm is extremal for the original matrix family once the candidate value is certified.
 
 \section{Algorithmic Formulation}
 \label{sec:invAlgorithmStructure}
 
-\subsection{Algorithm Description}
-Starting from an initial finite set of vertices
-\[
-V_0=\{v_1,\dots,v_M\},
-\]
-the algorithm iteratively enlarges $V$ by testing images $\tilde Av$ with $\tilde A\in\tilde{\mathcal{A}}$ and current vertices $v$. A point strictly outside $\mathrm{co}_{\mathrm{s}}(V)$ is appended. If one full iteration yields no new vertices, the procedure stops and returns $\mathrm{co}_{\mathrm{s}}(V)$.
+The initial finite set $V_0=\{v_1,\dots,v_M\}$ must span $\R^d$.
+The spanning assumption makes $\mathrm{co}_{\mathrm{s}}(V_0)$ a norm unit ball.
+The algorithm tests images $\tilde{A}v$ of pending vertices and appends those outside the current polytope.
+Images already inside remain inside when the polytope grows, so they need not be tested again.
+When the queue is empty, every stored vertex image lies in the final polytope.
 
-\subsection{Pseudocode}
 \begin{algorithm}[ht]
-\caption{Invariant-polytope algorithm}
-\label{alg:invariantPolytope}
-\begin{algorithmic}
-
-\State V := $\{v_1, \cdots, v_M\}$
-\State $V_{\text{new}} \gets V$
-\While {$V_{\text{new}} \ne \emptyset$}
-\State $V_{\text{rem}} \gets V_{\text{new}}$
-\State $V_{\text{new}} \gets \emptyset$
-\For {$v \in V_{\text{rem}}$}
-
-\For {$\tilde A \in \tilde{\mathcal{A}}$}
-\If {$\lVert \tilde Av \rVert _{\text{co}_{\text{s}}(V)} > 1$}
-\State $V \xleftarrow{\cup} \tilde Av$
-\State $V_{\text{new}} \xleftarrow{\cup} \tilde Av$
-\EndIf
-\EndFor
-\EndFor
-\EndWhile \\
-\Return $\text{co}_{\text{s}}(V)$ \\
-\end{algorithmic}
+    \caption{Invariant-polytope algorithm}
+    \label{alg:invariantPolytope}
+    \begin{algorithmic}
+        \State \Input{Normalized family $\tilde{\mathcal{A}}$ and finite spanning set $V_0$}
+        \State $V\gets V_0$
+        \State $Q\gets V_0$
+        \While{$Q\neq\emptyset$}
+            \State Remove a vertex $v$ from $Q$
+            \For{$\tilde{A}\in\tilde{\mathcal{A}}$}
+                \If{$\lVert\tilde{A}v\rVert_V>1$}
+                    \State $u\gets\tilde{A}v$
+                    \State $V\xleftarrow{\cup}\{u\}$
+                    \State $Q\xleftarrow{\cup}\{u\}$
+                \EndIf
+            \EndFor
+        \EndWhile
+        \State \Return $\mathrm{co}_{\mathrm{s}}(V)$
+    \end{algorithmic}
 \end{algorithm}
 
-\subsection{Visualization}
 \begin{figure}[ht]
-\centering
-\begin{tikzpicture}[>=latex,scale=.98,transform shape]
-  \node[draw, rounded corners, align=center] (s0) at (0,0)
-    {$V_r$ and current polytope\\$\mathcal{P}_r=\mathrm{co}_{\mathrm{s}}(V_r)$};
-  \node[draw, rounded corners, align=center] (s1) at (5.2,0)
-    {Compute images\\$\tilde{A}v,\ \tilde{A}\in\tilde{\mathcal{A}},\ v\in V_r$};
-  \node[draw, rounded corners, align=center] (s2) at (10.6,0)
-    {Test\\$\|\tilde{A}v\|_{\mathcal{P}_r}>1$};
-  \node[draw, rounded corners, align=center] (s3) at (10.6,-2.2)
-    {Add violating images\\$V_{r+1}=V_r\cup\{\tilde{A}v:\|\tilde{A}v\|_{\mathcal{P}_r}>1\}$};
-  \node[draw, rounded corners, align=center] (s4) at (5.2,-2.2)
-    {No new vertices};
-  \node[draw, rounded corners, align=center] (s5) at (0,-2.2)
-    {Terminate and return\\$\mathrm{co}_{\mathrm{s}}(V_r)$};
-
-  \draw[->] (s0) -- (s1);
-  \draw[->] (s1) -- (s2);
-  \draw[->] (s2) -- node[right] {yes} (s3);
-  \draw[->] (s2) -- node[above] {no} (s4);
-  \draw[->] (s4) -- (s5);
-  \draw[->] (s3) to[out=210,in=330] node[below] {next iteration} (s0);
-\end{tikzpicture}
-\caption{Schematic iteration of the invariant-polytope algorithm. Termination occurs when no new violating images are found.}
-\label{fig:invPolytopeWorkflow}
+    \centering
+    \begin{tikzpicture}[>=latex, every node/.style={draw, rounded corners, align=center, font=\small}]
+        \node (start) at (0,0) {Finite spanning $V$};
+        \node (test) at (5,0) {Test pending images\\$\tilde{A}v\in\mathrm{co}_{\mathrm{s}}(V)$};
+        \node (add) at (5,-1.7) {Add outside images\\and test their images};
+        \node (stop) at (0,-1.7) {Return when all\\images are inside};
+        \draw[->] (start) -- (test);
+        \draw[->] (test) -- node[draw=none,right] {outside} (add);
+        \draw[->] (add) to[bend right=35] (test);
+        \draw[->] (test) -- node[draw=none,above,sloped] {all inside} (stop);
+    \end{tikzpicture}
+    \caption{An exact invariant-polytope closure test.
+    Enlarging the polytope preserves all previously verified inclusions.}
+    \label{fig:invPolytopeWorkflow}
 \end{figure}
 
 \section{Termination Theory}
 \label{sec:invExtremalNorms}
 
-\subsection{Proof Strategy}
-The proof path is: (i) introduce invariant and extremal norms, (ii) connect balanced invariant polytopes to extremal norms, and (iii) deduce a valid upper bound for $\JSR(\mathcal{A})$. This provides a finite certificate when the algorithm terminates.
+\subsection{Invariant and Extremal Norms}
 
-\subsection{Auxiliary Results}
 \begin{definition}\citep{Barabanov1988LyapunovIndicatorDiscreteInclusions}
     \label{def:barabanovNorm}
-    For a family of matrices $\mathcal{A}$ a norm $\lVert \cdot \rVert$ is called \emph{invariant} or \emph{Barabanov} if there exists a number $\lambda \geq 0$ such that
-    $$\max\limits_{A \in \mathcal{A}}\lVert A x \rVert = \lambda \lVert x \rVert, \quad \text{for all } x \in \mathbb{R}^d.$$
+    For a finite matrix family $\mathcal{A}$, a vector norm is \emph{invariant}, or a \emph{Barabanov norm}, if a scalar $\lambda\geq0$ satisfies
+    \[
+        \max_{A\in\mathcal{A}}\lVert Ax\rVert=\lambda\lVert x\rVert
+        \quad\text{for every }x\in\R^d.
+    \]
 \end{definition}
-The scalar in Definition~\ref{def:barabanovNorm} equals $\JSR(\mathcal{A})$.
+
+The scalar $\lambda$ equals $\JSR(\mathcal{A})$.
+Indeed, successive maximizers give $\max_{P\in\mathcal{A}^k}\lVert Px\rVert=\lambda^k\lVert x\rVert$.
+Taking the supremum over the unit sphere gives the same equality for the induced operator norms and then the claimed JSR value.
 
 \begin{theorem}\citep{Barabanov1988LyapunovIndicatorDiscreteInclusions}
     \label{thm:barabanovNormExistence}
-    Every irreducible family $\mathcal{A}$ possesses an invariant norm.
+    Every finite irreducible real matrix family possesses a Barabanov norm.
 \end{theorem}
 
 \begin{example}
     \label{ex:barabanovExtremalNorm}
-    Consider the family
+    Consider the rotation and reflection
     \[
-    \mathcal{A}=\{A_1,A_2\},\qquad
-    A_1=\begin{bmatrix}
-    0 & -1 \\
-    1 & 0
-    \end{bmatrix},\quad
-    A_2=\begin{bmatrix}
-    1 & 0 \\
-    0 & -1
-    \end{bmatrix}.
+        A_1=\begin{bmatrix}0&-1\\1&0\end{bmatrix},\qquad
+        A_2=\begin{bmatrix}1&0\\0&-1\end{bmatrix},\qquad
+        \mathcal{A}=\{A_1,A_2\}.
     \]
-    Both matrices are orthogonal, so the Euclidean norm satisfies
-    \[
-    \lVert A_1x \rVert_2=\lVert x \rVert_2,\qquad
-    \lVert A_2x \rVert_2=\lVert x \rVert_2
-    \]
-    for all $x\in\R^2$. Therefore
-    \[
-    \max_{A\in\mathcal{A}}\lVert Ax\rVert_2=\lVert x\rVert_2
-    \]
-    for all $x\in\R^2$. Hence $\lVert\cdot\rVert_2$ is a Barabanov norm with $\lambda=1$, and in particular it is extremal for $\mathcal{A}$ with $\JSR(\mathcal{A})=1$.
+    Both preserve Euclidean length, so $\max_{A\in\mathcal{A}}\lVert Ax\rVert_2=\lVert x\rVert_2$.
+    Thus the Euclidean norm is a Barabanov norm and $\JSR(\mathcal{A})=1$.
+    We will also construct a polytope unit ball for this family.
 \end{example}
 
 \begin{definition}\citep{Protasov1996JSRInvariantSets}
     \label{def:extremalNorm}
-    A norm $\lVert \cdot \rVert$ is called \emph{extremal} for a family of matrices $\mathcal{A}$ if
-    $$\max\limits_{A \in \mathcal{A}}\lVert A x \rVert \leq \JSR(\mathcal{A}) \lVert x \rVert \quad \text{for all } x \in \mathbb{R}^d.$$
+    A vector norm is \emph{extremal} for $\mathcal{A}$ if
+    \[
+        \max_{A\in\mathcal{A}}\lVert Ax\rVert
+        \leq\JSR(\mathcal{A})\lVert x\rVert
+        \quad\text{for every }x\in\R^d.
+    \]
 \end{definition}
+
+A Barabanov norm is extremal.
+The upper-bound certificate below also applies to reducible families.
 
 \begin{theorem}
     \label{thm:extremalNormProductGrowth}
-    For every extremal norm $\lVert \cdot \rVert$ of a family of matrices $\mathcal{A}$
-    $$
-    \max \limits_{P \in \mathcal{A}^k} \lVert P \rVert = \JSR(\mathcal{A})^k
-    $$
-    holds for every $k \in \N$.
+    If a vector norm is extremal for $\mathcal{A}$, its induced matrix norm satisfies
+    \[
+        \max_{P\in\mathcal{A}^k}\lVert P\rVert=\JSR(\mathcal{A})^k
+        \quad\text{for every }k\in\N.
+    \]
 \end{theorem}
+
 \begin{proof}
-    By submultiplicativity and extremality of the norm, we have
-    $$
-    \begin{aligned}
-        \max \limits_{P \in \mathcal{A}^k} \lVert P \rVert & = \max \limits_{d_k,\dots,d_1} \lVert A_{d_k}\cdots A_{d_1} \rVert \\
-        & \le \max \limits_{d_k,\dots,d_1} \lVert A_{d_k} \rVert \cdots \lVert A_{d_1} \rVert \\
-        & \le \JSR(\mathcal{A})^k
-    \end{aligned}
-    $$
-    By the three-member inequality~\eqref{eq:three_member}, we know
-    $$
-    \begin{aligned}
-        & \JSR(\mathcal{A}) \leq \max_{P \in \mathcal{A}^k} \| P\|^{\frac{1}{k}} \\
-        & \JSR(\mathcal{A})^k \leq \max \limits_{P \in \mathcal{A}^k} \lVert P \rVert
-    \end{aligned}
-    $$
-    for every $k \in \N$.
+    Extremality gives $\lVert A_i\rVert\leq\JSR(\mathcal{A})$ for every $i$.
+    Submultiplicativity bounds every length-$k$ product by $\JSR(\mathcal{A})^k$.
+    The reverse inequality follows by raising the upper inequality in \eqref{eq:three_member} to the power $k$.
 \end{proof}
 
 \begin{remark}
     \label{rem:extremalNormExactComputation}
-    In particular, when $k = 1$, we have $\max\limits_{A \in \mathcal{A}} \lVert A \rVert = \JSR(\mathcal{A})$. The existence of an extremal norm for $\mathcal{A}$ therefore enables the exact computation of the joint spectral radius.
+    An explicitly known extremal norm reduces the JSR to $\max_i\lVert A_i\rVert$.
 \end{remark}
+
+\subsection{Polytopes as Norm Unit Balls}
 
 \begin{definition}
     \label{def:balancedPolytope}
-    A polytope $\mathcal{P}$ is called \emph{balanced} if it spans the whole space and is equal to the symmetrized convex hull of a finite set of vertices.
-    $$\mathcal{P} = \mathrm{co}_{\mathrm{s}}(V) := \mathrm{co}(V\cup -V) = \{x \in \R^d : x = \sum_{i=1}^M \alpha_i v_i \text{ and } \sum_{i=1}^M |\alpha_i| \le 1\}$$
-    If a polytope satisfies $\mathcal{A}\mathcal{P} \subseteq \mathcal{P}$ for some family $\mathcal{A}$, it is called \emph{invariant under $\mathcal{A}$}.
+    For a finite spanning set $V=\{v_1,\dots,v_M\}\subset\R^d$, its \emph{balanced polytope} is
+    \[
+        \mathcal{P}=\mathrm{co}_{\mathrm{s}}(V)=\mathrm{co}(V\cup(-V))
+        =\left\{\sum_{i=1}^M\alpha_iv_i:\sum_{i=1}^M|\alpha_i|\leq1\right\}.
+    \]
+    It is \emph{invariant under $\mathcal{A}$} if $A\mathcal{P}\subseteq\mathcal{P}$ for every $A\in\mathcal{A}$.
 \end{definition}
+
+The spanning condition puts the origin in the interior of $\mathcal{P}$.
+The polytope is also bounded, closed, convex, and symmetric.
+These properties make its gauge a norm.
 
 \begin{definition}\citep{MagarilIlyaevTikhomirov2001ConvexAnalysis}
     \label{def:minkowskiFunctional}
-    Let $C \subseteq \R^d$ be a nonempty, convex set such that $0 \in \operatorname{int}(C)$.
-    The \emph{Minkowski functional} (or \emph{gauge function}) associated to $C$ is the mapping $p_C : \R^d \to [0,\infty)$ defined by:
+    For a convex set $C\subseteq\R^d$ with $0\in\operatorname{int}(C)$, its \emph{Minkowski functional} is
     \[
-    p_C(x) = \inf\left\{ \lambda > 0 \ \middle| \ x \in \lambda C \right\} \quad \text{for all } x \in \R^d.
+        p_C(x)=\inf\{t>0:x\in tC\},\qquad x\in\R^d.
     \]
 \end{definition}
 
 \begin{remark}
     \label{rem:balancedPolytopeInducedNorm}
-    A general convex gauge need not be symmetric. For the bounded, spanning, symmetric polytope $\mathcal P$, its Minkowski functional is a vector norm. The induced matrix norm is submultiplicative; both are denoted by $\lVert\cdot\rVert_{\mathcal P}$ when the argument makes their roles clear.
+    A general convex gauge need not be symmetric or positive definite.
+    For the balanced polytope $\mathcal{P}$ above, the gauge is a vector norm with unit ball exactly $\mathcal{P}$.
+    We write it as $\lVert\cdot\rVert_{\mathcal{P}}$, or $\lVert\cdot\rVert_V$.
+    The same notation denotes its induced operator norm when the argument is a matrix.
 \end{remark}
 
-\subsection{Main Result}
+It suffices to test invariance at the stored vertices.
+Indeed, if $Av_i\in\mathcal{P}$ for every $i$ and $x=\sum_i\alpha_iv_i$ with $\sum_i|\alpha_i|\leq1$, then
+\[
+    \lVert Ax\rVert_V
+    \leq\sum_i|\alpha_i|\,\lVert Av_i\rVert_V\leq1.
+\]
+Hence $A\mathcal{P}\subseteq\mathcal{P}$ and $\lVert A\rVert_V\leq1$.
+
+\subsection{Upper-Bound Certificate}
+
 \begin{theorem}\citep{GuglielmiProtasov2013ExactComputationJSR}
     \label{thm:invariantPolytopeImpliesJsrUpperBound}
-    Let $\hat\rho=\rho(P)^{1/k}>0$ be the averaged spectral radius of a candidate $P\in\mathcal A^k$, and set $\tilde{\mathcal A}=\hat\rho^{-1}\mathcal A$. If a balanced polytope $\mathcal P$ is invariant under $\tilde{\mathcal A}$, then $\JSR(\mathcal A)=\hat\rho$ and its Minkowski functional is an extremal norm for $\mathcal A$.
+    Let $\hat\rho=\rho(P)^{1/k}>0$ for a candidate $P\in\mathcal{A}^k$, and set $\tilde{\mathcal{A}}=\hat\rho^{-1}\mathcal{A}$.
+    If a balanced polytope $\mathcal{P}$ is invariant under $\tilde{\mathcal{A}}$, then $\JSR(\mathcal{A})=\hat\rho$.
+    Its Minkowski functional is an extremal norm for $\mathcal{A}$.
 \end{theorem}
 
 \begin{proof}
-    Invariance gives $\lVert A\rVert_{\mathcal P}\le\hat\rho$ for each $A\in\mathcal A$, hence $\JSR(\mathcal A)\le\hat\rho$. The candidate product gives $\hat\rho\le\JSR(\mathcal A)$ by \eqref{eq:three_member}. Equality follows, and the norm is extremal by Definition~\ref{def:extremalNorm}.
+    Invariance gives $\lVert\tilde{A}_i\rVert_{\mathcal{P}}\leq1$ and hence $\lVert A_i\rVert_{\mathcal{P}}\leq\hat\rho$ for every $i$.
+    Every length-$r$ product therefore has norm at most $\hat\rho^r$, proving $\JSR(\mathcal{A})\leq\hat\rho$.
+    The candidate gives $\hat\rho\leq\JSR(\mathcal{A})$ by \eqref{eq:three_member}.
+    Equality follows, and $\lVert A_ix\rVert_{\mathcal{P}}\leq\JSR(\mathcal{A})\lVert x\rVert_{\mathcal{P}}$ proves extremality.
 \end{proof}
 
-\subsection{Termination Conditions}
-Theorem~\ref{thm:invariantPolytopeImpliesJsrUpperBound} gives the certificate: an invariant balanced polytope establishes the upper bound. Finite termination is a different question. For a normalized irreducible family with one spectrum-maximizing product, the strict-closure characterization in \citet[Theorem 2.5]{MejstrikReif2025HybridApproachJSR} requires a spectral gap, uniqueness of that product up to cyclic permutations and powers, and a simple leading eigenvalue. The example in Section~\ref{sec:numericsPrimaryTree} tests the consequence of losing this simple-leading-eigenvalue condition. Reaching an implementation limit alone does not prove mathematical nontermination.
+\begin{example}[A finite invariant-polytope certificate]
+    \label{ex:ipaDiamondCertificate}
+    Return to the rotation and reflection in Example~\ref{ex:barabanovExtremalNorm}.
+    With $V=\{e_1,e_2\}$, the polytope is the diamond
+    \[
+        \mathcal{P}=\{(x_1,x_2)^\top:|x_1|+|x_2|\leq1\},\qquad
+        \lVert x\rVert_V=|x_1|+|x_2|.
+    \]
+    Its vertex images are
+    \[
+        A_1e_1=e_2,\quad A_1e_2=-e_1,\qquad
+        A_2e_1=e_1,\quad A_2e_2=-e_2.
+    \]
+    Every image is again a vertex of the diamond.
+    Thus IPA adds no vertices, and every product has operator norm at most $1$ in this norm.
+    The candidate $A_2$ has spectral radius $1$, so the two inequalities give $\JSR(\mathcal{A})=1$.
+    The closure is non-strict because the vertex images lie on the boundary.
+\end{example}
 
-\section{Implementation Details}
+\subsection{Correctness and Finite Termination}
+
+The theorem proves correctness when the algorithm stops.
+Finite termination requires further assumptions.
+For normalized irreducible families, the strict one-generator closure characterization of \citet[Theorem 2.5]{MejstrikReif2025HybridApproachJSR} involves a spectral gap, uniqueness of the s.m.p.\ up to cyclic permutations and powers, and a simple leading eigenvalue.
+That strict criterion is stronger than the non-strict invariance used in Algorithm~\ref{alg:invariantPolytope}.
+Section~\ref{sec:numericsPrimaryTree} examines a candidate with two leading eigenvalues.
+
+\section{Implementation Considerations}
 
 \subsection{Stopping Criterion and Candidate Rejection}
 \label{sec:invStoppingCriterion}
-The runtime of Algorithm~\ref{alg:invariantPolytope} can be high, so implementations limit the vertex count and try to reject incorrect spectrum-maximizing candidates early. Under the simple-leading-eigenvalue assumptions, \citet{GuglielmiProtasov2013ExactComputationJSR} use dual eigenvectors of the cyclic candidate products to obtain a rejection test. This safeguard concerns the search for a candidate; it is separate from the invariant-polytope certificate in Theorem~\ref{thm:invariantPolytopeImpliesJsrUpperBound}.
+
+Implementations limit the vertex count and try to reject unsuitable candidates early.
+Under the relevant leading-eigenvalue assumptions, \citet{GuglielmiProtasov2013ExactComputationJSR} use dual eigenvectors of cyclic candidate products for rejection tests.
+Candidate rejection guides the search.
+The final certificate follows from the verified polytope inclusions.
 
 \subsection{Rebalancing and Additional Initial Vertices}
 \label{sec:invRebalancing}
-Rebalancing several candidate products and adding initial vertices can improve the conditioning of the polytope search \citep{GuglielmiProtasov2016InvariantPolytopes}. Termination with multiple s.m.p.s is more delicate than in the unique-candidate case.
 
-\section{Remarks}
+Balancing several candidates and adding initial vertices can improve the polytope search \citep{GuglielmiProtasov2016InvariantPolytopes}.
+Additional vectors must ensure that the initial set spans the ambient space before its gauge is used as a norm.
+Termination with several candidate products requires more care than in the unique-candidate setting.
 
 \subsection{Complex Variants}
 \label{sec:invEigenvectorCases}
-When a candidate product has a nonreal leading eigenvector, the standard initialization from a real leading eigenvector is unavailable. A \emph{complex-balanced polytope norm} is one established alternative; it changes the convex-hull membership tests while preserving the broad algorithmic structure.
 
-In the present thesis, we restrict attention to the real case. For details on complex variants, we refer to \citep{GuglielmiWirthZennaro2005ComplexPolytopeExtremality,GuglielmiZennaro2007BalancedComplexPolytopes,GuglielmiProtasov2013ExactComputationJSR}.
+A candidate with only nonreal leading eigenvectors does not provide a real eigenvector for the usual initialization.
+Complex-balanced polytope norms are one alternative \citep{GuglielmiWirthZennaro2005ComplexPolytopeExtremality,GuglielmiZennaro2007BalancedComplexPolytopes}.
+The certificates in this thesis use real matrices and real spanning vertex sets.
+A real invariant polytope can still exist in the presence of nonreal eigenvalues, as Example~\ref{ex:ipaDiamondCertificate} shows.
 
-\begin{remark}
-    There are rare cases where the finiteness property does not hold, or where no invariant polytopes exist. In those cases, the invariant-polytope algorithm will not find the value of $\JSR(\mathcal{A})$.
-\end{remark}
+Exact closure at the candidate scaling requires an invariant balanced polytope, which need not exist.
+The tree method in the next chapter permits some unbounded internal product families while retaining a finite certificate.

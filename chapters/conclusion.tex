@@ -1,12 +1,40 @@
+% !TeX root = ../masterthesis.tex
 \chapter{Conclusions and Outlook}
 \label{ch:thesisConclusion}
 
-The thesis connected two finite upper-bound certificates for the joint spectral radius. Ordinary IPA closes an invariant polytope under every normalized matrix. The invariant-tree method of \citet{MejstrikReif2025HybridApproachJSR} instead tests finite product trees on the polytope's vertices. Chapter~\ref{ch:hybridApproach} reconstructed the cited common-tree certificate and made its vertex-wise form explicit: valid generator trees and bounded leaf images at a finite spanning vertex set imply a polynomial bound for every product, hence $\JSR\le1$. The vertex-wise induction is the theoretical extension established here; a candidate with averaged spectral radius one supplies the matching lower bound.
+Invariant polytopes and finite product trees provide two upper-bound certificates for the joint spectral radius.
+Ordinary IPA closes a polytope under every normalized matrix.
+The invariant-tree method of \citet{MejstrikReif2025HybridApproachJSR} tests finite product trees at the polytope's vertices.
+Chapter~\ref{ch:finiteTree} bounds the products represented by tree nodes using finite depth and generator spectral radii at most $1$.
+In Chapter~\ref{ch:hybridApproach}, induction extends this bound to different test trees at different vertices.
+The absolute coefficient sums are at most $1$, so the recursive vertex combinations preserve a common polynomial bound and give $\JSR(\mathcal{A})\leq1$.
+A candidate with averaged spectral radius one supplies the reverse inequality.
 
-The $4\times4$ Mejstrik--Pumm pair shows the practical effect of the tree condition. The candidate matrix has leading eigenvalues $3$ and $-3$, outside the simple-leading-eigenvalue hypothesis of the standard strict IPA termination characterization. With the two supplied trees, strict hybrid returned the scalar JSR value $3$ in two iterations and closed twelve tree points in each of three runs. Ordinary IPA reached the limit of $80$ iterations in every matched run, returning a narrow interval rather than a scalar result. This is evidence for the value of the custom tree in this implementation under the stated settings. It does not prove that ordinary IPA cannot terminate under different initialization or without limits.
+For the $4\times4$ Mejstrik--Pumm pair, the candidate matrix has leading eigenvalues $3$ and $-3$.
+It therefore fails the simple-leading-eigenvalue condition in the standard strict IPA termination characterization.
+With the two supplied trees, strict hybrid returned the value $3$ in two iterations and closed twelve tree points in each of three runs.
+Ordinary IPA reached the limit of $80$ iterations in every matched run and returned a narrow interval.
+Under these settings, the custom trees gave a numerical certificate within the budget.
+The bounded runs leave open whether ordinary IPA closes with a different initialization or a larger budget.
 
-The fixed cohort shows where that gain extends and where it does not. Strict hybrid returned scalar values for MP252 and MP253 while ordinary IPA met the watchdog or iteration limit, respectively. Both modes met the watchdog on MP254. For MP255, MP256, and the controlled families, both modes returned scalar values; strict hybrid sometimes used fewer vertices but did not consistently take less time. The raw CSV preserves every repeat, including missing bounds after watchdog stops. The finite-tree algorithm remains a theoretical ingredient, with no separate implemented numerical baseline in this comparison.
+Strict hybrid also returned scalar values for MP252 and MP253, where ordinary IPA met the watchdog or iteration limit, respectively.
+Both modes met the watchdog on MP254.
+For MP255, MP256, and the controlled families, both modes returned scalar values.
+Strict hybrid sometimes used fewer vertices but did not consistently take less time.
+The raw CSV records every repeat, including runs that returned no bounds after a watchdog stop.
+These experiments compare ordinary IPA with the hybrid mode, without a separate finite-tree implementation.
 
-For the published $2\times2$ pair, the assumptions of the cited strict IPA characterization can be checked exactly, and the two leading eigenvalues rule out closure in that idealized sense. Both toolbox modes nevertheless returned scalar exits. This distinction matters: the theorem concerns strict mathematical closure, while the table records the implementation's floating-point stopping decision.
+For the published $2\times2$ pair, the hypotheses of the strict IPA characterization can be checked exactly.
+Its two leading eigenvalues rule out closure in that strict sense, yet both toolbox modes returned scalar exits.
+The cited theorem concerns strict mathematical closure, while the table reports floating-point stopping decisions.
 
-Several boundaries remain. The toolbox evaluates closure with floating-point optimization, so an independently rigorous computer-assisted certificate would require validated arithmetic for the final inequalities. The termination theorem is conditional on valid finite trees and suitable generators; selecting those trees automatically, especially when several products compete for maximal growth, remains a search problem. Future work can automate admissibility checks for user-supplied leaf words, validate the numerical upper bounds, and study tree selection on larger matrix families. These are direct next steps for turning the reconstructed proof and observed contrast into a separate paper.
+A rigorous computer-assisted certificate would require validated bounds for the final leaf inequalities.
+The current toolbox evaluates them by floating-point optimization.
+Finding suitable finite trees and generators automatically remains a search problem, particularly when several products compete for maximal growth.
+Further work could automate admissibility checks for user-supplied leaf words, validate the numerical upper bounds, and study tree selection on larger matrix families.
+
+The update rules in Remark~\ref{rem:hybridVertexUpdates} also warrant a direct comparison.
+Retaining a tree-certified outside image enlarges the norm unit ball and may help later tests close.
+Omitting it saves stored points and can reduce the cost of polytope-membership tests.
+The present experiments do not establish which rule is more efficient.
+A comparison under identical candidate and tree choices should measure runtime, stored points, and the number of tree and polytope-membership tests.

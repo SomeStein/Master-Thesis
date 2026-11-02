@@ -26,113 +26,114 @@
 \renewcommand{\arraystretch}{1.18}
 
 \tikzset{
-  every picture/.style={line width=0.72pt},
-  treebox/.style={
-    draw=Ink!75,
-    rounded corners=1.5pt,
-    align=center,
-    font=\scriptsize,
-    minimum width=17mm,
-    minimum height=7mm,
-    inner sep=2.2pt,
-    fill=white
-  },
-  rootbox/.style={treebox, fill=SoftBlue},
-  closedbox/.style={treebox, fill=SoftGreen, draw=HybridGreen!80},
-  exactbox/.style={treebox, fill=SoftOrange, draw=PerfOrange!85},
-  flowbox/.style={
-    draw=Ink!75,
-    rounded corners=2pt,
-    align=center,
-    font=\scriptsize,
-    text width=25mm,
-    minimum height=8mm,
-    inner sep=3pt,
-    fill=white
-  },
-  flowbase/.style={flowbox, fill=SoftBlue},
-  flowstrict/.style={flowbox, fill=SoftGreen},
-  flowperf/.style={flowbox, fill=SoftOrange},
-  flowarrow/.style={-{Latex[length=2.1mm]}, draw=Ink!70},
-  tinylabel/.style={font=\scriptsize, fill=white, inner sep=1pt},
-  ax/.style={draw=Ink!50, -{Latex[length=2mm]}},
-  pt/.style={circle, draw=Ink, fill=white, minimum size=3.3mm, inner sep=0pt},
-  impt/.style={circle, draw=HybridGreen!80!black, fill=SoftGreen, minimum size=3.3mm, inner sep=0pt}
+every picture/.style={line width=0.72pt},
+treebox/.style={
+draw=Ink!75,
+rounded corners=1.5pt,
+align=center,
+font=\scriptsize,
+minimum width=17mm,
+minimum height=7mm,
+inner sep=2.2pt,
+fill=white
+},
+rootbox/.style={treebox, fill=SoftBlue},
+closedbox/.style={treebox, fill=SoftGreen, draw=HybridGreen!80},
+exactbox/.style={treebox, fill=SoftOrange, draw=PerfOrange!85},
+flowbox/.style={
+draw=Ink!75,
+rounded corners=2pt,
+align=center,
+font=\scriptsize,
+text width=25mm,
+minimum height=8mm,
+inner sep=3pt,
+fill=white
+},
+flowbase/.style={flowbox, fill=SoftBlue},
+flowstrict/.style={flowbox, fill=SoftGreen},
+flowperf/.style={flowbox, fill=SoftOrange},
+flowarrow/.style={-{Latex[length=2.1mm]}, draw=Ink!70},
+tinylabel/.style={font=\scriptsize, fill=white, inner sep=1pt},
+ax/.style={draw=Ink!50, -{Latex[length=2mm]}},
+pt/.style={circle, draw=Ink, fill=white, minimum size=3.3mm, inner sep=0pt},
+impt/.style={circle, draw=HybridGreen!80!black, fill=SoftGreen, minimum size=3.3mm, inner sep=0pt}
 }
 
 \newcommand{\matthree}[9]{%
-  \begin{pmatrix}
+\begin{pmatrix}
     #1 & #2 & #3\\
     #4 & #5 & #6\\
     #7 & #8 & #9
-  \end{pmatrix}}
+\end{pmatrix}}
 
 \begin{document}
 
 \begin{center}
-  {\Large\bfseries Low-dimensional IPA hybrid certificate example}\\[0.25em]
-  {\small Example \texttt{controlled\_d3\_n2\_seed2\_a0.35\_s0.45\_c0.25}. Values are from the generated profiling artifact.}
+    {\Large\bfseries Low-dimensional IPA hybrid certificate example}\\[0.25em]
+    {\small Example \texttt{controlled\_d3\_n2\_seed2\_a0.35\_s0.45\_c0.25}. Values are from the generated profiling artifact.}
 \end{center}
 
 \section{Starting matrices and problem formulation}
 
 The matrix family is
 \[
-\mathcal A=\{A_1,A_2\}\subset \mathbb R^{3\times 3}.
+    \mathcal{A}=\{A_1,A_2\}\subset \mathbb R^{3\times 3}.
 \]
 For this example the invariant-polytope algorithm is initialized with the spectrum-maximizing product
 \[
-\Pi=A_1,\qquad \rho(\Pi)=1,\qquad \lambda=1.
+    \Pi=A_1,\qquad \rho(\Pi)=1,\qquad \lambda=1.
 \]
 The computational problem is to certify
 \[
-\JSR(\mathcal A)=1.
+    \JSR(\mathcal{A})=1.
 \]
 The matrices used by the run are
 \[
-A_1=
-\matthree
-{0.28608433}{0.03859008}{0.03387308}
-{0.03859008}{0.99003830}{-0.07403809}
-{0.03387308}{-0.07403809}{0.33637737},
+    A_1=
+    \matthree
+    {0.28608433}{0.03859008}{0.03387308}
+    {0.03859008}{0.99003830}{-0.07403809}
+    {0.03387308}{-0.07403809}{0.33637737},
 \]
 \[
-A_2=
-\matthree
-{0.16701638}{-0.00114923}{0.02347436}
-{0.05850404}{0.20641451}{0.02404550}
-{0.01739058}{0.03269350}{0.18344411}.
+    A_2=
+    \matthree
+    {0.16701638}{-0.00114923}{0.02347436}
+    {0.05850404}{0.20641451}{0.02404550}
+    {0.01739058}{0.03269350}{0.18344411}.
 \]
-Since \(A_1\) has spectral radius one, the hybrid certificate uses \(A_1\) as the generator.
+Since $A_1$ has spectral radius one, the hybrid certificate uses $A_1$ as the generator.
 The stored infinite-path leaf word is
 \[
-(-1,2).
+    (-1,2).
 \]
-Here the negative index \(-1\) denotes the generator direction associated with \(A_1\), and the positive index \(2\) denotes the original matrix \(A_2\).
+Here the negative index $-1$ denotes the generator direction associated with $A_1$, and the positive index $2$ denotes the original matrix $A_2$.
 
 \section{Used starting vertices}
 
-The first vertex is the leading eigenvector of \(A_1\). Two extra vertices are added explicitly.
+The first vertex is the leading eigenvector of $A_1$.
+Two extra vertices are added explicitly.
 \[
-v_1=
-\begin{pmatrix}
--0.04853357\\
--0.99293274\\
- 0.10830080
-\end{pmatrix},
-\qquad
-v_2=e_2=
-\begin{pmatrix}0\\1\\0\end{pmatrix},
-\qquad
-v_3=e_3=
-\begin{pmatrix}0\\0\\1\end{pmatrix}.
-\]
+    v_1=
+    \begin{pmatrix}
+        -0.04853357\\
+        -0.99293274\\
+        0.10830080
+    \end{pmatrix},
+    \qquad
+    v_2=e_2=
+    \begin{pmatrix}0\\1\\0\end{pmatrix},
+        \qquad
+        v_3=e_3=
+        \begin{pmatrix}0\\0\\1\end{pmatrix}.
+        \]
 
-The following diagram shows the initial vertices and their one-step images under \(A_1\) and \(A_2\).
-The picture uses the \((x_2,x_3)\)-projection, so it is a diagnostic plot rather than a geometric proof.
+        The following diagram shows the initial vertices and their one-step images under $A_1$ and $A_2$.
+        The picture uses the $(x_2,x_3)$-projection, so it is a diagnostic plot rather than a geometric proof.
 
-\begin{center}
-\begin{tikzpicture}[x=58mm,y=38mm]
+        \begin{center}
+            \begin{tikzpicture}[x=58mm,y=38mm]
   \draw[ax] (-1.08,0) -- (1.12,0) node[right,font=\scriptsize] {$x_2$};
   \draw[ax] (0,-0.16) -- (0,1.08) node[above,font=\scriptsize] {$x_3$};
   \foreach \y/\lab in {-1/-1, -0.5/-0.5, 0.5/0.5, 1/1} {
@@ -170,133 +171,135 @@ The picture uses the \((x_2,x_3)\)-projection, so it is a diagnostic plot rather
   \node[impt] (a2v3) at (0.0240,0.1834) {};
   \node[tinylabel,anchor=west] at (a2v3) {$A_2v_3$};
   \draw[flowarrow,HybridGreen!75] (vthree) -- (a2v3);
-\end{tikzpicture}
-\end{center}
+            \end{tikzpicture}
+        \end{center}
 
-\section{How the certificate is evaluated for three IPA versions}
+        \section{How the certificate is evaluated for three IPA versions}
 
-The baseline run uses ordinary IPA behavior. It generates vertices and evaluates exact polytope norms.
-The two hybrid runs construct the same initial cyclic trees but then try to close frontier vertices by the infinite-path certificate.
-The summary below is measured from the same profiling run.
+        The baseline run uses ordinary IPA behavior.
+        It generates vertices and evaluates exact polytope norms.
+        The two hybrid runs construct the same initial cyclic trees but then try to close frontier vertices by the infinite-path certificate.
+        The summary below is measured from the same profiling run.
 
-\begin{center}
-\begin{tabular}{lrrrrrr}
-\toprule
-Mode & vertices & generated & exact calls & exact points & hybrid closed & hybrid checks\\
-\midrule
-baseline & 7 & 13 & 2 & 4 & 0 & 0\\
-strict & 3 & 5 & 0 & 0 & 5 & 5\\
-performance & 3 & 5 & 0 & 0 & 2 & 2\\
-\bottomrule
-\end{tabular}
-\end{center}
+        \begin{center}
+            \begin{tabular}{lrrrrrr}
+                \toprule
+                Mode & vertices & generated & exact calls & exact points & hybrid closed & hybrid checks\\
+                \midrule
+                baseline & 7 & 13 & 2 & 4 & 0 & 0\\
+                strict & 3 & 5 & 0 & 0 & 5 & 5\\
+                performance & 3 & 5 & 0 & 0 & 2 & 2\\
+                \bottomrule
+            \end{tabular}
+        \end{center}
 
-For a candidate frontier vertex \(x\), the hybrid code evaluates the finite part, the limiting branch, and a tail bound.
-The recorded result has the form
-\[
-\text{closed if}\qquad
-\texttt{max\_upper\_norm}(x)<1
-\quad\text{and the stored tail bound is below the admissible threshold.}
-\]
-In this example every hybrid check closes.
-Strict mode evaluates every frontier vertex.
-Performance mode batches the checks and stops after the cheaper checks already close the necessary frontier vertices.
+        For a candidate frontier vertex $x$, the hybrid code evaluates the finite part, the limiting branch, and a tail bound.
+        The recorded result has the form
+        \[
+            \text{closed if}\qquad
+            \texttt{max\_upper\_norm}(x)<1
+            \quad\text{and the stored tail bound is below the admissible threshold.}
+        \]
+        In this example every hybrid check closes.
+        Strict mode evaluates every frontier vertex.
+        Performance mode batches the checks and stops after the cheaper checks already close the necessary frontier vertices.
 
-\begin{center}
-\begin{tabular}{lrrrrr}
-\toprule
-Mode & tree & vertex & max upper norm & tail \(N\) & tail bound\\
-\midrule
-strict & 1 & 2 & 0.04640145 & 0 & 0.37997383\\
-strict & 2 & 2 & 0.22752354 & 0 & 0.37017767\\
-strict & 2 & 3 & 0.05685588 & 1 & 0.20662863\\
-strict & 3 & 2 & 0.65556671 & 2 & 0.42480253\\
-strict & 3 & 3 & 0.37907819 & 2 & 0.24092434\\
-\midrule
-performance & 2 & 2 & 0 & 0 & 0.37017767\\
-performance & 3 & 2 & 0 & 2 & 0.42480253\\
-\bottomrule
-\end{tabular}
-\end{center}
+        \begin{center}
+            \begin{tabular}{lrrrrr}
+                \toprule
+                Mode & tree & vertex & max upper norm & tail $N$ & tail bound\\
+                \midrule
+                strict & 1 & 2 & 0.04640145 & 0 & 0.37997383\\
+                strict & 2 & 2 & 0.22752354 & 0 & 0.37017767\\
+                strict & 2 & 3 & 0.05685588 & 1 & 0.20662863\\
+                strict & 3 & 2 & 0.65556671 & 2 & 0.42480253\\
+                strict & 3 & 3 & 0.37907819 & 2 & 0.24092434\\
+                \midrule
+                performance & 2 & 2 & 0 & 0 & 0.37017767\\
+                performance & 3 & 2 & 0 & 2 & 0.42480253\\
+                \bottomrule
+            \end{tabular}
+        \end{center}
 
-\section{Used trees}
+        \section{Used trees}
 
-The three cyclic trees are rooted at \(v_1,v_2,v_3\).
-The edge labels are the indices of \(A_1\) and \(A_2\).
-The baseline has to grow trees \(T_2\) and \(T_3\) beyond depth one.
-The hybrid runs keep only the shallow frontier and certify it through the leaf word \((-1,2)\).
+        The three cyclic trees are rooted at $v_1,v_2,v_3$.
+        The edge labels are the indices of $A_1$ and $A_2$.
+        The baseline has to grow trees $T_2$ and $T_3$ beyond depth one.
+        The hybrid runs keep only the shallow frontier and certify it through the leaf word $(-1,2)$.
 
-\subsection*{Baseline trees}
+        \subsection*{Baseline trees}
 
-\begin{center}
-\begin{tikzpicture}[level distance=14mm,
-  level 1/.style={sibling distance=29mm},
-  level 2/.style={sibling distance=18mm},
-  level 3/.style={sibling distance=13mm}]
+        \begin{center}
+            \begin{tikzpicture}[level distance=14mm,
+level 1/.style={sibling distance=29mm},
+level 2/.style={sibling distance=18mm},
+level 3/.style={sibling distance=13mm}]
   \node[rootbox] (b1r) {$T_1$\\$v_1$}
-    child {node[exactbox] {$2$\\$A_2v_1$} edge from parent node[tinylabel,left] {$2$}};
+child {node[exactbox] {$2$\\$A_2v_1$} edge from parent node[tinylabel,left] {$2$}};
 
   \begin{scope}[xshift=48mm]
   \node[rootbox] {$T_2$\\$v_2$}
-    child {node[exactbox] {$2$\\$A_1v_2$}
-      child {node[exactbox] {$4$\\$A_1^2v_2$}
-        child {node[exactbox] {$6$} edge from parent node[tinylabel,left] {$1$}}
-        child {node[exactbox] {$7$} edge from parent node[tinylabel,right] {$2$}}
-        edge from parent node[tinylabel,left] {$1$}}
-      child {node[exactbox] {$5$\\$A_2A_1v_2$} edge from parent node[tinylabel,right] {$2$}}
-      edge from parent node[tinylabel,left] {$1$}}
-    child {node[exactbox] {$3$\\$A_2v_2$} edge from parent node[tinylabel,right] {$2$}};
+child {node[exactbox] {$2$\\$A_1v_2$}
+child {node[exactbox] {$4$\\$A_1^2v_2$}
+child {node[exactbox] {$6$} edge from parent node[tinylabel,left] {$1$}}
+child {node[exactbox] {$7$} edge from parent node[tinylabel,right] {$2$}}
+edge from parent node[tinylabel,left] {$1$}}
+child {node[exactbox] {$5$\\$A_2A_1v_2$} edge from parent node[tinylabel,right] {$2$}}
+edge from parent node[tinylabel,left] {$1$}}
+child {node[exactbox] {$3$\\$A_2v_2$} edge from parent node[tinylabel,right] {$2$}};
   \end{scope}
 
   \begin{scope}[xshift=122mm]
   \node[rootbox] {$T_3$\\$v_3$}
-    child {node[exactbox] {$2$\\$A_1v_3$}
-      child {node[exactbox] {$4$} edge from parent node[tinylabel,left] {$1$}}
-      child {node[exactbox] {$6$} edge from parent node[tinylabel,right] {$2$}}
-      edge from parent node[tinylabel,left] {$1$}}
-    child {node[exactbox] {$3$\\$A_2v_3$}
-      child {node[exactbox] {$5$} edge from parent node[tinylabel,left] {$1$}}
-      child {node[exactbox] {$7$} edge from parent node[tinylabel,right] {$2$}}
-      edge from parent node[tinylabel,right] {$2$}};
+child {node[exactbox] {$2$\\$A_1v_3$}
+child {node[exactbox] {$4$} edge from parent node[tinylabel,left] {$1$}}
+child {node[exactbox] {$6$} edge from parent node[tinylabel,right] {$2$}}
+edge from parent node[tinylabel,left] {$1$}}
+child {node[exactbox] {$3$\\$A_2v_3$}
+child {node[exactbox] {$5$} edge from parent node[tinylabel,left] {$1$}}
+child {node[exactbox] {$7$} edge from parent node[tinylabel,right] {$2$}}
+edge from parent node[tinylabel,right] {$2$}};
   \end{scope}
-\end{tikzpicture}
-\end{center}
+            \end{tikzpicture}
+        \end{center}
 
-\subsection*{Hybrid trees}
+        \subsection*{Hybrid trees}
 
-\begin{center}
-\begin{tikzpicture}[level distance=15mm,
-  level 1/.style={sibling distance=30mm}]
+        \begin{center}
+            \begin{tikzpicture}[level distance=15mm,
+level 1/.style={sibling distance=30mm}]
   \node[rootbox] {$T_1$\\$v_1$}
-    child {node[closedbox] {$2$\\closed} edge from parent node[tinylabel,left] {$2$}};
+child {node[closedbox] {$2$\\closed} edge from parent node[tinylabel,left] {$2$}};
 
   \begin{scope}[xshift=48mm]
   \node[rootbox] {$T_2$\\$v_2$}
-    child {node[closedbox] {$2$\\closed} edge from parent node[tinylabel,left] {$1$}}
-    child {node[closedbox] {$3$\\closed} edge from parent node[tinylabel,right] {$2$}};
+child {node[closedbox] {$2$\\closed} edge from parent node[tinylabel,left] {$1$}}
+child {node[closedbox] {$3$\\closed} edge from parent node[tinylabel,right] {$2$}};
   \end{scope}
 
   \begin{scope}[xshift=104mm]
   \node[rootbox] {$T_3$\\$v_3$}
-    child {node[closedbox] {$2$\\closed} edge from parent node[tinylabel,left] {$1$}}
-    child {node[closedbox] {$3$\\closed} edge from parent node[tinylabel,right] {$2$}};
+child {node[closedbox] {$2$\\closed} edge from parent node[tinylabel,left] {$1$}}
+child {node[closedbox] {$3$\\closed} edge from parent node[tinylabel,right] {$2$}};
   \end{scope}
 
   \node[draw=HybridGreen!70, fill=SoftGreen, rounded corners=2pt, align=center,
-        font=\scriptsize, text width=42mm, below=22mm of current bounding box.south] (legend)
-        {Strict checks all five green leaves.\\Performance closes leaves \(T_2:2\) and \(T_3:2\) after batching.};
-\end{tikzpicture}
-\end{center}
+font=\scriptsize, text width=42mm, below=22mm of current bounding box.south] (legend)
+        {Strict checks all five green leaves.\\Performance closes leaves $T_2:2$ and $T_3:2$ after batching.};
+            \end{tikzpicture}
+        \end{center}
 
-\section{Call flow}
+        \section{Call flow}
 
-The next diagram uses the measured MATLAB profiler call graph.
-Times are wall-clock times attributed to the corresponding call edge in the low-dimensional run.
-The baseline spends time in exact norm work.
-The hybrid runs enter \texttt{ipa\_hybrid\_filter\_vertices}; strict checks each tree separately, while performance uses a batched path.
+        The next diagram uses the measured MATLAB profiler call graph.
+        Times are wall-clock times attributed to the corresponding call edge in the low-dimensional run.
+        The baseline spends time in exact norm work.
+        The hybrid runs enter \texttt{ipa\_hybrid\_filter\_vertices}.
+        Strict checks each tree separately, while performance uses a batched path.
 
-\begin{center}
-\begin{tikzpicture}[node distance=8mm and 8mm]
+        \begin{center}
+            \begin{tikzpicture}[node distance=8mm and 8mm]
   \node[flowbase] (b0) {baseline\\\texttt{run\_ipa\_mode}};
   \node[flowbase, below=of b0] (b1) {\texttt{ipa}\\2.8925 s};
   \node[flowbase, below=of b1] (b2) {\texttt{ipa\_worker}\\1.4351 s};
@@ -337,19 +340,19 @@ The hybrid runs enter \texttt{ipa\_hybrid\_filter\_vertices}; strict checks each
   \draw[flowarrow] (p3) -- (p4);
   \draw[flowarrow] (p4) -- (p5);
   \draw[flowarrow] (p5) -- (p6);
-\end{tikzpicture}
-\end{center}
+            \end{tikzpicture}
+        \end{center}
 
-\begin{center}
-\begin{tabular}{lrrrr}
-\toprule
-Mode & wall time & profiler functions & line hits & exact norm points\\
-\midrule
-baseline & 2.89299 s & 473 & 120244 & 4\\
-strict & 3.57157 s & 517 & 171573 & 0\\
-performance & 3.46920 s & 525 & 119110 & 0\\
-\bottomrule
-\end{tabular}
-\end{center}
+        \begin{center}
+            \begin{tabular}{lrrrr}
+                \toprule
+                Mode & wall time & profiler functions & line hits & exact norm points\\
+                \midrule
+                baseline & 2.89299 s & 473 & 120244 & 4\\
+                strict & 3.57157 s & 517 & 171573 & 0\\
+                performance & 3.46920 s & 525 & 119110 & 0\\
+                \bottomrule
+            \end{tabular}
+        \end{center}
 
-\end{document}
+        \end{document}

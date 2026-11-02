@@ -1,282 +1,420 @@
-
+% !TeX root = ../masterthesis.tex
 \chapter{Finite-Tree Algorithm}
 \label{ch:finiteTree}
 
-This chapter is a literature-based summary of the finite-tree approach from \citep{MoellerReif2014TreeBasedJSR} and related references. Its role is to provide the theoretical and algorithmic background needed for the hybrid method in Chapter~\ref{ch:hybridApproach}.
+The finite-tree method of \citet{MoellerReif2014TreeBasedJSR} represents families of matrix products by nodes of a finite tree.
+Its product decomposition is also used in Chapter~\ref{ch:hybridApproach}.
 
-\section{Overview}
-
-\subsection{Motivating Ideas}
-The finite-tree algorithm bounds arbitrary products $P\in\mathcal{A}^k$ by decomposing them into factors that are $1$-bounded with respect to a chosen norm.
-
-\subsection{Problem Formulation}
-The objective is to construct a finite certificate that implies $\JSR(\mathcal{A})\le 1$. Concretely, one seeks a structured subtree such that all relevant leaf products are bounded by $1$ and all remaining factors admit polynomial control in their length.
-
-\subsection{Core Idea and Notation}
+\section{Overview and Tree Notation}
 \label{sec:finiteNotationDefinitions}
+
+The aim is to prove $\JSR(\mathcal{A})\leq1$.
+A long product is split into completed leaf factors of norm at most $1$ and one remaining factor controlled polynomially in its length.
+Irreducibility is not required for this certificate.
+
 \begin{definition}
     \label{def:treeGraph}
-    A \emph{tree} is a connected, acyclic graph \( T \) with a distinguished node \( t_0\) called the \emph{root}. The tree structure induces a natural hierarchy: for any node $t_i$, there exists a unique path from \( t_0 \) to \( t_i \). The tree can then be described in terms of the following concepts:
-    \begin{itemize}
-        \item \textbf{Parent}: For any node \( t \in T \), the node preceding \( t \) on the path from the root $t_0$ is called its \emph{parent}.
-        \item \textbf{Children}: The nodes adjacent to a given node \( t \) that are further from the root $t_0$ are called its \emph{children}.
-        \item \textbf{Leaf}: A node with no children is called a \emph{leaf}.
-        \item \textbf{Internal vertex}: A node with at least one child is called an \emph{internal} or \emph{non-leaf} node.
-    \end{itemize}
+    A \emph{rooted tree} is a connected, acyclic graph with a distinguished node called the \emph{root}.
+    The preceding node on the unique path from the root to a nonroot node is its \emph{parent}.
+    The following nodes are its \emph{children}.
+    A node without children is a \emph{leaf}.
+    Every other node is \emph{internal}.
 \end{definition}
 
-We define $T_{\mathcal{A}}$ as the tree consisting of all products in the set $\bigcup \limits_ {k \in \mathbb{N}_0}\mathcal{A}^k$ where every multi-index represents a node. For the empty index ($k = 0$) we set $A_{[]} = I_d$, the identity matrix in $\R^{d\times d}$, and call this node the root.
+The full product tree $T_{\mathcal{A}}$ has one node for each positive index word $I\in\bigcup_{k\geq0}\mathcal{I}^k$.
+Its root is the empty word $[]$, with $A_{[]}=I_d$.
+A child appends one index, so the corresponding matrix is multiplied on the left.
+Different words remain different nodes even when their matrices coincide.
 
 \begin{figure}[ht]
-\centering
-\begin{forest}
-    for tree={
-        grow'=0,
-        child anchor=west,
-        parent anchor=east,
-        l sep=20pt,
-        s sep=20pt,
-        edge={->, >=latex},
-        anchor=base west,
-        font=\small,
-    }
-    [{$A_{[]} = I_d$}
-  [{$A_{[1]} = A_1$}
-    [{$A_{[1,1]} = A_1 A_1$}
-      [{$A_{[1,1,1]} = A_1 A_1 A_1 \quad \cdots$}]
-      [{$A_{[1,1,2]} = A_2 A_1 A_1 \quad \cdots$}]
-    ]
-    [{$A_{[1,2]} = A_2 A_1$}
-      [{$A_{[1,2,1]} = A_1 A_2 A_1 \quad \cdots$}]
-      [{$A_{[1,2,2]} = A_2 A_2 A_1 \quad \cdots$}]
-    ]
-  ]
-  [{$A_{[2]} = A_2$}
-    [{$A_{[2,1]} = A_1 A_2$}
-      [{$A_{[2,1,1]} = A_1 A_1 A_2 \quad \cdots$}]
-      [{$A_{[2,1,2]} = A_2 A_1 A_2 \quad \cdots$}]
-    ]
-    [{$A_{[2,2]} = A_2 A_2$}
-      [{$A_{[2,2,1]} = A_1 A_2 A_2 \quad \cdots$}]
-      [{$A_{[2,2,2]} = A_2 A_2 A_2 \quad \cdots$}]
-    ]
-  ]
-]
-\end{forest}
-\caption{Example of the product tree $T_{\mathcal{A}}$ for $\mathcal{A} = \{A_1, A_2\}$.}
-\label{fig:finiteMatrixProductTree}
+    \centering
+    \begin{forest}
+for tree={grow'=0, child anchor=west, parent anchor=east,
+l sep=16pt, s sep=8pt, edge={->, >=latex}, font=\small}
+        [{$I_d$}
+            [{$A_1$}
+                [{$A_1A_1\quad\cdots$}]
+                [{$A_2A_1\quad\cdots$}]
+            ]
+            [{$A_2$}
+                [{$A_1A_2\quad\cdots$}]
+                [{$A_2A_2\quad\cdots$}]
+            ]
+        ]
+    \end{forest}
+    \caption{First levels of the infinite product tree for $\mathcal{A}=\{A_1,A_2\}$.}
+    \label{fig:finiteMatrixProductTree}
 \end{figure}
 
-In general, a direct search in $T_{\mathcal{A}}$ is not computationally feasible. Following \citep{MoellerReif2014TreeBasedJSR}, one introduces generators and set-valued nodes.
+\subsection{Generators and Encoded Words}
 
-We fix a set $\mathcal{G} = \{ G_1, \cdots, G_m \}$ with $G_i \in \mathcal{A}^{k_i}$ and $\rho(G_i)^{\frac{1}{k_i}} \le 1$.
-All products from this set will be called \emph{generators}.
-We also define $A_l := G_{-l}$ for $l \in \{-m, \dots, -1\}$.
+We fix a finite generator set $\mathcal{G}=\{G_1,\dots,G_m\}$.
+Each generator comes with a fixed nonempty positive word $H_i\in\mathcal{I}^{k_i}$, where $k_i\geq1$, and satisfies
+\[
+    G_i=A_{H_i},\qquad \rho(G_i)\leq1,\qquad 1\leq i\leq m.
+\]
+This is equivalent to $\rho(G_i)^{1/k_i}\leq1$.
 
-\begin{definition}\citep{MoellerReif2014TreeBasedJSR}
+\begin{definition}
     \label{def:extendedMultiIndexSet}
-    Set $\mathcal J:=\{-m,\dots,-1,1,\dots,n\}$. Then $\mathcal J^k$ denotes the collection of all extended multi-indices of length $k$.
-    For a multi-index \( J = [j_1, \dots, j_k] \in \mathcal{J}^k \), the corresponding matrix product set is defined by:
-    $$
-    A_J := \{ A_{j_k}^{e_k} \cdots A_{j_1}^{e_1} \mid  e_i = 1  \text{ if } j_i > 0 \text{ or } e_i \in \mathbb{N}_0 \text{ otherwise}\}.
-    $$
+    For negative indices we write $A_{-i}=G_i$.
+    The extended index alphabet is $\mathcal{J}=\{-m,\dots,-1,1,\dots,n\}$.
+    For $J=[j_1,\dots,j_l]\in\mathcal{J}^l$, let $\mathcal{W}(J)$ be the family of positive words obtained by replacing each positive entry $j_s$ by $[j_s]$ and each negative entry $-i$ by $H_i$ repeated $e_s\in\N_0$ times.
+    Repetition zero contributes the empty word.
+    The corresponding matrix set is
+    \[
+        A_J=\{A_I:I\in\mathcal{W}(J)\}
+        =\{A_{j_l}^{e_l}\cdots A_{j_1}^{e_1}:
+        e_s=1\text{ for }j_s>0,\ e_s\in\N_0\text{ for }j_s<0\}.
+    \]
+    For $J=[]$, these families are $\mathcal{W}([])=\{[]\}$ and $A_{[]}=\{I_d\}$, respectively.
 \end{definition}
+
+The notation $A_J$ denotes a set for an extended node index, whereas $A_I$ denotes a single matrix for a positive word.
+A word is \emph{encoded} by $J$ precisely when it belongs to $\mathcal{W}(J)$.
+Its expanded length is
+\[
+    |I|=\sum_{j_s>0}1+\sum_{j_s<0}k_{-j_s}e_s.
+\]
+Thus node depth $l$, generator exponents $e_s$, and product length $|I|$ are different quantities.
+Equality of two matrices alone does not identify their words or their lengths.
 
 \begin{definition}
     \label{def:multiIndexExtension}
-    Let $J = [j_1, \cdots, j_k]$ be a multi-index and let $j_{k+1} \in \mathcal{J}$. We define the extension
-    \[
-    [J, j_{k+1}] := [j_1, \cdots, j_k, j_{k+1}].
-    \]
-    Nested concatenations are always flattened a priori.
+    For words $J$ and $K$, the expression $[J,K]$ denotes their concatenation, with nested brackets flattened.
+    A child of node $J$ has index $[J,j]$ for one $j\in\mathcal{J}$.
+    \label{def:childType}
+    The child is \emph{positive} when $j>0$ and a \emph{generator child} when $j<0$.
 \end{definition}
+
+For example, if $n=2$ and $m=1$, the node $[-1,2,-1,1]$ encodes
+\[
+    \{A_1G_1^sA_2G_1^r:r,s\in\N_0\}.
+\]
+Its depth is four, while its words have length $2+k_1(r+s)$.
+The number of blocks is fixed even though the generator exponents are unbounded.
+
+\subsection{Finite Certificate Trees and Leafage}
+
+\begin{definition}[Finite $\AG$-tree]
+    \label{def:agTree}
+    Relative to the fixed generator words and bounds above, an $\AG$-tree $T$ is a finite rooted tree of extended index words with the following properties:
+    \begin{itemize}
+        \item The root is $[]$ and represents $\{I_d\}$.
+        It is internal.
+        \item Every internal node $J$ has either all $n$ positive children $[J,1],\dots,[J,n]$, or a nonempty selection of generator children $[J,-i]$.
+        \item A generator child is never a leaf.
+    \end{itemize}
+\end{definition}
+
+The full tree $T_{\mathcal{A}}$ is infinite, but every $\AG$-tree used as a certificate here is finite.
+Requiring an internal root excludes the vacuous tree $\{I_d\}$, whose norm bound would give no information about $\mathcal{A}$.
+
+\begin{definition}[Coverage and leafage]
+    \label{def:coveredNode}
+    A node $J$ is \emph{covered} if it has a proper ancestor $Q$ such that
+    \[
+        \mathcal{W}(J)\subseteq\mathcal{W}(Q).
+    \]
+    Otherwise it is \emph{uncovered}.
+    The \emph{leafage} $\mathcal{L}(T)$ is the collection of matrix sets $A_J$ represented by uncovered leaves $J$.
+
+    This word-preserving condition retains each expanded word and its length when it is represented at the ancestor.
+    It is stronger than the matrix-set inclusion $A_J\subseteq A_Q$ used in \citet{MoellerReif2014TreeBasedJSR,MejstrikReif2025HybridApproachJSR}.
+    Equality of matrices arising from different words alone does not establish coverage.
+    A typical covered node completes one more repetition of a generator word: $[Q,-i,H_i]$ is covered by $[Q,-i]$.
+    The expanded words are identical, with the generator exponent increased by one.
+\end{definition}
+
+For a matrix set $L$ and a vector $v$, define $\lVert L\rVert=\sup_{P\in L}\lVert P\rVert$ and $\lVert Lv\rVert=\sup_{P\in L}\lVert Pv\rVert$, using a given vector norm and its induced matrix norm.
+The supremum may be infinite.
+A leaf bound therefore concerns every represented generator power.
+For an empty leafage, the maximum of the leaf bounds is defined as $0$.
 
 \begin{definition}
-    \label{def:childType}
-    Let $t \in T$ be a node with the multi-index $J$.
-    A child node $\tilde{t}$ with the multi-index $[J, j_{k+1}]$ is called:
-    \begin{itemize}
-        \item \emph{positive} if $j_{k+1}$ is positive.
-        \item \emph{generator} if $j_{k+1}$ is negative.
-    \end{itemize}
+    \label{def:oneBoundedTree}
+    An $\AG$-tree is \emph{$1$-bounded} in a chosen submultiplicative matrix norm if $\lVert L\rVert\leq1$ for every $L\in\mathcal{L}(T)$.
+    It is \emph{strictly $1$-bounded} if $\max_{L\in\mathcal{L}(T)}\lVert L\rVert<1$.
 \end{definition}
 
-\begin{definition}\citep{MoellerReif2014TreeBasedJSR}
-    \label{def:agTree}
-    \begin{samepage}
-    A finite $\AG\text{-tree } T$ has the following structure:
-\begin{itemize}
-    \item The root node contains the identity matrix: \( t_0 = \{I_d\} \).
-    \item For every node \( t \in T \setminus \{t_0\} \), there is exactly one parent node in \(T\).
-    \item Each node \( t \in T \) is either:
-    \begin{itemize}
-        \item a leaf,
-        \item a parent of exactly \( n \) positive children,
-        \item or a parent with at least one generator child.
-    \end{itemize}
-    \item A generator child is never a leaf.
-\end{itemize}
-\end{samepage}
-\end{definition}
-
-\begin{definition}\citep{MoellerReif2014TreeBasedJSR}
-    \label{def:coveredNode}
-    A node in the tree is called \emph{covered} if it is a subset of one of its ancestors in the tree. Otherwise, it is called \emph{uncovered}.
-    The set of uncovered leaves is denoted as
-\[
-    \mathcal{L}(T) := \{ t \in T : t \text{ is an uncovered leaf} \}
-\]
-and called \emph{leafage} of the tree $T$.
-\end{definition}
-
-For a set-valued node $L$, we write $\lVert L\rVert:=\sup_{P\in L}\lVert P\rVert$ and $\lVert Lv\rVert:=\sup_{P\in L}\lVert Pv\rVert$. Thus a leaf condition concerns every matrix represented by that node, including every generator power.
-
-\begin{definition}\citep{MoellerReif2014TreeBasedJSR}
-\label{def:oneBoundedTree}
-An $\AG\text{-tree}$ $T$ is called \emph{1-bounded} with respect to a matrix norm \( \| \cdot \| \) if
-\[
-    \sup_{L \in \mathcal{L}(T)} \| L \| \leq 1.
-\]
-If \( \sup_{L \in \mathcal{L}(T)} \| L \| < 1 \), then the tree is called \emph{strictly 1-bounded}.
-\end{definition}
+\begin{example}[A finite generator tree]
+    \label{ex:finiteJordanTree}
+    Consider $\mathcal{A}=\{A_1,A_2\}=\{A,B\}$ with
+    \[
+        A=\begin{bmatrix}1&1\\0&1\end{bmatrix},\qquad
+        B=\begin{bmatrix}0&0\\0&1/2\end{bmatrix},\qquad G_1=A.
+    \]
+    The generator word is $H_1=[1]$ and $\rho(G_1)=1$.
+    In the induced maximum norm,
+    \[
+        A^r=\begin{bmatrix}1&r\\0&1\end{bmatrix},\qquad
+        \lVert A^r\rVert_\infty=r+1,\qquad BA^r=B.
+    \]
+    The following four-node tree has a generator child and two positive leaves.
+    \begin{center}
+        \begin{forest}
+for tree={grow'=0, child anchor=west, parent anchor=east,
+l sep=14pt, s sep=10pt, edge={->, >=latex}, font=\small}
+            [{$\{I_2\}$}
+                [{$\{A^r:r\geq0\}$}, edge label={node[midway,above]{$-1$}}
+                    [{$\{A^{r+1}:r\geq0\}$ covered}, edge label={node[midway,above]{$1$}}]
+                    [{$\{BA^r:r\geq0\}=\{B\}$}, edge label={node[midway,below]{$2$}}]
+                ]
+            ]
+        \end{forest}
+    \end{center}
+    The words at $[-1,1]$ are nonempty strings of $1$'s, all already represented by $[-1]$.
+    The other leaf $[-1,2]$ has norm $1/2$, so the tree is strictly $1$-bounded.
+    Its internal generator family has unbounded norm but admits the linear bound $r+1$.
+    In particular, spectral radius at most $1$ does not imply uniformly bounded powers.
+\end{example}
 
 \section{Algorithmic Formulation}
 \label{sec:finiteAlgorithmStructure}
 
-\subsection{Algorithm Description}
-The finite-tree algorithm performs a non-exhaustive search in the space of $\AG$-trees. At each active node, it checks whether the corresponding set of products is already $1$-bounded. If not, children are generated according to the child-selection rule, and the process is repeated until no active node violates the bound.
+The search starts from the root and its positive children.
+A positive node can close when it is covered or its entire matrix family has norm at most $1$.
+All other nodes are expanded.
+Generator children must be expanded even if they already satisfy a bound.
+The child-selection rule chooses either all positive children or a nonempty selection of generator children.
 
-\subsection{Pseudocode}
 \begin{algorithm}[ht]
-    \caption{Finite-tree algorithm}
+    \caption{Finite-tree certificate search}
     \label{alg:finiteTree}
     \begin{algorithmic}
-        \State \Input{$\mathcal{A} = \{A_1, \ldots, A_n\}$ and $\mathcal{G} = \{ G_1, \cdots, G_m \}$}
-        \State \Output{If the algorithm terminates, the tree condition holds}
-        \State $Q \leftarrow \{[1], \cdots, [n]\}$
-        \While{$Q \ne \emptyset$}
-            \State $Q_{\text{new}} \leftarrow \emptyset$
-            \For{$J \in Q$}
-                \If{$\sup \{ \lVert P \rVert : P \in A_J \} > 1$}
-                    \State $\mathcal{C} \leftarrow \textproc{selectChildren}(J, \mathcal{A}, \mathcal{G})$
-                    \State $Q_{\text{new}} \xleftarrow{\cup} \{[J,j]: j \in \mathcal{C}\}$
-                \EndIf
-            \EndFor
-            \State $Q \leftarrow Q_{\text{new}}$
-        \EndWhile \\
+        \State \Input{$\mathcal{A}$, admissible generators $\mathcal{G}$, and a matrix norm}
+        \State $T\gets\{[],[1],\dots,[n]\}$
+        \State $Q\gets\{[1],\dots,[n]\}$
+        \While{$Q\neq\emptyset$}
+            \State Remove a node $J$ from $Q$
+            \If{$J$ is a generator child}
+                \State $\mathcal{C}\gets\textproc{selectChildren}(J)$
+            \ElsIf{$J$ is covered or $\lVert A_J\rVert\leq1$}
+                \State Close $J$ as a leaf
+                \State Continue with the next node
+            \Else
+                \State $\mathcal{C}\gets\textproc{selectChildren}(J)$
+            \EndIf
+            \State $\mathcal{D}\gets\{[J,j]:j\in\mathcal{C}\}$
+            \State $T\xleftarrow{\cup}\mathcal{D}$
+            \State $Q\xleftarrow{\cup}\mathcal{D}$
+        \EndWhile
+        \State \Return $T$
     \end{algorithmic}
 \end{algorithm}
 
-This pseudocode is a schematic search rule. A concrete implementation must ensure that the selected children form a valid finite $\AG$-tree and must bound each set-valued node, including all represented generator powers. The numerical chapter does not use this procedure as a separate baseline.
+This is a mathematical search procedure with exact coverage and norm tests.
+Testing a generator family requires control of all its powers, not only a finite sample.
+If the procedure returns, its finite tree satisfies Definition~\ref{def:agTree} and is $1$-bounded.
+The search may also continue indefinitely.
 
-\subsection{Visualization}
 \begin{figure}[ht]
-\centering
-\begin{tikzpicture}[>=latex]
-  \node[draw, rounded corners, align=center] (s0) at (0,0) {Initialize queue\\$Q=\{[1],\dots,[n]\}$};
-  \node[draw, rounded corners, align=center] (s1) at (4.8,0) {Pick $J\in Q$\\and test $\sup\{\|P\|:P\in A_J\}\le 1$};
-  \node[draw, rounded corners, align=center] (s2) at (10.2,0) {Violation?};
-  \node[draw, rounded corners, align=center] (s3) at (10.2,-2.1) {Expand via\\$\textproc{selectChildren}$};
-  \node[draw, rounded corners, align=center] (s4) at (4.8,-2.1) {Update queue\\$Q\leftarrow Q_{\text{new}}$};
-  \node[draw, rounded corners, align=center] (s5) at (0,-2.1) {Terminate if\\$Q=\emptyset$};
-
-  \draw[->] (s0) -- (s1);
-  \draw[->] (s1) -- (s2);
-  \draw[->] (s2) -- node[right] {yes} (s3);
-  \draw[->] (s2) -- node[above] {no} (s4);
-  \draw[->] (s3) -- (s4);
-  \draw[->] (s4) -- (s5);
-  \draw[->] (s5) to[out=210,in=330] node[below] {next loop if nonempty} (s0);
-\end{tikzpicture}
-\caption{Workflow of the finite-tree algorithm. Termination occurs when no violating node remains in the active queue.}
-\label{fig:finiteTreeWorkflow}
+    \centering
+    \begin{tikzpicture}[>=latex, every node/.style={draw, rounded corners, align=center, font=\small}]
+        \node (queue) at (0,0) {$Q=\emptyset$?};
+        \node (remove) at (4,0) {Remove $J$ from $Q$};
+        \node (test) at (8,0) {Positive node and\\(covered or $\lVert A_J\rVert\leq1$)?};
+        \node (stop) at (0,-2) {Return $T$};
+        \node (close) at (3,-2) {Close $J$ as a leaf};
+        \node (expand) at (8,-2) {Form admissible children $\mathcal{D}$\\$T\xleftarrow{\cup}\mathcal{D}$\\$Q\xleftarrow{\cup}\mathcal{D}$};
+        \coordinate (repeat) at (3,-3.3);
+        \draw[->] (queue) -- node[draw=none,above] {no} (remove);
+        \draw[->] (queue) -- node[draw=none,left] {yes} (stop);
+        \draw[->] (remove) -- (test);
+        \draw[->] (test.south west) -- node[draw=none,above,sloped] {yes} (close.north);
+        \draw[->] (test) -- node[draw=none,right] {no} (expand);
+        \draw[->] (close.south) -- (repeat);
+        \draw[->,rounded corners] (expand.south) |- (repeat);
+        \draw[->,rounded corners] (repeat) -- (-1.4,-3.3) -- (-1.4,0) -- (queue.west);
+    \end{tikzpicture}
+    \caption{Finite-tree search loop.
+    Closing a leaf and expanding a node both return to the queue test.
+    The search returns $T$ only when $Q$ is empty.
+    Generator children always take the expansion branch.}
+    \label{fig:finiteTreeWorkflow}
 \end{figure}
 
 \section{Termination Theory}
 
-\subsection{Proof Strategy}
-The proof strategy has two steps. First, one proves a polynomial bound for products encoded by nodes of a fixed $\AG$-tree. Second, one combines this with prefix-leaf decomposition to bound arbitrary products and pass to the $k$-th root limit in the definition of $\JSR$.
+\subsection{Bounds for Encoded Products}
 
-\subsection{Auxiliary Results}
-\begin{lemma}
+The first lemma uses only finite depth and the generator spectral bounds.
+It does not assume $1$-bounded leafage or any spectral bound on the base matrices.
+The bound on generator powers follows from Jordan normal form \citep{HornJohnson1985MatrixAnalysis}.
+
+\begin{lemma}[Common polynomial bound]
     \label{lem:finitePolynomialBound}
-    For every $\AG\text{-tree } T$ there exists a strictly positive, monotone polynomial $p$ such that for every node $t \in T$ and every product $P \in \mathcal{A}^k$ encoded by $t$, $\lVert P \rVert \le p(k)$ holds.
+    Fix a finite $\AG$-tree $T$ and a submultiplicative matrix norm.
+    There is a positive, monotonically nondecreasing polynomial $p_T$ such that
+    \[
+        \lVert A_I\rVert\leq p_T(k)
+    \]
+    for every word $I\in\mathcal{I}^k$ encoded by any node of $T$, including $k=0$.
 \end{lemma}
 
 \begin{proof}
-    Take an arbitrary node $t \in T$ with multi-index $J = [j_1, \cdots, j_l]$.
-    Now every $j_i$ encodes either a matrix from $\mathcal{A}$ or arbitrary powers of a generator from $\mathcal{G}$.
-    The positive indices occur only to the first power and are bounded by constants. Each generator has spectral radius at most $1$, so its powers grow at most polynomially by Jordan normal form. Consequently, for every position there exists a strictly positive, monotone polynomial $p_i$ with
-    $$
-    \lVert A_{j_i}^{e} \rVert \le p_i(e) \quad \text{for all } e \in \mathbb{N}_0.
-    $$
-
-    We define:
-    $$
-    \begin{aligned}
-    p_t & := p_{l} \cdots p_{1} \\
-    p & := \sum \limits_{t \in T} p_t
-    \end{aligned}
-    $$
-    The sum over all of $T$ is finite since $T$ has only finitely many nodes.
-    Take now an arbitrary product $P = A_{j_l}^{e_{l}}\cdots A_{j_1}^{e_1} \in \mathcal{A}^k$ that is encoded by $t$.
-
-    Now we have:
-    $$
-    \begin{aligned}
-    \lVert P \rVert & = \lVert A_{j_l}^{e_{l}} \cdots A_{j_1}^{e_{1}} \rVert \\
-    & \leq \lVert A_{j_l}^{e_{l}} \rVert \cdots \lVert A_{j_1}^{e_{1}} \rVert \\
-    & \leq p_{l}(e_l) \cdots p_{1}(e_1) \\
-    & \leq p_{l}(k) \cdots p_{1}(k) \\
-    & = p_t(k) \leq p(k).
-    \end{aligned}
-    $$
-    Since the node $t$ and the product $P$ were chosen arbitrary, this concludes the proof.
+    Bound the positive factors by the common constant
+    \[
+        C_{\mathcal{A}}=\max\{1,\lVert A_1\rVert,\dots,\lVert A_n\rVert\}.
+    \]
+    Since $\rho(G_i)\leq1$, Jordan normal form bounds each generator power by a polynomial of degree at most $d-1$.
+    There are finitely many generators, so one constant $C_{\mathcal{G}}\geq1$ satisfies
+    \[
+        \lVert G_i^r\rVert\leq C_{\mathcal{G}}(1+r)^{d-1}
+        \quad\text{for }1\leq i\leq m,\ r\in\N_0.
+    \]
+    Set $C=\max\{C_{\mathcal{A}},C_{\mathcal{G}},\lVert I_d\rVert\}$ and let $h\geq1$ be the maximum node depth of $T$.
+    Define
+    \[
+        q(x)=C(1+x)^{d-1},\qquad p_T(x)=q(x)^h.
+    \]
+    Take an encoded word $I\in\mathcal{W}(J)$ of expanded length $k$ at a nonroot node $J=[j_1,\dots,j_l]$.
+    Each positive position occurs once and has norm at most $C_{\mathcal{A}}\leq q(k)$.
+    At a negative position, the expansion contributes $k_{-j_s}e_s$ letters, so $e_s\leq k$ and its matrix norm is at most $q(e_s)\leq q(k)$.
+    Submultiplicativity and $l\leq h$ therefore give
+    \[
+        \lVert A_I\rVert\leq q(k)^l\leq q(k)^h=p_T(k).
+    \]
+    The second inequality uses $q(k)\geq1$.
+    For the root, $\lVert I_d\rVert\leq C\leq p_T(0)$.
 \end{proof}
 
-\subsection{Main Result}
-\begin{theorem}\citep{MoellerReif2014TreeBasedJSR}
-\label{thm:finiteTreeTermination}
-    If a $1$-bounded $\AG\text{-tree}$ is found for a given matrix set $\mathcal{A}$ and generator set $\mathcal{G}$, then $\JSR(\mathcal{A}) \le 1$. If a candidate product has averaged spectral radius $1$, equality follows.
+\begin{remark}
+    The lemma allows base matrices of spectral radius greater than $1$.
+    A $1$-bounded certificate cannot exist for such a family, since its upper JSR bound would contradict the lower inequality in \eqref{eq:three_member}.
+\end{remark}
+
+\begin{remark}
+    Finite depth is essential for this argument.
+    For instance, the infinite positive chain generated by $A=[2]$ contains $A^k$ of norm $2^k$.
+    A truncation at depth $h$ has the constant bound $2^h$.
+    Individual spectral bounds on base matrices do not permit arbitrary infinite trees either: the switching example in Chapter~\ref{ch:introduction} already has exponentially growing products.
+\end{remark}
+
+\begin{remark}
+    If all generator spectral radii are strictly below $1$, their powers are uniformly bounded, and the fixed finite tree even admits a constant bound.
+\end{remark}
+
+\subsection{Prefix--Leaf Decomposition}
+
+The next lemma identifies an uncovered leaf factor whenever a word is not encoded by any node.
+In index order, a prefix is read first and corresponds to a rightmost factor of the matrix product.
+
+\begin{lemma}[One-step decomposition]
+    \label{lem:finitePrefixLeaf}
+    Let $T$ be a finite $\AG$-tree.
+    Every nonempty positive word $I$ is either encoded by a node of $T$, or has a decomposition $I=[U,J]$ such that $U$ is a nonempty word encoded by an uncovered leaf and $|J|<|I|$.
+    Thus $A_I=A_JA_U$ in the second case.
+\end{lemma}
+
+\begin{proof}
+    Every one-letter word is encoded somewhere in $T$.
+    Indeed, start at the internal root and follow generator children with exponent zero until reaching a node with positive children.
+    Such a node must occur because the tree is finite and generator children are not leaves.
+    Its full set of positive children encodes every one-letter word.
+
+    Suppose $I$ is not encoded by any node.
+    Choose its longest encoded prefix $U$, and among nodes encoding $U$ choose a node $K$ of greatest depth.
+    The preceding observation gives $1\leq|U|<|I|$.
+    The node $K$ has no generator child, since exponent zero would encode $U$ at a deeper node.
+    It has no positive children either, since the next letter of $I$ would extend $U$ to a longer encoded prefix.
+    Hence $K$ is a leaf.
+
+    If $K$ were covered, let $Q$ be an ancestor with $\mathcal{W}(K)\subseteq\mathcal{W}(Q)$.
+    On the path from $Q$ to $K$, consider the parent $R$ of the first positive child.
+    Such a child exists because the leaf $K$ is positive.
+    All earlier edges on this path are generator edges, so exponent zero gives $\mathcal{W}(Q)\subseteq\mathcal{W}(R)$.
+    Consequently $R$ encodes $U$ and has all positive children.
+    Appending the next letter of $I$ again contradicts maximality of $U$.
+    Thus $K$ is uncovered, and the complementary word $J$ is strictly shorter than $I$.
+\end{proof}
+
+Repeating the lemma on the remaining word yields
+\[
+    I=[I_1,\dots,I_s,R],\qquad
+    A_I=A_RA_{I_s}\cdots A_{I_1},
+\]
+where each $I_j$ is a nonempty uncovered-leaf word and $R$ is encoded by a node of $T$.
+The number of removed factors is at most $|I|$.
+It may be zero when the entire word is already encoded by $T$.
+The remaining factor $A_R$ lies on the left and may come from an internal node.
+
+\subsection{Upper-Bound Certificate}
+
+\begin{theorem}[Finite-tree certificate]
+    \label{thm:finiteTreeTermination}
+    If a finite $\AG$-tree is $1$-bounded in a submultiplicative matrix norm, then $\JSR(\mathcal{A})\leq1$.
+    If some product has averaged spectral radius $1$, then $\JSR(\mathcal{A})=1$.
 \end{theorem}
 
 \begin{proof}
-    We take an arbitrary positive multi-index $I = [i_1, \cdots, i_k]$.
-    The $\AG\text{-tree } T$ gives a prefix--leaf decomposition of this multi-index into $I_r, \cdots, I_1$ where
-    $$
-    A_I = A_{I_r}A_{I_{r-1}}\cdots A_{I_1}.
-    $$
-    Each $I_j$ for $j<r$ encodes an uncovered leaf of $T$, while the residual $I_r$ is encoded by a node of $T$. By Lemma~\ref{lem:finitePolynomialBound} there exists a polynomial $p$ such that
+    For a word $I$ of length $k\geq1$, use the decomposition above and the common polynomial from Lemma~\ref{lem:finitePolynomialBound}.
+    The leaf factors have norm at most $1$, and $|R|\leq k$.
+    Hence
     \[
-        \lVert A_{I}  \rVert =  \lVert A_{I_r}A_{I_{r-1}}\cdots A_{I_1}\rVert \le  \lVert A_{I_r} \rVert \prod_{j=1}^{r-1}\lVert A_{I_j}\rVert \le \lVert A_{I_r} \rVert\le p(k).
+        \lVert A_I\rVert
+        \leq\lVert A_R\rVert\prod_{j=1}^s\lVert A_{I_j}\rVert
+        \leq p_T(|R|)\leq p_T(k).
     \]
-    The leaf factors have norm at most $1$. The residual node product has length at most $k$, so monotonicity gives the final bound.
-    Now we have
-      $$\JSR(\mathcal{A}) = \lim_{k \to \infty} \max_{P \in \mathcal{A}^k} \lVert P \rVert ^{\frac{1}{k}} \leq \lim_{k \to \infty} p(k) ^{\frac{1}{k}}  = 1$$
-    since the chosen multi-index was arbitrary.
+    This holds for every word of length $k$, so
+    \[
+        \JSR(\mathcal{A})
+        \leq\lim_{k\to\infty}p_T(k)^{1/k}=1.
+    \]
+    A product with averaged spectral radius $1$ supplies the reverse inequality by \eqref{eq:three_member}.
 \end{proof}
 
-\subsection{Termination Conditions}
-Theorem~\ref{thm:finiteTreeTermination} gives a sufficient upper-bound certificate. The normalized candidate supplies the matching lower bound when its averaged spectral radius is $1$.
+This is the finite-tree implication of \citet{MoellerReif2014TreeBasedJSR}.
+It verifies a tree found by the search, but a child-selection heuristic may run indefinitely.
 
-For finite termination of the implemented search procedure, a necessary algorithmic condition is that the child-selection process reaches a finite $1$-bounded tree. In practice, this depends on the choice of generators and branching heuristics.
+\begin{example}[Leaf factors and an internal remainder]
+    \label{ex:finiteLeafDecomposition}
+    Continue Example~\ref{ex:finiteJordanTree} and consider the word with matrix product
+    \[
+        P=A^3BA^2BA^4
+        =\underbrace{A^3}_{R}
+        \underbrace{(BA^2)}_{L_2}
+        \underbrace{(BA^4)}_{L_1}.
+    \]
+    The factors $L_1,L_2$ are leaf factors, and $R$ is the remainder.
+    Read the product from the right: the first run of $A$'s stays in the generator family, and the next $B$ completes a leaf factor.
+    Repeat after removing that factor.
+    The last run $A^3$ remains at an internal node.
+    Its norm is $4$, while both leaf factors have norm $1/2$, giving $\lVert P\rVert_\infty\leq4(1/2)^2=1$.
+    For an arbitrary word of length $k$, the same argument leaves $A^q$ with $q\leq k$, and thus gives $\lVert P\rVert_\infty\leq k+1$.
+    The all-$A$ word has norm exactly $k+1$, so a constant bound would fail.
+    Nevertheless $(k+1)^{1/k}\to1$, and $\rho(A)=1$ supplies the lower bound: $\JSR(\{A,B\})=1$.
+\end{example}
 
-\section{Implementation Details}
+\section{Search and Implementation}
 
-\subsection{Child-Selection Policy}
-\begin{remark}\citep{MoellerReif2014TreeBasedJSR}
-\label{rem:moller}
-The procedure \textproc{selectChildren} determines whether all positive children (from $1$ to $n$) or a subset of generator children (from $-1$ to $-m$) is chosen, according to the theory established there.
+\begin{remark}
+    \label{rem:moller}
+    The procedure \textproc{selectChildren} must respect the branching rule and the fixed admissible generator set.
+    A concrete search strategy is described in \citet[Sections~4.1--4.2, Algorithms~4.3--4.4]{Moeller2015NewStrategyExactJSR}.
+    M\"oller uses a local decision routine to choose a generator child or positive children, without storing an entire search tree in advance.
+    Covered or bounded nodes close their branches, and all positive siblings must be processed before returning to the parent.
+    If a depth limit is reached without closure, backtracking revises the choice at the nearest ancestor with a generator child and retains the other closed branches.
+
+    Her practical routine controls the earliest generator level and the number of generator positions along a path.
+    It can first follow several positive repetitions of a generator word before introducing the corresponding generator child.
+    The resulting family contains only the tail of the generator powers, which can be easier to bound than all powers starting at exponent $0$.
+    For example, if the powers converge and the limiting product has norm strictly below $1$, a sufficiently late tail satisfies the bound.
+    These choices affect search cost and whether a certificate is found within the chosen limits.
+    The schematic procedure here does not prescribe this backtracking strategy or guarantee a complete search.
+    Theorem~\ref{thm:finiteTreeTermination} concerns only the returned certificate.
 \end{remark}
 
-\section{Remarks}
-
-\begin{remark}\citep{MoellerReif2014TreeBasedJSR}
+\begin{remark}
     \label{rem:finiteTreeDecomposition}
-    The tree structure ensures that a prefix--leaf decomposition exists. The proof only needs existence; it does not depend on a unique decomposition when different generator powers encode the same product.
+    The decomposition need not be unique.
+    The proof requires only an actual word partition with nonempty leaf words and a node-encoded remainder.
 \end{remark}
 
-\begin{remark}\citep{MoellerReif2014TreeBasedJSR}
+\begin{remark}
     \label{rem:finiteGeneratorNecessity}
-    In the cited work, the authors show that the use of generators is essential for ensuring termination in cases where the original invariant-polytope algorithm fails to terminate. Deciding when to use generators instead of all positive children is still part of active research and is handled by heuristics. In particular, termination with multiple s.m.p.\ candidates is substantially more delicate.
+    A finite tree may close even when no invariant polytope exists at the candidate scaling \citep{MoellerReif2014TreeBasedJSR,MejstrikReif2025HybridApproachJSR}.
+    In Example~\ref{ex:finiteJordanTree}, powers of $A$ are unbounded.
+    Invariance of a bounded norm unit ball would instead bound every power.
+    The tree certificate succeeds because only its uncovered leafage must satisfy the norm bound.
 \end{remark}

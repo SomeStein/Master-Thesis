@@ -1,15 +1,35 @@
+% !TeX root = ../masterthesis.tex
 \chapter*{Zusammenfassung}
 \begin{otherlanguage}{ngerman}
-\emergencystretch=1em
+    \emergencystretch=2em
 
-Der gemeinsame Spektralradius beschreibt das maximale asymptotische Wachstum von Produkten einer Matrizenfamilie. Diese Arbeit rekonstruiert das Invariant-Tree-Verfahren nach Mejstrik und Reif (2025) und beweist eine explizite Erweiterung des Terminierungszertifikats auf verschiedene Testbäume je Eckpunkt. Das zentrale Zertifikat verbindet eine endliche, den Raum aufspannende Menge von Eckpunkten mit zulässigen Testbäumen, deren Blattbilder in der zugehörigen Polytopeinheitskugel liegen. Damit werden alle Produkte polynomial beschränkt und der Spektralradius nach oben abgeschätzt. Die Arbeit vergleicht den gewöhnlichen Invariant-Polytope-Algorithmus (IPA) mit dessen strengem Hybridmodus in reproduzierbaren MATLAB-Versuchen. Für ein $4\times4$-Matrizenpaar liefert der Hybridmodus in allen drei Läufen den Wert $3$ nach zwei Iterationen; gewöhnlicher IPA erreicht jeweils das Limit von $80$ Iterationen mit der Schranke $[3,3.0000000150]$. In zwei weiteren Testfällen liefert nur der Hybridmodus einen numerischen Abschluss innerhalb der Grenzen; in einem Fall erreichen beide Modi die externe Zeitgrenze. Die verwendeten Testbäume, Rohdaten und Einstellungen sind dokumentiert. Die begrenzten Versuche belegen eine numerische Zertifizierung durch den Hybridmodus, ohne mathematische Nichtterminierung des gewöhnlichen IPA zu behaupten.
-
+    Der gemeinsame Spektralradius beschreibt das maximale asymptotische Wachstum von Produkten einer Matrizenfamilie.
+    Diese Arbeit untersucht das Invariant-Tree-Ver\-fahren nach Mejstrik und Reif (\citeyear{MejstrikReif2025HybridApproachJSR}) und beweist, dass das Zertifikat auch bei verschiedenen Testbäumen an den einzelnen Eckpunkten gilt.
+    Das Zertifikat verbindet eine endliche, den Raum aufspannende Menge von Eckpunkten mit endlichen Testbäumen, deren Generatoren Spektralradius höchstens $1$ haben.
+    Liegen die Bilder der unüberdeckten Blätter in der zugehörigen Polytopeinheitskugel, sind alle Produkte durch ein gemeinsames Polynom beschränkt und der gemeinsame Spektralradius ist höchstens $1$.
+    Die Arbeit vergleicht den gewöhnlichen Invariant-Polytope-Algorithmus (IPA) mit dessen strengem Hybridmodus in reproduzierbaren MATLAB-Versuchen.
+    Für ein $4\times4$-Matrizenpaar liefert der Hybridmodus in allen drei Läufen den Wert $3$ nach zwei Iterationen.
+    Der gewöhnliche IPA erreicht jeweils das Limit von $80$ Iterationen mit der Schranke $[3,3.0000000150]$.
+    In zwei weiteren Testfällen liefert nur der Hybridmodus einen numerischen Abschluss innerhalb der Grenzen.
+    In einem Fall erreichen beide Modi die externe Zeitgrenze.
+    Die verwendeten Testbäume, Rohdaten und Einstellungen sind dokumentiert.
+    Die numerischen Zertifikate beruhen auf Gleitkommarechnungen und wurden nicht unabhängig mit validierten Schranken überprüft.
+    Das Erreichen eines Laufzeit- oder Iterationslimits beweist keine mathematische Nichtterminierung des gewöhnlichen IPA.
 \end{otherlanguage}
+
 \chapter*{Abstract}
 
-The joint spectral radius measures the maximal asymptotic growth of products from a matrix family. This thesis reconstructs the invariant-tree algorithm of Mejstrik and Reif (2025) and proves an explicit extension of its termination certificate to different test trees at different vertices. Its certificate combines a finite spanning vertex set with valid test trees whose leaf images lie in the associated polytope unit ball. This yields a polynomial bound on all products and hence an upper bound on the joint spectral radius. Reproducible MATLAB experiments compare ordinary invariant-polytope algorithm (IPA) with its strict hybrid mode. For a $4\times4$ pair, strict hybrid returned the value $3$ after two iterations in all three runs; ordinary IPA reached the $80$-iteration limit each time with bounds $[3,3.0000000150]$. Two further cases closed only in hybrid mode within the limits, while both modes reached the external time limit on another case. The tested trees, raw results, and settings are archived. The bounded runs support a numerical certificate for the hybrid mode without establishing mathematical nontermination of ordinary IPA.
+The joint spectral radius measures the maximal asymptotic growth of products from a matrix family.
+This thesis studies the invariant-tree algorithm of Mejstrik and Reif (\citeyear{MejstrikReif2025HybridApproachJSR}) and proves that its certificate remains valid when each vertex uses a different test tree.
+The certificate combines a finite spanning vertex set with finite test trees whose generators have spectral radius at most $1$.
+If the uncovered-leaf images lie in the associated polytope unit ball, all products admit a common polynomial bound and the joint spectral radius is at most $1$.
+Reproducible MATLAB experiments compare ordinary invariant-polytope algorithm (IPA) with its strict hybrid mode.
+For a $4\times4$ pair, strict hybrid returned the value $3$ after two iterations in all three runs.
+Ordinary IPA reached the $80$-iteration limit each time with bounds $[3,3.0000000150]$.
+Two further cases closed only in hybrid mode within the limits, while both modes reached the external time limit on another case.
+The tested trees, raw results, and settings are archived.
+The numerical certificates rely on floating-point calculations and have not been independently validated.
+Reaching a run limit does not prove mathematical nontermination of ordinary IPA.
 
 \smallskip
 \textbf{Keywords:} joint spectral radius, invariant-tree algorithm, invariant-polytope algorithm, finite-tree algorithm, matrix norms.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
